@@ -1,21 +1,18 @@
-#----------------------------------------------------------
-LICENSE_${PN}-rtl8188eu = "Firmware-rtlwifi_firmware"
+# Do this in python to stay backward/forward compatible with
+# openembedded-core, morty.
 
-PACKAGES_prepend = "\
-                     ${PN}-rtl8188eu \
-                   "
-FILES_${PN}-rtl8188eu = " \
-  /lib/firmware/rtlwifi/rtl8188eufw.bin \
-"
-RDEPENDS_${PN}-rtl8188eu += "${PN}-rtl-license"
+python __anonymous () {
+    pks = (d.getVar("PACKAGES", False) or "").split()
 
-#----------------------------------------------------------
-LICENSE_${PN}-sd8887 = "Firmware-Marvell"
+    if ("${PN}-rtl8188eu" not in pks):
+        d.prependVar("PACKAGES", "${PN}-rtl8188eu ")
+        d.setVar("FILES_${PN}-rtl8188eu", "/lib/firmware/rtlwifi/rtl8188eufw.bin")
+        d.setVar("LICENSE_${PN}-rtl8188eu", "Firmware-rtlwifi_firmware")
+        d.appendVar("RDEPENDS_${PN}-rtl8188eu", " ${PN}-rtl-license")
 
-PACKAGES_prepend = "\
-                     ${PN}-sd8887 \
-                   "
-FILES_${PN}-sd8887 = " \
-  /lib/firmware/mrvl/sd8887_uapsta.bin \
-"
-RDEPENDS_${PN}-sd8887 += "${PN}-marvell-license"
+    if ("${PN}-sd8887" not in pks):
+        d.prependVar("PACKAGES", "${PN}-sd8887 ")
+        d.setVar("FILES_${PN}-sd8887", "/lib/firmware/mrvl/sd8887_uapsta.bin")
+        d.setVar("LICENSE_${PN}-sd8887", "Firmware-Marvell")
+        d.appendVar("RDEPENDS_${PN}-sd8887", " ${PN}-marvell-license")
+}
