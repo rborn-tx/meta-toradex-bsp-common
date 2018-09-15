@@ -16,7 +16,7 @@ index fc037b5a5..841d7a83f 100644
  KillMode=mixed
  WatchdogSec=3min
  TasksMax=infinity
--MountFlags=slave
+-PrivateMounts=yes
  MemoryDenyWriteExecute=yes
  RestrictRealtime=yes
  RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
