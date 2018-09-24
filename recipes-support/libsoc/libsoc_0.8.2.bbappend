@@ -32,7 +32,7 @@ PACKAGECONFIG_colibri-t20 = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-t30 = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-vf = "allboardconfigs enableboardconfig python"
 
-pkg_postinst_${PN}_colibri-imx6ull () {
+pkg_postinst_ontarget_${PN}_colibri-imx6ull () {
     # can't do this offline
     if [ "x$D" != "x" ]; then
         exit 1
