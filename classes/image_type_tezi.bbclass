@@ -22,18 +22,15 @@ def rootfs_get_size(d):
                                       d.getVar('IMAGE_ROOTFS', True)])
     return int(output.split()[0])
 
-def rootfs_tezi_emmc(d):
+def bootfs_get_size(d):
     import subprocess
-    from collections import OrderedDict
-    deploydir = d.getVar('DEPLOY_DIR_IMAGE', True)
+
     kernel = d.getVar('KERNEL_IMAGETYPE', True)
-    offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD', True)
-    offset_spl = d.getVar('OFFSET_SPL_PAYLOAD', True)
-    imagename = d.getVar('IMAGE_NAME', True)
-    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX', True)
+    deploydir = d.getVar('DEPLOY_DIR_IMAGE', True)
 
     # Calculate size of bootfs...
     bootfiles = [ os.path.join(deploydir, kernel) ]
+
     has_devicetree = d.getVar('KERNEL_DEVICETREE', True)
     if has_devicetree:
         for dtb in d.getVar('KERNEL_DEVICETREE', True).split():
@@ -42,7 +39,14 @@ def rootfs_tezi_emmc(d):
     args = ['du', '-kLc']
     args.extend(bootfiles)
     output = subprocess.check_output(args)
-    bootfssize_kb = int(output.splitlines()[-1].split()[0])
+    return int(output.splitlines()[-1].split()[0])
+
+def rootfs_tezi_emmc(d):
+    from collections import OrderedDict
+    offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD', True)
+    offset_spl = d.getVar('OFFSET_SPL_PAYLOAD', True)
+    imagename = d.getVar('IMAGE_NAME', True)
+    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX', True)
 
     bootpart_rawfiles = []
 
@@ -71,7 +75,7 @@ def rootfs_tezi_emmc(d):
                 "filesystem_type": "FAT",
                 "mkfs_options": "",
                 "filename": imagename + ".bootfs.tar.xz",
-                "uncompressed_size": bootfssize_kb / 1024
+                "uncompressed_size": bootfs_get_size(d) / 1024
               }
             },
             {
