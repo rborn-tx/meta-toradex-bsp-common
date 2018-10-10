@@ -168,7 +168,7 @@ def rootfs_tezi_rawnand(d):
           ]
         })]
 
-python rootfs_tezi_json() {
+def rootfs_tezi_json(d, flash_type, flash_data, json_file):
     import json
     from collections import OrderedDict
     from datetime import datetime
@@ -200,18 +200,34 @@ python rootfs_tezi_json() {
 
     data["supported_product_ids"] = d.getVar('TORADEX_PRODUCT_IDS', True).split()
 
-    if bb.utils.contains("TORADEX_FLASH_TYPE", "rawnand", True, False, d):
-        data["mtddevs"] = rootfs_tezi_rawnand(d)
-    else:
-        data["blockdevs"] = rootfs_tezi_emmc(d)
+    if flash_type == "rawnand":
+        data["mtddevs"] = flash_data
+    elif flash_type == "emmc":
+        data["blockdevs"] = flash_data
 
-    deploy_dir = d.getVar('DEPLOY_DIR_IMAGE', True)
-    with open(os.path.join(deploy_dir, 'image.json'), 'w') as outfile:
+    with open(os.path.join(deploydir, json_file), 'w') as outfile:
         json.dump(data, outfile, indent=4)
-    bb.note("Toradex Easy Installer metadata file image.json written.")
+    bb.note("Toradex Easy Installer metadata file {0} written.".format(json_file))
+
+python rootfs_tezi_run_json() {
+    flash_type = d.getVar('TORADEX_FLASH_TYPE', True)
+    if flash_type is None:
+        bb.fatal("Toradex flash type not specified")
+
+    if len(flash_type.split()) > 1:
+        bb.fatal("This class only supports a single flash type.")
+
+    if flash_type == "rawnand":
+        flash_data = rootfs_tezi_rawnand(d)
+    elif flash_type == "emmc":
+        flash_data = rootfs_tezi_emmc(d)
+    else:
+        bb.fatal("Toradex flash type unknown")
+
+    rootfs_tezi_json(d, flash_type, flash_data, "image.json")
 }
 
-do_image_teziimg[prefuncs] += "rootfs_tezi_json"
+do_image_teziimg[prefuncs] += "rootfs_tezi_run_json"
 
 IMAGE_CMD_teziimg () {
 	bbnote "Create Toradex Easy Installer tarball"
