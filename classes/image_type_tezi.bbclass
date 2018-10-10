@@ -214,7 +214,7 @@ python rootfs_tezi_json() {
 do_image_teziimg[prefuncs] += "rootfs_tezi_json"
 
 IMAGE_CMD_teziimg () {
-	bbnote "Create bootfs tarball"
+	bbnote "Create Toradex Easy Installer tarball"
 
 	# Fixup release_date in image.json, convert ${TDX_VERDATE} to isoformat
 	# This works around the non fatal ERRORS: "the basehash value changed" when DATE is referenced
