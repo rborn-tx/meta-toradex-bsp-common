@@ -232,7 +232,9 @@ IMAGE_CMD_teziimg () {
 			--transform='s/.*\///' \
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
-			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh ${SPL_BINARY} ${UBOOT_BINARY_TEZI} ${UBOOT_ENV_TEZI} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
+			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
+			${SPL_BINARY} ${UBOOT_BINARY_TEZI} ${UBOOT_ENV_TEZI} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
+			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
 		;;
 		*)
 		# Create bootfs...
@@ -247,7 +249,9 @@ IMAGE_CMD_teziimg () {
 			--transform='s/.*\///' \
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
-			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh ${SPL_BINARY} ${UBOOT_BINARY_TEZI} ${UBOOT_ENV_TEZI} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
+			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
+			${SPL_BINARY} ${UBOOT_BINARY_TEZI} ${UBOOT_ENV_TEZI} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz \
+			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
 		;;
 	esac
 }
