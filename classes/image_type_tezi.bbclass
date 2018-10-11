@@ -3,6 +3,8 @@ inherit image_types
 do_image_teziimg[depends] += "tezi-metadata:do_deploy virtual/bootloader:do_deploy"
 
 TEZI_ROOT_FSTYPE ??= "ext4"
+TEZI_ROOT_LABEL ??= "RFS"
+TEZI_ROOT_SUFFIX ??= "tar.xz"
 UBOOT_BINARY ??= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARY_TEZI = "${UBOOT_BINARY}"
 UBOOT_BINARY_TEZI_apalis-t30 = "apalis_t30.img"
@@ -47,6 +49,7 @@ def rootfs_tezi_emmc(d):
     offset_spl = d.getVar('OFFSET_SPL_PAYLOAD', True)
     imagename = d.getVar('IMAGE_NAME', True)
     imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX', True)
+    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX', True)
 
     bootpart_rawfiles = []
 
@@ -82,10 +85,10 @@ def rootfs_tezi_emmc(d):
               "partition_size_nominal": 512,
               "want_maximised": True,
               "content": {
-                "label": "RFS",
+                "label": d.getVar('TEZI_ROOT_LABEL', True),
                 "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE', True),
                 "mkfs_options": "-E nodiscard",
-                "filename": imagename + imagename_suffix + ".tar.xz",
+                "filename": imagename + imagename_suffix + "." + imagetype_suffix,
                 "uncompressed_size": rootfs_get_size(d) / 1024
               }
             }
@@ -104,6 +107,7 @@ def rootfs_tezi_rawnand(d):
     from collections import OrderedDict
     imagename = d.getVar('IMAGE_NAME', True)
     imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX', True)
+    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX', True)
 
     # Use device tree mapping to create product id <-> device tree relationship
     dtmapping = d.getVarFlags('TORADEX_PRODUCT_IDS')
@@ -161,7 +165,7 @@ def rootfs_tezi_rawnand(d):
               "name": "rootfs",
               "content": {
                 "filesystem_type": "ubifs",
-                "filename": imagename + imagename_suffix + ".tar.xz",
+                "filename": imagename + imagename_suffix + "." + imagetype_suffix,
                 "uncompressed_size": rootfs_get_size(d) / 1024
               }
             }
@@ -272,4 +276,4 @@ IMAGE_CMD_teziimg () {
 	esac
 }
 
-IMAGE_TYPEDEP_teziimg += "tar.xz"
+IMAGE_TYPEDEP_teziimg += "${TEZI_ROOT_SUFFIX}"
