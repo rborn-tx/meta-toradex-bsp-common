@@ -218,38 +218,23 @@ IMAGE_CMD_teziimg () {
 	ISODATE=`echo ${TDX_VERDATE} | sed 's/.\(....\)\(..\)\(..\).*/\1-\2-\3/'`
 	sed -i "s/%release_date%/$ISODATE/" ${DEPLOY_DIR_IMAGE}/image.json
 
-	# Create list of device tree files
-	if test -n "${KERNEL_DEVICETREE}"; then
-		for DTS_FILE in ${KERNEL_DEVICETREE}; do
-			DTS_BASE_NAME=`basename ${DTS_FILE} .dtb`
-			if [ -e "${DEPLOY_DIR_IMAGE}/${DTS_BASE_NAME}.dtb" ]; then
-				KERNEL_DEVICETREE_FILES="${KERNEL_DEVICETREE_FILES} ${DTS_BASE_NAME}.dtb"
-			else
-				bbfatal "${DTS_FILE} does not exist."
-			fi
-		done
-	fi
-
 	cd ${DEPLOY_DIR_IMAGE}
 
 	case "${TORADEX_FLASH_TYPE}" in
 		rawnand)
 		# The first transform strips all folders from the files to tar, the
 		# second transform "moves" them in a subfolder ${IMAGE_NAME}_${PV}.
-		# The third transform removes zImage from the device tree.
 		${IMAGE_CMD_TAR} \
 			--transform='s/.*\///' \
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
-			--transform="flags=r;s|${KERNEL_IMAGETYPE}-||" \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
-			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh ${SPL_BINARY} ${UBOOT_BINARY_TEZI} ${UBOOT_ENV_TEZI} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE_FILES} ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
+			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh ${SPL_BINARY} ${UBOOT_BINARY_TEZI} ${UBOOT_ENV_TEZI} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
 		;;
 		*)
 		# Create bootfs...
 		${IMAGE_CMD_TAR} \
-			--transform="flags=r;s|${KERNEL_IMAGETYPE}-||" \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} \
-			${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE_FILES}
+			${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE}
 		xz -f -k -c ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar > ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz
 
 		# The first transform strips all folders from the files to tar, the
