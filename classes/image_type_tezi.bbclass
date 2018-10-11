@@ -6,11 +6,13 @@ TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
 UBOOT_BINARY ??= "u-boot.${UBOOT_SUFFIX}"
-UBOOT_BINARY_TEZI = "${UBOOT_BINARY}"
-UBOOT_BINARY_TEZI_apalis-t30 = "apalis_t30.img"
-UBOOT_BINARY_TEZI_apalis-tk1 = "apalis-tk1.img"
-UBOOT_BINARY_TEZI_apalis-tk1-mainline = "apalis-tk1.img"
-UBOOT_ENV_TEZI = "uEnv.txt"
+UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
+UBOOT_BINARY_TEZI_EMMC_apalis-t30 = "apalis_t30.img"
+UBOOT_BINARY_TEZI_EMMC_apalis-tk1 = "apalis-tk1.img"
+UBOOT_BINARY_TEZI_EMMC_apalis-tk1-mainline = "apalis-tk1.img"
+UBOOT_BINARY_TEZI_RAWNAND ?= "${UBOOT_BINARY}"
+UBOOT_ENV_TEZI_EMMC ?= "uEnv.txt"
+UBOOT_ENV_TEZI_RAWNAND ?= "uEnv.txt"
 
 # for generic images this is not yet defined
 TDX_VERDATE ?= "-${DATE}"
@@ -62,7 +64,7 @@ def rootfs_tezi_emmc(d):
               })
     bootpart_rawfiles.append(
               {
-                "filename": d.getVar('UBOOT_BINARY_TEZI', True),
+                "filename": d.getVar('UBOOT_BINARY_TEZI_EMMC', True),
                 "dd_options": "seek=" + (offset_spl if has_spl else offset_bootrom)
               })
 
@@ -120,7 +122,7 @@ def rootfs_tezi_rawnand(d):
           "name": "u-boot1",
           "content": {
             "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI', True),
+              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True),
               "size": 1
             }
           },
@@ -129,7 +131,7 @@ def rootfs_tezi_rawnand(d):
           "name": "u-boot2",
           "content": {
             "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI', True),
+              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True),
               "size": 1
             }
           }
@@ -172,7 +174,7 @@ def rootfs_tezi_rawnand(d):
           ]
         })]
 
-def rootfs_tezi_json(d, flash_type, flash_data, json_file):
+def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     import json
     from collections import OrderedDict
     from datetime import datetime
@@ -188,7 +190,7 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file):
     data["description"] = d.getVar('DESCRIPTION', True)
     data["version"] = d.getVar('PV', True)
     data["release_date"] = release_date
-    data["u_boot_env"] = d.getVar('UBOOT_ENV_TEZI', True)
+    data["u_boot_env"] = uenv_file
     if os.path.exists(os.path.join(deploydir, "prepare.sh")):
         data["prepare_script"] = "prepare.sh"
     if os.path.exists(os.path.join(deploydir, "wrapup.sh")):
@@ -223,12 +225,14 @@ python rootfs_tezi_run_json() {
 
     if flash_type == "rawnand":
         flash_data = rootfs_tezi_rawnand(d)
+        uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND', True)
     elif flash_type == "emmc":
         flash_data = rootfs_tezi_emmc(d)
+        uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC', True)
     else:
         bb.fatal("Toradex flash type unknown")
 
-    rootfs_tezi_json(d, flash_type, flash_data, "image.json")
+    rootfs_tezi_json(d, flash_type, flash_data, "image.json", uenv_file)
 }
 
 do_image_teziimg[prefuncs] += "rootfs_tezi_run_json"
@@ -253,7 +257,7 @@ IMAGE_CMD_teziimg () {
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${SPL_BINARY} ${UBOOT_BINARY_TEZI} ${UBOOT_ENV_TEZI} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
+			${SPL_BINARY} ${UBOOT_BINARY_TEZI_RAWNAND} ${UBOOT_ENV_TEZI_RAWNAND} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
 			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
 		;;
 		*)
@@ -270,7 +274,7 @@ IMAGE_CMD_teziimg () {
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${SPL_BINARY} ${UBOOT_BINARY_TEZI} ${UBOOT_ENV_TEZI} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz \
+			${SPL_BINARY} ${UBOOT_BINARY_TEZI_EMMC} ${UBOOT_ENV_TEZI_EMMC} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz \
 			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
 		;;
 	esac
