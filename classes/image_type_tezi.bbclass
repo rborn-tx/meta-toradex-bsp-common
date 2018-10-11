@@ -243,7 +243,7 @@ IMAGE_CMD_teziimg () {
 	# Fixup release_date in image.json, convert ${TDX_VERDATE} to isoformat
 	# This works around the non fatal ERRORS: "the basehash value changed" when DATE is referenced
 	# in a python prefunction to do_image
-	ISODATE=`echo ${TDX_VERDATE} | sed 's/.\(....\)\(..\)\(..\).*/\1-\2-\3/'`
+	ISODATE=$(echo ${TDX_VERDATE} | sed 's/.\(....\)\(..\)\(..\).*/\1-\2-\3/')
 	sed -i "s/%release_date%/$ISODATE/" ${DEPLOY_DIR_IMAGE}/image.json
 
 	cd ${DEPLOY_DIR_IMAGE}
