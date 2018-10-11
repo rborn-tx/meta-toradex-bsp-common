@@ -1,6 +1,17 @@
 inherit image_types
 
+# This class implements Toradex Easy Installer image type
+# It allows to use OpenEmbedded to build images which can be consumed
+# by the Toradex Easy Installer.
+# Since it also generates the image.json description file it is rather
+# interwind with the boot flow which is U-Boot target specific.
+#
+# Currently there are two image types implemented:
+# teziimg: Default Toradex boot flow
+# teziimg-distro: Distro boot boot flow
+
 do_image_teziimg[depends] += "tezi-metadata:do_deploy virtual/bootloader:do_deploy"
+do_image_teziimg_distro[depends] += "tezi-metadata:do_deploy virtual/bootloader:do_deploy"
 
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
@@ -204,7 +215,17 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     if product_ids is None:
         bb.fatal("Supported Toradex product ids missing, assign TORADEX_PRODUCT_IDS with a list of product ids.")
 
-    data["supported_product_ids"] = d.getVar('TORADEX_PRODUCT_IDS', True).split()
+    dtmapping = d.getVarFlags('TORADEX_PRODUCT_IDS')
+    data["supported_product_ids"] = []
+
+    # If no varflags are set, we assume all product ids supported with single image/U-Boot
+    if dtmapping is not None:
+        for f, v in dtmapping.items():
+            dtbflashtypearr = v.split(',')
+            if len(dtbflashtypearr) < 2 or dtbflashtypearr[1] == flash_type:
+                data["supported_product_ids"].append(f)
+    else:
+        data["supported_product_ids"].extend(product_ids.split())
 
     if flash_type == "rawnand":
         data["mtddevs"] = flash_data
@@ -281,3 +302,116 @@ IMAGE_CMD_teziimg () {
 }
 
 IMAGE_TYPEDEP_teziimg += "${TEZI_ROOT_SUFFIX}"
+
+def rootfs_tezi_distro_rawnand(d):
+    from collections import OrderedDict
+    imagename = d.getVar('IMAGE_NAME', True)
+    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX', True)
+    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX', True)
+
+    return [
+        OrderedDict({
+          "name": "u-boot1",
+          "content": {
+            "rawfile": {
+              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True),
+              "size": 1
+            }
+          },
+        }),
+        OrderedDict({
+          "name": "u-boot2",
+          "content": {
+            "rawfile": {
+              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True),
+              "size": 1
+            }
+          }
+        }),
+        OrderedDict({
+          "name": "ubi",
+          "ubivolumes": [
+            {
+              "name": "boot",
+              "size_kib": 16384,
+              "content": {
+                "filesystem_type": "ubifs",
+                "filename": imagename + ".bootfs.tar.xz",
+                "uncompressed_size": bootfs_get_size(d) / 1024
+              }
+            },
+            {
+              "name": "rootfs",
+              "content": {
+                "filesystem_type": "ubifs",
+                "filename": imagename + imagename_suffix + "." + imagetype_suffix,
+                "uncompressed_size": rootfs_get_size(d) / 1024
+              }
+            }
+          ]
+        })]
+
+python rootfs_tezi_run_distro_json() {
+    flash_types = d.getVar('TORADEX_FLASH_TYPE', True)
+    if flash_types is None:
+        bb.fatal("Toradex flash type not specified")
+
+    flash_types_list = flash_types.split()
+    for flash_type in flash_types_list:
+        if flash_type == "rawnand":
+            flash_data = rootfs_tezi_distro_rawnand(d)
+            uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND', True)
+            uboot_file = d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True)
+        elif flash_type == "emmc":
+            flash_data = rootfs_tezi_emmc(d)
+            uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC', True)
+            uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC', True)
+            # TODO: Multi image/raw NAND with SPL currently not supported
+            if d.getVar('SPL_BINARY', True):
+                uboot_file += " " + d.getVar('SPL_BINARY', True)
+        else:
+            bb.fatal("Toradex flash type unknown")
+
+        if len(flash_types_list) > 1:
+            json_file = "image-{0}.json".format(flash_type)
+        else:
+            json_file = "image.json"
+
+        rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file)
+        d.appendVar("TEZI_IMAGE_JSON_FILES", json_file + " ")
+        d.appendVar("TEZI_IMAGE_UBOOT_FILES", uenv_file + " " + uboot_file + " ")
+}
+
+do_image_teziimg_distro[prefuncs] += "rootfs_tezi_run_distro_json"
+
+IMAGE_CMD_teziimg-distro () {
+	bbnote "Create Toradex Easy Installer tarball"
+
+	# Fixup release_date in image.json, convert ${DATE} to isoformat
+	# This works around the non fatal ERRORS: "the basehash value changed" when DATE is referenced
+	# in a python prefunction to do_image
+	ISODATE=$(echo ${DATE} | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/')
+	for TEZI_IMAGE_JSON in ${TEZI_IMAGE_JSON_FILES}; do
+		sed -i "s/%release_date%/$ISODATE/" ${DEPLOY_DIR_IMAGE}/${TEZI_IMAGE_JSON}
+	done
+
+	cd ${DEPLOY_DIR_IMAGE}
+
+	# Create bootfs...
+	${IMAGE_CMD_TAR} \
+		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} \
+		${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} boot.scr
+	xz -f -k -c ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar > ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz
+
+	# The first transform strips all folders from the files to tar, the
+	# second transform "moves" them in a subfolder ${IMAGE_NAME}-Tezi_${PV}.
+	${IMAGE_CMD_TAR} \
+		--transform='s/.*\///' \
+		--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
+		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
+		${TEZI_IMAGE_JSON_FILES} toradexlinux.png marketing.tar prepare.sh wrapup.sh \
+                ${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz \
+		${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${TEZI_ROOT_SUFFIX}
+}
+
+IMAGE_TYPEDEP_teziimg-distro += "${TEZI_ROOT_SUFFIX}"
