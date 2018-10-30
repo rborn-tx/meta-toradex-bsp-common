@@ -16,6 +16,7 @@ do_image_teziimg_distro[depends] += "tezi-metadata:do_deploy virtual/bootloader:
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
+TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY ??= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
 UBOOT_BINARY_TEZI_EMMC_apalis-t30 = "apalis_t30.img"
