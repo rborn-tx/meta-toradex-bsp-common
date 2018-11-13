@@ -1,5 +1,3 @@
-inherit image_types
-
 # This class implements Toradex Easy Installer image type
 # It allows to use OpenEmbedded to build images which can be consumed
 # by the Toradex Easy Installer.
