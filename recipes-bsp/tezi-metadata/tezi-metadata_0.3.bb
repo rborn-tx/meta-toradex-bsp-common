@@ -9,7 +9,7 @@ SRC_URI = " \
     file://marketing.tar;unpack=false \
 "
 
-inherit deploy
+inherit deploy nopackages
 
 do_deploy () {
     install -m 644 ${WORKDIR}/prepare.sh ${DEPLOYDIR}
@@ -18,7 +18,7 @@ do_deploy () {
     install -m 644 ${WORKDIR}/marketing.tar ${DEPLOYDIR}
 }
 
-addtask deploy before do_package after do_install
+addtask deploy before do_build after do_install
 
 COMPATIBLE_MACHINE = "(apalis-imx6|apalis-t30|apalis-tk1|colibri-imx6|colibri-imx7)"
 
