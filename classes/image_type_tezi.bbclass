@@ -14,6 +14,9 @@ do_image_teziimg_distro[depends] += "tezi-metadata:do_deploy virtual/bootloader:
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
+KERNEL_DEVICETREE ??= ""
+TEZI_KERNEL_DEVICETREE ??= "${KERNEL_DEVICETREE}"
+TEZI_KERNEL_IMAGETYPE ??= "${KERNEL_IMAGETYPE}"
 TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY ??= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
@@ -39,16 +42,21 @@ def rootfs_get_size(d):
 def bootfs_get_size(d):
     import subprocess
 
-    kernel = d.getVar('KERNEL_IMAGETYPE', True)
     deploydir = d.getVar('DEPLOY_DIR_IMAGE', True)
+    bootfiles = []
 
-    # Calculate size of bootfs...
-    bootfiles = [ os.path.join(deploydir, kernel) ]
+    has_kernel = d.getVar('TEZI_KERNEL_IMAGETYPE', True)
+    if has_kernel:
+        kernel = d.getVar('TEZI_KERNEL_IMAGETYPE', True)
+        bootfiles.append(os.path.join(deploydir,kernel))
 
-    has_devicetree = d.getVar('KERNEL_DEVICETREE', True)
+    has_devicetree = d.getVar('TEZI_KERNEL_DEVICETREE', True)
     if has_devicetree:
-        for dtb in d.getVar('KERNEL_DEVICETREE', True).split():
+        for dtb in d.getVar('TEZI_KERNEL_DEVICETREE', True).split():
             bootfiles.append(os.path.join(deploydir, dtb))
+
+    if len(bootfiles) == 0:
+        return int(0)
 
     args = ['du', '-kLc']
     args.extend(bootfiles)
@@ -155,7 +163,7 @@ def rootfs_tezi_rawnand(d):
               "type": "static",
               "content": {
                 "rawfile": {
-                  "filename": d.getVar('KERNEL_IMAGETYPE', True),
+                  "filename": d.getVar('TEZI_KERNEL_IMAGETYPE', True),
                   "size": 5
                 }
               }
@@ -277,14 +285,14 @@ IMAGE_CMD_teziimg () {
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${SPL_BINARY} ${UBOOT_BINARY_TEZI_RAWNAND} ${UBOOT_ENV_TEZI_RAWNAND} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
+			${SPL_BINARY} ${UBOOT_BINARY_TEZI_RAWNAND} ${UBOOT_ENV_TEZI_RAWNAND} ${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE} \
 			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
 		;;
 		*)
 		# Create bootfs...
 		${IMAGE_CMD_TAR} \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} \
-			${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE}
+			${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE}
 		xz -f -k -c ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar > ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz
 
 		# The first transform strips all folders from the files to tar, the
@@ -399,7 +407,7 @@ IMAGE_CMD_teziimg-distro () {
 	# Create bootfs...
 	${IMAGE_CMD_TAR} \
 		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} \
-		${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} boot.scr
+		${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE} boot.scr
 	xz -f -k -c ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar > ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz
 
 	# The first transform strips all folders from the files to tar, the
