@@ -1,4 +1,3 @@
-#for the tegras (Android Gadget) also consult /etc/udev/ruldes.d/usb-rndis.rules
 [Unit]
 Description=Load/Configure the kernel driver providing the RNDIS gadget
 Documentation=http://www.linux-usb.org/gadget/ http://permalink.gmane.org/gmane.linux.usb.general/56244

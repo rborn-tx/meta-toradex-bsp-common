@@ -27,16 +27,12 @@ if [ "$ACTION" = "add" ] && [ -n "$DEVNAME" ] && [ "$DEVTYPE" = "disk" ]; then
 			else #imx6dl
 				set_read_ahead_size 1024 512
 			fi
-		elif [ $SYSNAME == "colibri-t30" ]; then
-			set_read_ahead_size 2048 1024
 		elif [ $SYSNAME == "apalis-imx6" ]; then
 			if [ $CORES -eq 2 ]; then #imx6d
 				set_read_ahead_size 1024 512
 			else #imx6q
 				set_read_ahead_size 1024 512
 			fi
-		elif [ $SYSNAME == "apalis-t30" ]; then
-			set_read_ahead_size 4096 1024
 		elif [ $SYSNAME == "apalis-tk1" ]; then
 			set_read_ahead_size 4096 1024
 		else
