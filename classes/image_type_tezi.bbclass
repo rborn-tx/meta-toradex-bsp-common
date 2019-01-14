@@ -36,23 +36,23 @@ def rootfs_get_size(d):
 
     # Calculate size of rootfs in kilobytes...
     output = subprocess.check_output(['du', '-ks',
-                                      d.getVar('IMAGE_ROOTFS', True)])
+                                      d.getVar('IMAGE_ROOTFS')])
     return int(output.split()[0])
 
 def bootfs_get_size(d):
     import subprocess
 
-    deploydir = d.getVar('DEPLOY_DIR_IMAGE', True)
+    deploydir = d.getVar('DEPLOY_DIR_IMAGE')
     bootfiles = []
 
-    has_kernel = d.getVar('TEZI_KERNEL_IMAGETYPE', True)
+    has_kernel = d.getVar('TEZI_KERNEL_IMAGETYPE')
     if has_kernel:
-        kernel = d.getVar('TEZI_KERNEL_IMAGETYPE', True)
+        kernel = d.getVar('TEZI_KERNEL_IMAGETYPE')
         bootfiles.append(os.path.join(deploydir,kernel))
 
-    has_devicetree = d.getVar('TEZI_KERNEL_DEVICETREE', True)
+    has_devicetree = d.getVar('TEZI_KERNEL_DEVICETREE')
     if has_devicetree:
-        for dtb in d.getVar('TEZI_KERNEL_DEVICETREE', True).split():
+        for dtb in d.getVar('TEZI_KERNEL_DEVICETREE').split():
             bootfiles.append(os.path.join(deploydir, dtb))
 
     if len(bootfiles) == 0:
@@ -65,24 +65,24 @@ def bootfs_get_size(d):
 
 def rootfs_tezi_emmc(d):
     from collections import OrderedDict
-    offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD', True)
-    offset_spl = d.getVar('OFFSET_SPL_PAYLOAD', True)
-    imagename = d.getVar('IMAGE_NAME', True)
-    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX', True)
-    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX', True)
+    offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD')
+    offset_spl = d.getVar('OFFSET_SPL_PAYLOAD')
+    imagename = d.getVar('IMAGE_NAME')
+    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX')
+    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX')
 
     bootpart_rawfiles = []
 
-    has_spl = d.getVar('SPL_BINARY', True)
+    has_spl = d.getVar('SPL_BINARY')
     if has_spl:
         bootpart_rawfiles.append(
               {
-                "filename": d.getVar('SPL_BINARY', True),
+                "filename": d.getVar('SPL_BINARY'),
                 "dd_options": "seek=" + offset_bootrom
               })
     bootpart_rawfiles.append(
               {
-                "filename": d.getVar('UBOOT_BINARY_TEZI_EMMC', True),
+                "filename": d.getVar('UBOOT_BINARY_TEZI_EMMC'),
                 "dd_options": "seek=" + (offset_spl if has_spl else offset_bootrom)
               })
 
@@ -105,8 +105,8 @@ def rootfs_tezi_emmc(d):
               "partition_size_nominal": 512,
               "want_maximised": True,
               "content": {
-                "label": d.getVar('TEZI_ROOT_LABEL', True),
-                "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE', True),
+                "label": d.getVar('TEZI_ROOT_LABEL'),
+                "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
                 "mkfs_options": "-E nodiscard",
                 "filename": imagename + imagename_suffix + "." + imagetype_suffix,
                 "uncompressed_size": rootfs_get_size(d) / 1024
@@ -125,9 +125,9 @@ def rootfs_tezi_emmc(d):
 
 def rootfs_tezi_rawnand(d):
     from collections import OrderedDict
-    imagename = d.getVar('IMAGE_NAME', True)
-    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX', True)
-    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX', True)
+    imagename = d.getVar('IMAGE_NAME')
+    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX')
+    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX')
 
     # Use device tree mapping to create product id <-> device tree relationship
     dtmapping = d.getVarFlags('TORADEX_PRODUCT_IDS')
@@ -140,7 +140,7 @@ def rootfs_tezi_rawnand(d):
           "name": "u-boot1",
           "content": {
             "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True),
+              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
               "size": 1
             }
           },
@@ -149,7 +149,7 @@ def rootfs_tezi_rawnand(d):
           "name": "u-boot2",
           "content": {
             "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True),
+              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
               "size": 1
             }
           }
@@ -163,7 +163,7 @@ def rootfs_tezi_rawnand(d):
               "type": "static",
               "content": {
                 "rawfile": {
-                  "filename": d.getVar('TEZI_KERNEL_IMAGETYPE', True),
+                  "filename": d.getVar('TEZI_KERNEL_IMAGETYPE'),
                   "size": 5
                 }
               }
@@ -197,16 +197,16 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     from collections import OrderedDict
     from datetime import datetime
 
-    deploydir = d.getVar('DEPLOY_DIR_IMAGE', True)
+    deploydir = d.getVar('DEPLOY_DIR_IMAGE')
     # patched in IMAGE_CMD_teziimg() below
     release_date = "%release_date%"
 
     data = OrderedDict({ "config_format": 2, "autoinstall": False })
 
     # Use image recipes SUMMARY/DESCRIPTION/PV...
-    data["name"] = d.getVar('SUMMARY', True)
-    data["description"] = d.getVar('DESCRIPTION', True)
-    data["version"] = d.getVar('PV', True)
+    data["name"] = d.getVar('SUMMARY')
+    data["description"] = d.getVar('DESCRIPTION')
+    data["version"] = d.getVar('PV')
     data["release_date"] = release_date
     data["u_boot_env"] = uenv_file
     if os.path.exists(os.path.join(deploydir, "prepare.sh")):
@@ -218,7 +218,7 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     if os.path.exists(os.path.join(deploydir, "toradexlinux.png")):
         data["icon"] = "toradexlinux.png"
 
-    product_ids = d.getVar('TORADEX_PRODUCT_IDS', True)
+    product_ids = d.getVar('TORADEX_PRODUCT_IDS')
     if product_ids is None:
         bb.fatal("Supported Toradex product ids missing, assign TORADEX_PRODUCT_IDS with a list of product ids.")
 
@@ -244,7 +244,7 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     bb.note("Toradex Easy Installer metadata file {0} written.".format(json_file))
 
 python rootfs_tezi_run_json() {
-    flash_type = d.getVar('TORADEX_FLASH_TYPE', True)
+    flash_type = d.getVar('TORADEX_FLASH_TYPE')
     if flash_type is None:
         bb.fatal("Toradex flash type not specified")
 
@@ -253,10 +253,10 @@ python rootfs_tezi_run_json() {
 
     if flash_type == "rawnand":
         flash_data = rootfs_tezi_rawnand(d)
-        uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND', True)
+        uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND')
     elif flash_type == "emmc":
         flash_data = rootfs_tezi_emmc(d)
-        uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC', True)
+        uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
     else:
         bb.fatal("Toradex flash type unknown")
 
@@ -312,16 +312,16 @@ IMAGE_TYPEDEP_teziimg += "${TEZI_ROOT_SUFFIX}"
 
 def rootfs_tezi_distro_rawnand(d):
     from collections import OrderedDict
-    imagename = d.getVar('IMAGE_NAME', True)
-    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX', True)
-    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX', True)
+    imagename = d.getVar('IMAGE_NAME')
+    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX')
+    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX')
 
     return [
         OrderedDict({
           "name": "u-boot1",
           "content": {
             "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True),
+              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
               "size": 1
             }
           },
@@ -330,7 +330,7 @@ def rootfs_tezi_distro_rawnand(d):
           "name": "u-boot2",
           "content": {
             "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True),
+              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
               "size": 1
             }
           }
@@ -359,7 +359,7 @@ def rootfs_tezi_distro_rawnand(d):
         })]
 
 python rootfs_tezi_run_distro_json() {
-    flash_types = d.getVar('TORADEX_FLASH_TYPE', True)
+    flash_types = d.getVar('TORADEX_FLASH_TYPE')
     if flash_types is None:
         bb.fatal("Toradex flash type not specified")
 
@@ -367,15 +367,15 @@ python rootfs_tezi_run_distro_json() {
     for flash_type in flash_types_list:
         if flash_type == "rawnand":
             flash_data = rootfs_tezi_distro_rawnand(d)
-            uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND', True)
-            uboot_file = d.getVar('UBOOT_BINARY_TEZI_RAWNAND', True)
+            uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND')
+            uboot_file = d.getVar('UBOOT_BINARY_TEZI_RAWNAND')
         elif flash_type == "emmc":
             flash_data = rootfs_tezi_emmc(d)
-            uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC', True)
-            uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC', True)
+            uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
+            uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
             # TODO: Multi image/raw NAND with SPL currently not supported
-            if d.getVar('SPL_BINARY', True):
-                uboot_file += " " + d.getVar('SPL_BINARY', True)
+            if d.getVar('SPL_BINARY'):
+                uboot_file += " " + d.getVar('SPL_BINARY')
         else:
             bb.fatal("Toradex flash type unknown")
 
