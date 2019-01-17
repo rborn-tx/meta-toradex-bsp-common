@@ -10,6 +10,10 @@ UBOOT_BINARY_TEZI_apalis-tk1 = "apalis-tk1.img"
 UBOOT_BINARY_TEZI_apalis-tk1-mainline = "apalis-tk1.img"
 UBOOT_ENV_TEZI = "uEnv.txt"
 
+# for generic images this is not yet defined
+TDX_VERDATE ?= "-${DATE}"
+TDX_VERDATE[vardepsexclude] = "DATE"
+
 def rootfs_get_size(d):
     import subprocess
 
@@ -208,10 +212,10 @@ do_image_teziimg[prefuncs] += "rootfs_tezi_json"
 IMAGE_CMD_teziimg () {
 	bbnote "Create bootfs tarball"
 
-	# Fixup release_date in image.json, convert ${DATE} to isoformat
+	# Fixup release_date in image.json, convert ${TDX_VERDATE} to isoformat
 	# This works around the non fatal ERRORS: "the basehash value changed" when DATE is referenced
 	# in a python prefunction to do_image
-	ISODATE=`echo ${DATE} | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/'`
+	ISODATE=`echo ${TDX_VERDATE} | sed 's/.\(....\)\(..\)\(..\).*/\1-\2-\3/'`
 	sed -i "s/%release_date%/$ISODATE/" ${DEPLOY_DIR_IMAGE}/image.json
 
 	# Create list of device tree files
