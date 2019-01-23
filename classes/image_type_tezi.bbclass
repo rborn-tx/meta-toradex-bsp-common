@@ -31,37 +31,22 @@ UBOOT_ENV_TEZI_RAWNAND ?= "uEnv.txt"
 TDX_VERDATE ?= "-${DATE}"
 TDX_VERDATE[vardepsexclude] = "DATE"
 
-def rootfs_get_size(d):
-    import subprocess
+# append tar command to store uncompressed image size to ${T}.
+# If a custom rootfs type is used make sure this file is created before
+# compression
+IMAGE_CMD_tar_append = "; echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar | cut -f 1) > ${T}/image-size.tar"
 
-    # Calculate size of rootfs in kilobytes...
-    output = subprocess.check_output(['du', '-ks',
-                                      d.getVar('IMAGE_ROOTFS')])
-    return int(output.split()[0])
+create_bootfs () {
+	${IMAGE_CMD_TAR} -chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} $1
+	echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar | cut -f 1) > ${T}/image-size.bootfs.tar
+	xz -f -k -c ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar > ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz
+}
 
-def bootfs_get_size(d):
-    import subprocess
-
-    deploydir = d.getVar('DEPLOY_DIR_IMAGE')
-    bootfiles = []
-
-    has_kernel = d.getVar('TEZI_KERNEL_IMAGETYPE')
-    if has_kernel:
-        kernel = d.getVar('TEZI_KERNEL_IMAGETYPE')
-        bootfiles.append(os.path.join(deploydir,kernel))
-
-    has_devicetree = d.getVar('TEZI_KERNEL_DEVICETREE')
-    if has_devicetree:
-        for dtb in d.getVar('TEZI_KERNEL_DEVICETREE').split():
-            bootfiles.append(os.path.join(deploydir, dtb))
-
-    if len(bootfiles) == 0:
-        return int(0)
-
-    args = ['du', '-kLc']
-    args.extend(bootfiles)
-    output = subprocess.check_output(args)
-    return int(output.splitlines()[-1].split()[0])
+def get_uncompressed_size(d, type=""):
+    suffix = type if type else '.'.join((d.getVar('TEZI_ROOT_SUFFIX') or "").split('.')[:-1])
+    with open(os.path.join(d.getVar('T'), "image-size.%s" % suffix), "r") as f:
+        size = f.read().strip()
+    return float(size)
 
 def rootfs_tezi_emmc(d):
     from collections import OrderedDict
@@ -98,7 +83,7 @@ def rootfs_tezi_emmc(d):
                 "filesystem_type": "FAT",
                 "mkfs_options": "",
                 "filename": imagename + ".bootfs.tar.xz",
-                "uncompressed_size": bootfs_get_size(d) / 1024
+                "uncompressed_size": get_uncompressed_size(d, 'bootfs.tar') / 1024
               }
             },
             {
@@ -109,7 +94,7 @@ def rootfs_tezi_emmc(d):
                 "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
                 "mkfs_options": "-E nodiscard",
                 "filename": imagename + imagename_suffix + "." + imagetype_suffix,
-                "uncompressed_size": rootfs_get_size(d) / 1024
+                "uncompressed_size": get_uncompressed_size(d) / 1024
               }
             }
           ]
@@ -186,7 +171,7 @@ def rootfs_tezi_rawnand(d):
               "content": {
                 "filesystem_type": "ubifs",
                 "filename": imagename + imagename_suffix + "." + imagetype_suffix,
-                "uncompressed_size": rootfs_get_size(d) / 1024
+                "uncompressed_size": get_uncompressed_size(d) / 1024
               }
             }
           ]
@@ -263,7 +248,11 @@ python rootfs_tezi_run_json() {
     rootfs_tezi_json(d, flash_type, flash_data, "image.json", uenv_file)
 }
 
-do_image_teziimg[prefuncs] += "rootfs_tezi_run_json"
+create_tezi_bootfs () {
+	create_bootfs "${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE}"
+}
+
+do_image_teziimg[prefuncs] += "create_tezi_bootfs rootfs_tezi_run_json"
 
 IMAGE_CMD_teziimg () {
 	bbnote "Create Toradex Easy Installer tarball"
@@ -289,12 +278,6 @@ IMAGE_CMD_teziimg () {
 			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
 		;;
 		*)
-		# Create bootfs...
-		${IMAGE_CMD_TAR} \
-			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} \
-			${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE}
-		xz -f -k -c ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar > ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz
-
 		# The first transform strips all folders from the files to tar, the
 		# second transform "moves" them in a subfolder ${IMAGE_NAME}-Tezi_${PV}.
 		${IMAGE_CMD_TAR} \
@@ -344,7 +327,7 @@ def rootfs_tezi_distro_rawnand(d):
               "content": {
                 "filesystem_type": "ubifs",
                 "filename": imagename + ".bootfs.tar.xz",
-                "uncompressed_size": bootfs_get_size(d) / 1024
+                "uncompressed_size": get_uncompressed_size(d, 'bootfs.tar') / 1024
               }
             },
             {
@@ -352,7 +335,7 @@ def rootfs_tezi_distro_rawnand(d):
               "content": {
                 "filesystem_type": "ubifs",
                 "filename": imagename + imagename_suffix + "." + imagetype_suffix,
-                "uncompressed_size": rootfs_get_size(d) / 1024
+                "uncompressed_size": get_uncompressed_size(d) / 1024
               }
             }
           ]
@@ -389,10 +372,16 @@ python rootfs_tezi_run_distro_json() {
         d.appendVar("TEZI_IMAGE_UBOOT_FILES", uenv_file + " " + uboot_file + " ")
 }
 
-do_image_teziimg_distro[prefuncs] += "rootfs_tezi_run_distro_json"
+create_tezi_distro_bootfs () {
+	create_bootfs "${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE} boot.scr"
+}
+
+do_image_teziimg_distro[prefuncs] += "create_tezi_distro_bootfs rootfs_tezi_run_distro_json"
 
 IMAGE_CMD_teziimg-distro () {
 	bbnote "Create Toradex Easy Installer tarball"
+
+	cd ${DEPLOY_DIR_IMAGE}
 
 	# Fixup release_date in image.json, convert ${DATE} to isoformat
 	# This works around the non fatal ERRORS: "the basehash value changed" when DATE is referenced
@@ -401,14 +390,6 @@ IMAGE_CMD_teziimg-distro () {
 	for TEZI_IMAGE_JSON in ${TEZI_IMAGE_JSON_FILES}; do
 		sed -i "s/%release_date%/$ISODATE/" ${DEPLOY_DIR_IMAGE}/${TEZI_IMAGE_JSON}
 	done
-
-	cd ${DEPLOY_DIR_IMAGE}
-
-	# Create bootfs...
-	${IMAGE_CMD_TAR} \
-		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} \
-		${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE} boot.scr
-	xz -f -k -c ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar > ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz
 
 	# The first transform strips all folders from the files to tar, the
 	# second transform "moves" them in a subfolder ${IMAGE_NAME}-Tezi_${PV}.
