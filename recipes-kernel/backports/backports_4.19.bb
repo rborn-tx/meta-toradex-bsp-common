@@ -7,7 +7,7 @@ INC_PR = "r1"
 
 DEPENDS_append = " coreutils-native"
 
-SRCREV = "5e68b9c311afd867e92f0d71b1121d677698bba1"
+SRCREV = "348fa3f6871f56a37dcd16c99ca98118c6d79a38"
 SRCREV_use-head-next = "${AUTOREV}"
 SRC_URI = " \
     git://git.toradex.com/backports-toradex.git;protocol=git;branch=toradex-${PV} \
