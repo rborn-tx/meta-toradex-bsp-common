@@ -17,7 +17,7 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
-inherit module
+inherit module cml1
 
 MAKE_TARGETS = "modules"
 MODULES_INSTALL_TARGET = "modules_install"
@@ -26,6 +26,8 @@ PACKAGES_DYNAMIC += "^${BPN}-kernel-module-.*"
 KERNEL_MODULE_PACKAGE_PREFIX = "${BPN}-"
 
 EXTRA_OEMAKE = " KLIB=${STAGING_KERNEL_DIR} KLIB_BUILD=${STAGING_KERNEL_BUILDDIR} "
+
+KCONFIG_CONFIG_COMMAND = "CC=${BUILD_CC} LD=${BUILD_LD} AR=${BUILD_AR} menuconfig"
 
 do_configure() {
 
