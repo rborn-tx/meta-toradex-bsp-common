@@ -15,7 +15,6 @@ BOARD_colibri-imx6 = "colibri-imx6"
 BOARD_colibri-imx6ull = "colibri-imx6ull"
 BOARD_colibri-imx7 = "colibri-imx7"
 BOARD_colibri-imx7-emmc = "colibri-imx7-emmc"
-BOARD_colibri-vf = "colibri-vf"
 
 PACKAGECONFIG_apalis-imx6 = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_apalis-tk1 = "allboardconfigs enableboardconfig python"
@@ -24,7 +23,6 @@ PACKAGECONFIG_colibri-imx6 = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-imx6ull = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-imx7 = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-imx7-emmc = "allboardconfigs enableboardconfig python"
-PACKAGECONFIG_colibri-vf = "allboardconfigs enableboardconfig python"
 
 pkg_postinst_ontarget_${PN}_colibri-imx6ull () {
     # can't do this offline
