@@ -26,13 +26,13 @@ UBOOT_BINARY_TEZI_RAWNAND ?= "${UBOOT_BINARY}"
 UBOOT_ENV_TEZI_EMMC ?= "uEnv.txt"
 UBOOT_ENV_TEZI_RAWNAND ?= "uEnv.txt"
 
-# for generic images this is not yet defined
+# For generic images this is not yet defined
 TDX_VERDATE ?= "-${DATE}"
 TDX_VERDATE[vardepsexclude] = "DATE"
 
-# append tar command to store uncompressed image size to ${T}.
-# If a custom rootfs type is used make sure this file is created before
-# compression
+# Append tar command to store uncompressed image size to ${T}.
+# If a custom rootfs type is used make sure this file is created
+# before compression.
 IMAGE_CMD_tar_append = "; echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar | cut -f 1) > ${T}/image-size.tar"
 
 # Creates boot filesystem tarball
@@ -186,7 +186,7 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     from datetime import datetime
 
     deploydir = d.getVar('DEPLOY_DIR_IMAGE')
-    # patched in IMAGE_CMD_teziimg() below
+    # Patched in IMAGE_CMD_teziimg() below
     release_date = "%release_date%"
 
     data = OrderedDict({ "config_format": 2, "autoinstall": False })
@@ -394,8 +394,6 @@ IMAGE_CMD_teziimg-distro () {
 		sed -i "s/%release_date%/$ISODATE/" ${DEPLOY_DIR_IMAGE}/${TEZI_IMAGE_JSON}
 	done
 
-	# The first transform strips all folders from the files to tar, the
-	# second transform "moves" them in a subfolder ${IMAGE_NAME}-Tezi_${PV}.
 	${IMAGE_CMD_TAR} \
 		--transform='s/.*\///' \
 		--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
