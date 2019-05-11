@@ -266,7 +266,7 @@ IMAGE_CMD_teziimg () {
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${SPL_BINARY} ${UBOOT_BINARY_TEZI_RAWNAND} ${UBOOT_ENV_TEZI_RAWNAND} ${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE} \
-			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
+			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${TEZI_ROOT_SUFFIX}
 		;;
 		*)
 		# The first transform strips all folders from the files to tar, the
@@ -277,7 +277,7 @@ IMAGE_CMD_teziimg () {
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${SPL_BINARY} ${UBOOT_BINARY_TEZI_EMMC} ${UBOOT_ENV_TEZI_EMMC} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz \
-			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar.xz
+			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${TEZI_ROOT_SUFFIX}
 		;;
 	esac
 }
