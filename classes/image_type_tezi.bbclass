@@ -35,8 +35,12 @@ TDX_VERDATE[vardepsexclude] = "DATE"
 # compression
 IMAGE_CMD_tar_append = "; echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar | cut -f 1) > ${T}/image-size.tar"
 
+# Creates boot filesystem tarball
 create_bootfs () {
-	${IMAGE_CMD_TAR} -chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} $1
+	kernel_image="$1"
+	device_trees="$(basename -a $2)"
+	extra_files="$3"
+	${IMAGE_CMD_TAR} -chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} ${kernel_image} ${device_trees} ${extra_files}
 	echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar | cut -f 1) > ${T}/image-size.bootfs.tar
 	xz -f -k -c ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar > ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz
 }
@@ -248,7 +252,7 @@ python rootfs_tezi_run_json() {
 }
 
 create_tezi_bootfs () {
-	create_bootfs "${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE}"
+	create_bootfs "${TEZI_KERNEL_IMAGETYPE}" "${TEZI_KERNEL_DEVICETREE}"
 }
 
 do_image_teziimg[prefuncs] += "create_tezi_bootfs rootfs_tezi_run_json"
@@ -372,7 +376,7 @@ python rootfs_tezi_run_distro_json() {
 }
 
 create_tezi_distro_bootfs () {
-	create_bootfs "${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE} boot.scr"
+	create_bootfs "${TEZI_KERNEL_IMAGETYPE}" "${TEZI_KERNEL_DEVICETREE}" "boot.scr"
 }
 
 do_image_teziimg_distro[prefuncs] += "create_tezi_distro_bootfs rootfs_tezi_run_distro_json"
