@@ -34,7 +34,9 @@ IMAGE_CMD_tar_append = "; echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAM
 # Creates boot filesystem tarball
 create_bootfs () {
 	kernel_image="$1"
-	device_trees="$(basename -a $2)"
+	if [ -n "$2" ]; then
+		device_trees="$(basename -a $2)"
+	fi
 	extra_files="$3"
 	${IMAGE_CMD_TAR} -chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} ${kernel_image} ${device_trees} ${extra_files}
 	echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar | cut -f 1) > ${T}/image-size.bootfs.tar
