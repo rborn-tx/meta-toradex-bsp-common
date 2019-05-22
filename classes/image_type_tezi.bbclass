@@ -47,6 +47,14 @@ def get_uncompressed_size(d, type=""):
         size = f.read().strip()
     return float(size)
 
+# Make an educated guess of the needed boot partition size
+# max(16MB, twice the size of the payload rounded up to the next 2^x number)
+def get_bootfs_part_size(d):
+    from math import log
+    payload_size = get_uncompressed_size(d, 'bootfs.tar') / 1024
+    part_size = 2 ** (2 + int(log (payload_size, 2)))
+    return max(16, part_size)
+
 def rootfs_tezi_emmc(d):
     from collections import OrderedDict
     offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD')
@@ -75,7 +83,7 @@ def rootfs_tezi_emmc(d):
           "name": "mmcblk0",
           "partitions": [
             {
-              "partition_size_nominal": 16,
+              "partition_size_nominal": get_bootfs_part_size(d),
               "want_maximised": False,
               "content": {
                 "label": "BOOT",
@@ -247,7 +255,7 @@ python rootfs_tezi_run_json() {
 }
 
 create_tezi_bootfs () {
-	create_bootfs "${TEZI_KERNEL_IMAGETYPE}" "${TEZI_KERNEL_DEVICETREE}"
+	create_bootfs "${TEZI_KERNEL_IMAGETYPE}" "${TEZI_KERNEL_DEVICETREE}" "${MACHINE_BOOT_FILES}"
 }
 
 do_image_teziimg[prefuncs] += "create_tezi_bootfs rootfs_tezi_run_json"
@@ -364,7 +372,7 @@ python rootfs_tezi_run_distro_json() {
 }
 
 create_tezi_distro_bootfs () {
-	create_bootfs "${TEZI_KERNEL_IMAGETYPE}" "${TEZI_KERNEL_DEVICETREE}" "boot.scr"
+	create_bootfs "${TEZI_KERNEL_IMAGETYPE}" "${TEZI_KERNEL_DEVICETREE}" "boot.scr" ${MACHINE_BOOT_FILES}
 }
 
 do_image_teziimg_distro[prefuncs] += "create_tezi_distro_bootfs rootfs_tezi_run_distro_json"
