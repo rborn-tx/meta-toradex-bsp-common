@@ -16,10 +16,15 @@ SRCBRANCH = "master"
 SRC_URI = " \
     git://github.com/libusbgx/libusbgx.git;branch=${SRCBRANCH} \
     file://usbg.service \
-    file://g1.schema \
+    file://g1.schema.in \
 "
 
 S = "${WORKDIR}/git"
+
+MACHINE_NAME ?= "${MACHINE}"
+do_compile_append () {
+    sed -e "s:@@PRODUCT_NAME@@:${MACHINE_NAME}:" ${WORKDIR}/g1.schema.in > ${WORKDIR}/g1.schema
+}
 
 do_install_append () {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
@@ -36,6 +41,7 @@ SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "usbg.service"
 
 PACKAGES =+ "${PN}-examples"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 FILES_${PN}-examples = " \
     ${bindir}/gadget-* \
