@@ -19,7 +19,7 @@ strings = (
     {
         lang = 0x409;
         manufacturer = "Toradex";
-        product = "Toradex Colibri iMX6ULL";
+        product = "@@PRODUCT_NAME@@";
         serialnumber = "00000000";
     } );
 functions : 
