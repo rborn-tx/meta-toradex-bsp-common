@@ -1,6 +1,6 @@
 if test ${devtype} = "ubi"
 then
-    echo "This script is not meant to distro boot from raw NAND flash.
+    echo "This script is not meant to distro boot from raw NAND flash."
     exit
 fi
 
