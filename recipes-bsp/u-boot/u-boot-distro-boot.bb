@@ -12,24 +12,16 @@ SRC_URI = " \
 KERNEL_BOOTCMD ??= "bootz"
 KERNEL_BOOTCMD_aarch64 ?= "booti"
 
-S = "${WORKDIR}"
-
-inherit deploy
-
-do_compile() {
-    sed -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
-        "${WORKDIR}/boot.cmd.in" > boot.cmd
-    mkimage -T script -C none -n "Distro boot script" -d "${WORKDIR}/boot.cmd" boot.scr
-}
+inherit deploy nopackages
 
 do_deploy() {
-    install -d ${DEPLOYDIR}
+    sed -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
+        "${WORKDIR}/boot.cmd.in" > boot.cmd
+    mkimage -T script -C none -n "Distro boot script" -d boot.cmd boot.scr
+
     install -m 0644 boot.scr ${DEPLOYDIR}
 }
 
 addtask deploy after do_install before do_build
-
-do_install[noexec] = "1"
-do_populate_sysroot[noexec] = "1"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
