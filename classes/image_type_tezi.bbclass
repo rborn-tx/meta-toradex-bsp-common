@@ -8,15 +8,15 @@
 # teziimg: Default Toradex boot flow
 # teziimg-distro: Distro boot boot flow
 
-do_image_teziimg[depends] += "tezi-metadata:do_deploy virtual/bootloader:do_deploy"
-do_image_teziimg_distro[depends] += "tezi-metadata:do_deploy virtual/bootloader:do_deploy"
+do_image_teziimg[recrdeptask] += "do_deploy"
+do_image_teziimg_distro[recrdeptask] += "do_deploy"
+
+WKS_FILE_DEPENDS_append = " tezi-metadata"
+DEPENDS += "${WKS_FILE_DEPENDS}"
 
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
-KERNEL_DEVICETREE ??= ""
-TEZI_KERNEL_DEVICETREE ??= "${KERNEL_DEVICETREE}"
-TEZI_KERNEL_IMAGETYPE ??= "${KERNEL_IMAGETYPE}"
 TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY ??= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
@@ -35,23 +35,68 @@ TDX_VERDATE[vardepsexclude] = "DATE"
 # before compression.
 IMAGE_CMD_tar_append = "; echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar | cut -f 1) > ${T}/image-size.tar"
 
-# Creates boot filesystem tarball
-create_bootfs () {
-	kernel_image="$1"
-	if [ -n "$2" ]; then
-		device_trees="$(basename -a $2)"
-	fi
-	extra_files="$3"
-	${IMAGE_CMD_TAR} -chf ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar -C ${DEPLOY_DIR_IMAGE} ${kernel_image} ${device_trees} ${extra_files}
-	echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar | cut -f 1) > ${T}/image-size.bootfs.tar
-	xz -f -k -c ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar > ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz
-}
-
 def get_uncompressed_size(d, type=""):
     suffix = type if type else '.'.join((d.getVar('TEZI_ROOT_SUFFIX') or "").split('.')[:-1])
     with open(os.path.join(d.getVar('T'), "image-size.%s" % suffix), "r") as f:
         size = f.read().strip()
     return float(size)
+
+# Whitespace separated list of files declared by 'deploy_var' variable
+# from 'source_dir' (DEPLOY_DIR_IMAGE by default) to place in 'deploy_dir'.
+# Entries will be installed under a same name as the source file. To change
+# the destination file name, pass a desired name after a semicolon
+# (eg. u-boot.img;uboot). Exactly same rules with how IMAGE_BOOT_FILES being
+# handled by wic.
+def tezi_deploy_files(d, deploy_var, deploy_dir, source_dir=None):
+    import os, re, glob, subprocess
+
+    src_files = d.getVar(deploy_var) or ""
+    src_dir = source_dir or d.getVar('DEPLOY_DIR_IMAGE')
+    dst_dir = deploy_dir
+
+    # list of tuples (src_name, dst_name)
+    deploy_files = []
+    for src_entry in re.findall(r'[\w;\-\./\*]+', src_files):
+        if ';' in src_entry:
+            dst_entry = tuple(src_entry.split(';'))
+            if not dst_entry[0] or not dst_entry[1]:
+                bb.fatal('Malformed file entry: %s' % src_entry)
+        else:
+            dst_entry = (src_entry, src_entry)
+        deploy_files.append(dst_entry)
+
+    # list of tuples (src_path, dst_path)
+    install_task = []
+    for deploy_entry in deploy_files:
+        src, dst = deploy_entry
+        if '*' in src:
+            # by default install files under their basename
+            entry_name_fn = os.path.basename
+            if dst != src:
+                # unless a target name was given, then treat name
+                # as a directory and append a basename
+                entry_name_fn = lambda name: \
+                                os.path.join(dst,
+                                             os.path.basename(name))
+
+            srcs = glob.glob(os.path.join(src_dir, src))
+            for entry in srcs:
+                src = os.path.relpath(entry, src_dir)
+                entry_dst_name = entry_name_fn(entry)
+                install_task.append((src, entry_dst_name))
+        else:
+            install_task.append((src, dst))
+
+    # install src_path to dst_path
+    for task in install_task:
+        src_path, dst_path = task
+        install_cmd = "install -m 0644 -D %s %s" \
+                      % (os.path.join(src_dir, src_path),
+                         os.path.join(dst_dir, dst_path))
+        try:
+            subprocess.check_output(install_cmd, stderr=subprocess.STDOUT, shell=True)
+        except subprocess.CalledProcessError as e:
+            bb.fatal("Command '%s' returned %d:\n%s" % (e.cmd, e.returncode, e.output))
 
 # Make an educated guess of the needed boot partition size
 # max(16MB, twice the size of the payload rounded up to the next 2^x number)
@@ -65,8 +110,7 @@ def rootfs_tezi_emmc(d):
     from collections import OrderedDict
     offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD')
     offset_spl = d.getVar('OFFSET_SPL_PAYLOAD')
-    imagename = d.getVar('IMAGE_NAME')
-    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX')
+    imagename = d.getVar('IMAGE_LINK_NAME')
     imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX')
 
     bootpart_rawfiles = []
@@ -106,7 +150,7 @@ def rootfs_tezi_emmc(d):
                 "label": d.getVar('TEZI_ROOT_LABEL'),
                 "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
                 "mkfs_options": "-E nodiscard",
-                "filename": imagename + imagename_suffix + "." + imagetype_suffix,
+                "filename": imagename + "." + imagetype_suffix,
                 "uncompressed_size": get_uncompressed_size(d) / 1024
               }
             }
@@ -123,8 +167,7 @@ def rootfs_tezi_emmc(d):
 
 def rootfs_tezi_rawnand(d, distro=False):
     from collections import OrderedDict
-    imagename = d.getVar('IMAGE_NAME')
-    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX')
+    imagename = d.getVar('IMAGE_LINK_NAME')
     imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX')
 
     uboot1 = OrderedDict({
@@ -151,7 +194,7 @@ def rootfs_tezi_rawnand(d, distro=False):
                "name": "rootfs",
                "content": {
                  "filesystem_type": "ubifs",
-                 "filename": imagename + imagename_suffix + "." + imagetype_suffix,
+                 "filename": imagename + "." + imagetype_suffix,
                  "uncompressed_size": get_uncompressed_size(d) / 1024
                }
              }
@@ -281,11 +324,22 @@ python rootfs_tezi_run_json() {
     rootfs_tezi_json(d, flash_type, flash_data, "image.json", uenv_file)
 }
 
+python tezi_deploy_bootfs_files() {
+    tezi_deploy_files(d, 'IMAGE_BOOT_FILES', os.path.join(d.getVar('WORKDIR'), 'bootfs'))
+}
+tezi_deploy_bootfs_files[dirs] =+ "${WORKDIR}/bootfs"
+tezi_deploy_bootfs_files[cleandirs] += "${WORKDIR}/bootfs"
+
 create_tezi_bootfs () {
-	create_bootfs "${TEZI_KERNEL_IMAGETYPE}" "${TEZI_KERNEL_DEVICETREE}" "${MACHINE_BOOT_FILES}"
+	cd ${IMGDEPLOYDIR}
+	rm -f ${IMAGE_BASENAME}-*.bootfs.tar.xz
+	${IMAGE_CMD_TAR} -chf ${IMAGE_NAME}.bootfs.tar -C ${WORKDIR}/bootfs -p .
+	echo $(du -ks ${IMAGE_NAME}.bootfs.tar | cut -f 1) > ${T}/image-size.bootfs.tar
+	xz -f ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMAGE_NAME}.bootfs.tar
+	ln -sf ${IMAGE_NAME}.bootfs.tar.xz ${IMAGE_LINK_NAME}.bootfs.tar.xz
 }
 
-do_image_teziimg[prefuncs] += "create_tezi_bootfs rootfs_tezi_run_json"
+do_image_teziimg[prefuncs] += "tezi_deploy_bootfs_files create_tezi_bootfs rootfs_tezi_run_json"
 
 IMAGE_CMD_teziimg () {
 	bbnote "Create Toradex Easy Installer tarball"
@@ -307,8 +361,8 @@ IMAGE_CMD_teziimg () {
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${SPL_BINARY} ${UBOOT_BINARY_TEZI_RAWNAND} ${UBOOT_ENV_TEZI_RAWNAND} ${TEZI_KERNEL_IMAGETYPE} ${TEZI_KERNEL_DEVICETREE} \
-			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${TEZI_ROOT_SUFFIX}
+			${SPL_BINARY} ${UBOOT_BINARY_TEZI_RAWNAND} ${UBOOT_ENV_TEZI_RAWNAND} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
+			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
 		*)
 		# The first transform strips all folders from the files to tar, the
@@ -318,8 +372,8 @@ IMAGE_CMD_teziimg () {
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${SPL_BINARY} ${UBOOT_BINARY_TEZI_EMMC} ${UBOOT_ENV_TEZI_EMMC} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz \
-			${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${TEZI_ROOT_SUFFIX}
+			${SPL_BINARY} ${UBOOT_BINARY_TEZI_EMMC} ${UBOOT_ENV_TEZI_EMMC} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.bootfs.tar.xz \
+			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
 	esac
 }
@@ -357,11 +411,7 @@ python rootfs_tezi_run_distro_json() {
         d.appendVar("TEZI_IMAGE_UBOOT_FILES", uenv_file + " " + uboot_file + " ")
 }
 
-create_tezi_distro_bootfs () {
-	create_bootfs "${TEZI_KERNEL_IMAGETYPE}" "${TEZI_KERNEL_DEVICETREE}" "boot.scr" ${MACHINE_BOOT_FILES}
-}
-
-do_image_teziimg_distro[prefuncs] += "create_tezi_distro_bootfs rootfs_tezi_run_distro_json"
+do_image_teziimg_distro[prefuncs] += "tezi_deploy_bootfs_files create_tezi_bootfs rootfs_tezi_run_distro_json"
 
 IMAGE_CMD_teziimg-distro () {
 	bbnote "Create Toradex Easy Installer tarball"
@@ -381,8 +431,8 @@ IMAGE_CMD_teziimg-distro () {
 		--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
 		${TEZI_IMAGE_JSON_FILES} toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-                ${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_NAME}.bootfs.tar.xz \
-		${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${TEZI_ROOT_SUFFIX}
+		${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.bootfs.tar.xz \
+		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 }
 
 IMAGE_TYPEDEP_teziimg-distro += "${TEZI_ROOT_SUFFIX}"
