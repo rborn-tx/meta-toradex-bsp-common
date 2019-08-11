@@ -121,74 +121,94 @@ def rootfs_tezi_emmc(d):
         })]
 
 
-def rootfs_tezi_rawnand(d):
+def rootfs_tezi_rawnand(d, distro=False):
     from collections import OrderedDict
     imagename = d.getVar('IMAGE_NAME')
     imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX')
     imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX')
 
-    # Use device tree mapping to create product id <-> device tree relationship
-    dtmapping = d.getVarFlags('TORADEX_PRODUCT_IDS')
-    dtfiles = []
-    for f, v in dtmapping.items():
-        dtfiles.append({ "filename": v, "product_ids": f })
+    uboot1 = OrderedDict({
+               "name": "u-boot1",
+               "content": {
+                 "rawfile": {
+                   "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
+                   "size": 1
+                 }
+               },
+             })
 
-    return [
-        OrderedDict({
-          "name": "u-boot1",
-          "content": {
-            "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
-              "size": 1
-            }
-          },
-        }),
-        OrderedDict({
-          "name": "u-boot2",
-          "content": {
-            "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
-              "size": 1
-            }
-          }
-        }),
-        OrderedDict({
-          "name": "ubi",
-          "ubivolumes": [
-            {
-              "name": "kernel",
-              "size_kib": 8192,
-              "type": "static",
-              "content": {
-                "rawfile": {
-                  "filename": d.getVar('TEZI_KERNEL_IMAGETYPE'),
-                  "size": 5
-                }
+    uboot2 = OrderedDict({
+               "name": "u-boot2",
+               "content": {
+                 "rawfile": {
+                   "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
+                   "size": 1
+                 }
+               }
+             })
+
+    rootfs = {
+               "name": "rootfs",
+               "content": {
+                 "filesystem_type": "ubifs",
+                 "filename": imagename + imagename_suffix + "." + imagetype_suffix,
+                 "uncompressed_size": get_uncompressed_size(d) / 1024
+               }
+             }
+
+    if distro:
+        boot = {
+                 "name": "boot",
+                 "size_kib": 16384,
+                 "content": {
+                   "filesystem_type": "ubifs",
+                   "filename": imagename + ".bootfs.tar.xz",
+                   "uncompressed_size": get_uncompressed_size(d, 'bootfs.tar') / 1024
+                 }
+               }
+        ubivolumes = [boot, rootfs]
+    else:
+        kernel = {
+                   "name": "kernel",
+                   "size_kib": 8192,
+                   "type": "static",
+                   "content": {
+                     "rawfile": {
+                     "filename": d.getVar('TEZI_KERNEL_IMAGETYPE'),
+                     "size": 5
+                     }
+                   }
+                 }
+
+        # Use device tree mapping to create product id <-> device tree relationship
+        dtmapping = d.getVarFlags('TORADEX_PRODUCT_IDS')
+        dtfiles = []
+        for f, v in dtmapping.items():
+            dtfiles.append({ "filename": v, "product_ids": f })
+
+        dtb = {
+                "name": "dtb",
+                "content": {
+                  "rawfiles": dtfiles
+                },
+                "size_kib": 128,
+                "type": "static"
               }
-            },
-            {
-              "name": "dtb",
-              "content": {
-                "rawfiles": dtfiles
-              },
-              "size_kib": 128,
-              "type": "static"
-            },
-            {
-              "name": "m4firmware",
-              "size_kib": 896,
-              "type": "static"
-            },
-            {
-              "name": "rootfs",
-              "content": {
-                "filesystem_type": "ubifs",
-                "filename": imagename + imagename_suffix + "." + imagetype_suffix,
-                "uncompressed_size": get_uncompressed_size(d) / 1024
-              }
-            }
-          ]
-        })]
+
+        m4firmware = {
+                       "name": "m4firmware",
+                       "size_kib": 896,
+                       "type": "static"
+                     }
+
+        ubivolumes = [kernel, dtb, m4firmware, rootfs]
+
+    ubi = OrderedDict({
+            "name": "ubi",
+            "ubivolumes": ubivolumes
+          })
+
+    return [uboot1, uboot2, ubi]
 
 def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     import json
@@ -306,54 +326,6 @@ IMAGE_CMD_teziimg () {
 
 IMAGE_TYPEDEP_teziimg += "${TEZI_ROOT_SUFFIX}"
 
-def rootfs_tezi_distro_rawnand(d):
-    from collections import OrderedDict
-    imagename = d.getVar('IMAGE_NAME')
-    imagename_suffix = d.getVar('IMAGE_NAME_SUFFIX')
-    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX')
-
-    return [
-        OrderedDict({
-          "name": "u-boot1",
-          "content": {
-            "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
-              "size": 1
-            }
-          },
-        }),
-        OrderedDict({
-          "name": "u-boot2",
-          "content": {
-            "rawfile": {
-              "filename": d.getVar('UBOOT_BINARY_TEZI_RAWNAND'),
-              "size": 1
-            }
-          }
-        }),
-        OrderedDict({
-          "name": "ubi",
-          "ubivolumes": [
-            {
-              "name": "boot",
-              "size_kib": 16384,
-              "content": {
-                "filesystem_type": "ubifs",
-                "filename": imagename + ".bootfs.tar.xz",
-                "uncompressed_size": get_uncompressed_size(d, 'bootfs.tar') / 1024
-              }
-            },
-            {
-              "name": "rootfs",
-              "content": {
-                "filesystem_type": "ubifs",
-                "filename": imagename + imagename_suffix + "." + imagetype_suffix,
-                "uncompressed_size": get_uncompressed_size(d) / 1024
-              }
-            }
-          ]
-        })]
-
 python rootfs_tezi_run_distro_json() {
     flash_types = d.getVar('TORADEX_FLASH_TYPE')
     if flash_types is None:
@@ -362,7 +334,7 @@ python rootfs_tezi_run_distro_json() {
     flash_types_list = flash_types.split()
     for flash_type in flash_types_list:
         if flash_type == "rawnand":
-            flash_data = rootfs_tezi_distro_rawnand(d)
+            flash_data = rootfs_tezi_rawnand(d, True)
             uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND')
             uboot_file = d.getVar('UBOOT_BINARY_TEZI_RAWNAND')
         elif flash_type == "emmc":
