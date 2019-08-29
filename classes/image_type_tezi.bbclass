@@ -217,7 +217,7 @@ def rootfs_tezi_rawnand(d, distro=False):
                    "type": "static",
                    "content": {
                      "rawfile": {
-                     "filename": d.getVar('TEZI_KERNEL_IMAGETYPE'),
+                     "filename": d.getVar('KERNEL_IMAGETYPE'),
                      "size": 5
                      }
                    }
