@@ -151,6 +151,7 @@ def rootfs_tezi_emmc(d):
                 "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
                 "mkfs_options": "-E nodiscard",
                 "filename": imagename + "." + imagetype_suffix,
+                "ota_provisioning": True if d.getVar('SOTA_PACKED_CREDENTIALS') else False,
                 "uncompressed_size": get_uncompressed_size(d) / 1024
               }
             }
@@ -195,6 +196,7 @@ def rootfs_tezi_rawnand(d, distro=False):
                "content": {
                  "filesystem_type": "ubifs",
                  "filename": imagename + "." + imagetype_suffix,
+                 "ota_provisioning": True if distro and d.getVar('SOTA_PACKED_CREDENTIALS') else False,
                  "uncompressed_size": get_uncompressed_size(d) / 1024
                }
              }
@@ -254,11 +256,12 @@ def rootfs_tezi_rawnand(d, distro=False):
     return [uboot1, uboot2, ubi]
 
 def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
-    import json
+    import json, os
     from collections import OrderedDict
     from datetime import datetime
 
     deploydir = d.getVar('DEPLOY_DIR_IMAGE')
+    ota_credentials = d.getVar('SOTA_PACKED_CREDENTIALS')
     # Patched in IMAGE_CMD_teziimg() below
     release_date = "%release_date%"
 
@@ -299,6 +302,11 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
         data["mtddevs"] = flash_data
     elif flash_type == "emmc":
         data["blockdevs"] = flash_data
+
+    if ota_credentials:
+        data["ota_credentials"] = os.path.basename(ota_credentials)
+    else:
+        data["ota_credentials"] = ""
 
     with open(os.path.join(deploydir, json_file), 'w') as outfile:
         json.dump(data, outfile, indent=4)
@@ -432,7 +440,7 @@ IMAGE_CMD_teziimg-distro () {
 		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
 		${TEZI_IMAGE_JSON_FILES} toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 		${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.bootfs.tar.xz \
-		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
+		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX} ${SOTA_PACKED_CREDENTIALS}
 }
 
 IMAGE_TYPEDEP_teziimg-distro += "${TEZI_ROOT_SUFFIX}"
