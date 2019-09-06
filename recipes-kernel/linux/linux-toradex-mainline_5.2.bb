@@ -1,6 +1,7 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-${PV}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-5.2:"
 
 LINUX_VERSION ?= "5.2.7"
+PV = "${LINUX_VERSION}+git${SRCPV}"
 
 SRCREV_machine = "74e785ce1024471e77b6fb9da83ffd60762c8cac"
 
