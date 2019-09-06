@@ -14,6 +14,8 @@ do_image_teziimg_distro[recrdeptask] += "do_deploy"
 WKS_FILE_DEPENDS_append = " tezi-metadata"
 DEPENDS += "${WKS_FILE_DEPENDS}"
 
+RM_WORK_EXCLUDE += "${PN}"
+
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
