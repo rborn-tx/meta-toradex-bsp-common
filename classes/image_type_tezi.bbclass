@@ -26,10 +26,6 @@ UBOOT_BINARY_TEZI_RAWNAND ?= "${UBOOT_BINARY}"
 UBOOT_ENV_TEZI_EMMC ?= "uEnv.txt"
 UBOOT_ENV_TEZI_RAWNAND ?= "uEnv.txt"
 
-# For generic images this is not yet defined
-TDX_VERDATE ?= "-${DATE}"
-TDX_VERDATE[vardepsexclude] = "DATE"
-
 # Append tar command to store uncompressed image size to ${T}.
 # If a custom rootfs type is used make sure this file is created
 # before compression.
@@ -259,16 +255,13 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     from datetime import datetime
 
     deploydir = d.getVar('DEPLOY_DIR_IMAGE')
-    # Patched in IMAGE_CMD_teziimg() below
-    release_date = "%release_date%"
-
     data = OrderedDict({ "config_format": 2, "autoinstall": False })
 
     # Use image recipes SUMMARY/DESCRIPTION/PV...
     data["name"] = d.getVar('SUMMARY')
     data["description"] = d.getVar('DESCRIPTION')
     data["version"] = d.getVar('PV')
-    data["release_date"] = release_date
+    data["release_date"] = datetime.strptime(d.getVar('DATE', False), '%Y%m%d').date().isoformat()
     data["u_boot_env"] = uenv_file
     if os.path.exists(os.path.join(deploydir, "prepare.sh")):
         data["prepare_script"] = "prepare.sh"
@@ -344,12 +337,6 @@ do_image_teziimg[prefuncs] += "tezi_deploy_bootfs_files create_tezi_bootfs rootf
 IMAGE_CMD_teziimg () {
 	bbnote "Create Toradex Easy Installer tarball"
 
-	# Fixup release_date in image.json, convert ${TDX_VERDATE} to isoformat
-	# This works around the non fatal ERRORS: "the basehash value changed" when DATE is referenced
-	# in a python prefunction to do_image
-	ISODATE=$(echo ${TDX_VERDATE} | sed 's/.\(....\)\(..\)\(..\).*/\1-\2-\3/')
-	sed -i "s/%release_date%/$ISODATE/" ${DEPLOY_DIR_IMAGE}/image.json
-
 	cd ${DEPLOY_DIR_IMAGE}
 
 	case "${TORADEX_FLASH_TYPE}" in
@@ -359,7 +346,7 @@ IMAGE_CMD_teziimg () {
 		${IMAGE_CMD_TAR} \
 			--transform='s/.*\///' \
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
-			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
+			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${SPL_BINARY} ${UBOOT_BINARY_TEZI_RAWNAND} ${UBOOT_ENV_TEZI_RAWNAND} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
@@ -370,13 +357,14 @@ IMAGE_CMD_teziimg () {
 		${IMAGE_CMD_TAR} \
 			--transform='s/.*\///' \
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
-			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
+			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${SPL_BINARY} ${UBOOT_BINARY_TEZI_EMMC} ${UBOOT_ENV_TEZI_EMMC} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.bootfs.tar.xz \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
 	esac
 }
+do_image_teziimg[vardepsexclude] = "DATE"
 
 IMAGE_TYPEDEP_teziimg += "${TEZI_ROOT_SUFFIX}"
 
@@ -418,21 +406,14 @@ IMAGE_CMD_teziimg-distro () {
 
 	cd ${DEPLOY_DIR_IMAGE}
 
-	# Fixup release_date in image.json, convert ${DATE} to isoformat
-	# This works around the non fatal ERRORS: "the basehash value changed" when DATE is referenced
-	# in a python prefunction to do_image
-	ISODATE=$(echo ${DATE} | sed 's/\(....\)\(..\)\(..\)/\1-\2-\3/')
-	for TEZI_IMAGE_JSON in ${TEZI_IMAGE_JSON_FILES}; do
-		sed -i "s/%release_date%/$ISODATE/" ${DEPLOY_DIR_IMAGE}/${TEZI_IMAGE_JSON}
-	done
-
 	${IMAGE_CMD_TAR} \
 		--transform='s/.*\///' \
 		--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
-		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}${TDX_VERDATE}.tar \
+		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
 		${TEZI_IMAGE_JSON_FILES} toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 		${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.bootfs.tar.xz \
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 }
+do_image_teziimg_distro[vardepsexclude] = "DATE"
 
 IMAGE_TYPEDEP_teziimg-distro += "${TEZI_ROOT_SUFFIX}"
