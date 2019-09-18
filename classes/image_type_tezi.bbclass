@@ -149,7 +149,6 @@ def rootfs_tezi_emmc(d):
                 "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
                 "mkfs_options": "-E nodiscard",
                 "filename": imagename + "." + imagetype_suffix,
-                "ota_provisioning": True if d.getVar('SOTA_PACKED_CREDENTIALS') else False,
                 "uncompressed_size": get_uncompressed_size(d) / 1024
               }
             }
@@ -194,7 +193,6 @@ def rootfs_tezi_rawnand(d, distro=False):
                "content": {
                  "filesystem_type": "ubifs",
                  "filename": imagename + "." + imagetype_suffix,
-                 "ota_provisioning": True if distro and d.getVar('SOTA_PACKED_CREDENTIALS') else False,
                  "uncompressed_size": get_uncompressed_size(d) / 1024
                }
              }
@@ -254,12 +252,11 @@ def rootfs_tezi_rawnand(d, distro=False):
     return [uboot1, uboot2, ubi]
 
 def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
-    import json, os
+    import json
     from collections import OrderedDict
     from datetime import datetime
 
     deploydir = d.getVar('DEPLOY_DIR_IMAGE')
-    ota_credentials = d.getVar('SOTA_PACKED_CREDENTIALS')
     data = OrderedDict({ "config_format": 2, "autoinstall": False })
 
     # Use image recipes SUMMARY/DESCRIPTION/PV...
@@ -297,11 +294,6 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
         data["mtddevs"] = flash_data
     elif flash_type == "emmc":
         data["blockdevs"] = flash_data
-
-    if ota_credentials:
-        data["ota_credentials"] = os.path.basename(ota_credentials)
-    else:
-        data["ota_credentials"] = ""
 
     with open(os.path.join(deploydir, json_file), 'w') as outfile:
         json.dump(data, outfile, indent=4)
@@ -420,7 +412,7 @@ IMAGE_CMD_teziimg-distro () {
 		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
 		${TEZI_IMAGE_JSON_FILES} toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 		${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.bootfs.tar.xz \
-		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX} ${SOTA_PACKED_CREDENTIALS}
+		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 }
 do_image_teziimg_distro[vardepsexclude] = "DATE"
 
