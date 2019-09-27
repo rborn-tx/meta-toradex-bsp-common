@@ -4,15 +4,11 @@ then
     exit
 fi
 
-if test -n ${setup}
-then
-    run setup
-fi
-
 env set overlays_file "overlays.txt"
 env set load_overlay 'load ${devtype} ${devnum}:1 ${loadaddr} ${overlays_file}; env import -t ${loadaddr} ${filesize}'
 env set apply_overlays 'fdt addr ${fdt_addr_r} && fdt resize 0x20000 && for overlay_file in ${fdt_overlays}; do echo "Applying Overlay: ${overlay_file}"
 && load ${devtype} ${devnum}:1 ${loadaddr} ${overlay_file} && fdt apply ${loadaddr}; done;'
+
 
 env set bootcmd_load_k 'load ${devtype} ${devnum}:2 ${kernel_addr_r} "/boot"${kernel_image}'
 env set bootcmd_load_r 'load ${devtype} ${devnum}:2 ${ramdisk_addr_r} "/boot"${ramdisk_image}; env set ramdisk_size ${filesize}'
