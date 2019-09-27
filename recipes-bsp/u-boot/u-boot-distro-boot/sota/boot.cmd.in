@@ -26,6 +26,14 @@ fi
 
 run bootcmd_otenv
 
+if test "${board}" = "apalis-imx8"
+then
+	echo "Loading HDMI firmware..."
+	env set hdp_file hdmitxfw.bin
+	load ${devtype} ${devnum}:1 ${loadaddr} ${hdp_file}
+	hdp load ${loadaddr}
+fi
+
 if test -n ${rollback} && test ${rollback} = 1
 then
     echo "Roolback enabled. Booting old version."
