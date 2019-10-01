@@ -28,6 +28,8 @@ UBOOT_BINARY_TEZI_RAWNAND ?= "${UBOOT_BINARY}"
 UBOOT_ENV_TEZI_EMMC ?= "uEnv.txt"
 UBOOT_ENV_TEZI_RAWNAND ?= "uEnv.txt"
 
+SUMMARY_append = "${DISTRO_FLAVOUR}"
+
 # Append tar command to store uncompressed image size to ${T}.
 # If a custom rootfs type is used make sure this file is created
 # before compression.
