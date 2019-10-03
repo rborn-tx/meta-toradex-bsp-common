@@ -28,6 +28,8 @@ UBOOT_BINARY_TEZI_RAWNAND ?= "${UBOOT_BINARY}"
 UBOOT_ENV_TEZI_EMMC ?= "uEnv.txt"
 UBOOT_ENV_TEZI_RAWNAND ?= "uEnv.txt"
 
+# use DISTRO_FLAVOUR to append to the image name displayed in TEZI
+DISTRO_FLAVOUR ??= ""
 SUMMARY_append = "${DISTRO_FLAVOUR}"
 
 # Append tar command to store uncompressed image size to ${T}.
