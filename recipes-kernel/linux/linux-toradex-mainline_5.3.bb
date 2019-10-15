@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-5.2:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-5.3:"
 
 LINUX_VERSION ?= "5.3.2"
 PV = "${LINUX_VERSION}+git${SRCPV}"
