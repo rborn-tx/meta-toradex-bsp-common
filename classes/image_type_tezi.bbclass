@@ -19,6 +19,7 @@ RM_WORK_EXCLUDE += "${PN}"
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
+TEZI_BOOT_SUFFIX ??= "bootfs.tar.xz"
 TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY ??= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
@@ -31,13 +32,22 @@ UBOOT_ENV_TEZI_RAWNAND ?= "uEnv.txt"
 # Append tar command to store uncompressed image size to ${T}.
 # If a custom rootfs type is used make sure this file is created
 # before compression.
-IMAGE_CMD_tar_append = "; echo $(du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar | cut -f 1) > ${T}/image-size.tar"
+IMAGE_CMD_tar_append = "; du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar | cut -f 1 > ${T}/image-size${IMAGE_NAME_SUFFIX}"
+CONVERSION_CMD_tar_append = "; du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.tar | cut -f 1 > ${T}/image-size.${type}"
+CONVERSION_CMD_tar = "touch ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}; ${IMAGE_CMD_TAR} --numeric-owner -cf ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.tar -C ${TAR_IMAGE_ROOTFS} . || [ $? -eq 1 ]"
+CONVERSIONTYPES_append = " tar"
 
-def get_uncompressed_size(d, type=""):
-    suffix = type if type else '.'.join((d.getVar('TEZI_ROOT_SUFFIX') or "").split('.')[:-1])
-    with open(os.path.join(d.getVar('T'), "image-size.%s" % suffix), "r") as f:
+def get_uncompressed_size(d, type):
+    with open(os.path.join(d.getVar('T'), "image-size.%s" % type), "r") as f:
         size = f.read().strip()
-    return float(size)
+    return float(size) / 1024
+
+# Make an educated guess of the needed boot partition size
+# max(16MB, twice the size of the payload rounded up to the next 2^x number)
+def get_bootfs_part_size(d):
+    from math import log
+    part_size = 2 ** (2 + int(log(get_uncompressed_size(d, 'bootfs'), 2)))
+    return max(16, part_size)
 
 # Whitespace separated list of files declared by 'deploy_var' variable
 # from 'source_dir' (DEPLOY_DIR_IMAGE by default) to place in 'deploy_dir'.
@@ -96,20 +106,11 @@ def tezi_deploy_files(d, deploy_var, deploy_dir, source_dir=None):
         except subprocess.CalledProcessError as e:
             bb.fatal("Command '%s' returned %d:\n%s" % (e.cmd, e.returncode, e.output))
 
-# Make an educated guess of the needed boot partition size
-# max(16MB, twice the size of the payload rounded up to the next 2^x number)
-def get_bootfs_part_size(d):
-    from math import log
-    payload_size = get_uncompressed_size(d, 'bootfs.tar') / 1024
-    part_size = 2 ** (2 + int(log (payload_size, 2)))
-    return max(16, part_size)
-
-def rootfs_tezi_emmc(d):
+def rootfs_tezi_emmc(d, distro=False):
     from collections import OrderedDict
     offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD')
     offset_spl = d.getVar('OFFSET_SPL_PAYLOAD')
     imagename = d.getVar('IMAGE_LINK_NAME')
-    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX')
 
     bootpart_rawfiles = []
 
@@ -137,8 +138,8 @@ def rootfs_tezi_emmc(d):
                 "label": "BOOT",
                 "filesystem_type": "FAT",
                 "mkfs_options": "",
-                "filename": imagename + ".bootfs.tar.xz",
-                "uncompressed_size": get_uncompressed_size(d, 'bootfs.tar') / 1024
+                "filename": imagename + "." + d.getVar('TEZI_BOOT_SUFFIX'),
+                "uncompressed_size": get_uncompressed_size(d, 'bootfs')
               }
             },
             {
@@ -148,8 +149,8 @@ def rootfs_tezi_emmc(d):
                 "label": d.getVar('TEZI_ROOT_LABEL'),
                 "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
                 "mkfs_options": "-E nodiscard",
-                "filename": imagename + "." + imagetype_suffix,
-                "uncompressed_size": get_uncompressed_size(d) / 1024
+                "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
+                "uncompressed_size": get_uncompressed_size(d, 'ota' if distro else "rootfs")
               }
             }
           ]
@@ -166,7 +167,6 @@ def rootfs_tezi_emmc(d):
 def rootfs_tezi_rawnand(d, distro=False):
     from collections import OrderedDict
     imagename = d.getVar('IMAGE_LINK_NAME')
-    imagetype_suffix = d.getVar('TEZI_ROOT_SUFFIX')
 
     uboot1 = OrderedDict({
                "name": "u-boot1",
@@ -192,8 +192,8 @@ def rootfs_tezi_rawnand(d, distro=False):
                "name": "rootfs",
                "content": {
                  "filesystem_type": "ubifs",
-                 "filename": imagename + "." + imagetype_suffix,
-                 "uncompressed_size": get_uncompressed_size(d) / 1024
+                 "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
+                 "uncompressed_size": get_uncompressed_size(d, 'ota' if distro else 'rootfs')
                }
              }
 
@@ -203,8 +203,8 @@ def rootfs_tezi_rawnand(d, distro=False):
                  "size_kib": 16384,
                  "content": {
                    "filesystem_type": "ubifs",
-                   "filename": imagename + ".bootfs.tar.xz",
-                   "uncompressed_size": get_uncompressed_size(d, 'bootfs.tar') / 1024
+                   "filename": imagename + "." + d.getVar('TEZI_BOOT_SUFFIX'),
+                   "uncompressed_size": get_uncompressed_size(d, 'bootfs')
                  }
                }
         ubivolumes = [boot, rootfs]
@@ -325,16 +325,11 @@ python tezi_deploy_bootfs_files() {
 tezi_deploy_bootfs_files[dirs] =+ "${WORKDIR}/bootfs"
 tezi_deploy_bootfs_files[cleandirs] += "${WORKDIR}/bootfs"
 
-create_tezi_bootfs () {
-	cd ${IMGDEPLOYDIR}
-	rm -f ${IMAGE_BASENAME}-*.bootfs.tar.xz
-	${IMAGE_CMD_TAR} -chf ${IMAGE_NAME}.bootfs.tar -C ${WORKDIR}/bootfs -p .
-	echo $(du -ks ${IMAGE_NAME}.bootfs.tar | cut -f 1) > ${T}/image-size.bootfs.tar
-	xz -f ${XZ_COMPRESSION_LEVEL} ${XZ_THREADS} --check=${XZ_INTEGRITY_CHECK} ${IMAGE_NAME}.bootfs.tar
-	ln -sf ${IMAGE_NAME}.bootfs.tar.xz ${IMAGE_LINK_NAME}.bootfs.tar.xz
+TAR_IMAGE_ROOTFS_task-image-bootfs = "${WORKDIR}/bootfs"
+IMAGE_CMD_bootfs () {
+	:
 }
-
-do_image_teziimg[prefuncs] += "tezi_deploy_bootfs_files create_tezi_bootfs rootfs_tezi_run_json"
+do_image_bootfs[prefuncs] += "tezi_deploy_bootfs_files"
 
 IMAGE_CMD_teziimg () {
 	bbnote "Create Toradex Easy Installer tarball"
@@ -360,14 +355,15 @@ IMAGE_CMD_teziimg () {
 			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${SPL_BINARY} ${UBOOT_BINARY_TEZI_EMMC} ${UBOOT_ENV_TEZI_EMMC} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.bootfs.tar.xz \
+			${SPL_BINARY} ${UBOOT_BINARY_TEZI_EMMC} ${UBOOT_ENV_TEZI_EMMC} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
 	esac
 }
+do_image_teziimg[prefuncs] += "rootfs_tezi_run_json"
 do_image_teziimg[vardepsexclude] = "DATE"
 
-IMAGE_TYPEDEP_teziimg += "${TEZI_ROOT_SUFFIX}"
+IMAGE_TYPEDEP_teziimg += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
 
 python rootfs_tezi_run_distro_json() {
     flash_types = d.getVar('TORADEX_FLASH_TYPE')
@@ -381,7 +377,7 @@ python rootfs_tezi_run_distro_json() {
             uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND')
             uboot_file = d.getVar('UBOOT_BINARY_TEZI_RAWNAND')
         elif flash_type == "emmc":
-            flash_data = rootfs_tezi_emmc(d)
+            flash_data = rootfs_tezi_emmc(d, True)
             uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
             uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
             # TODO: Multi image/raw NAND with SPL currently not supported
@@ -400,7 +396,7 @@ python rootfs_tezi_run_distro_json() {
         d.appendVar("TEZI_IMAGE_UBOOT_FILES", uenv_file + " " + uboot_file + " ")
 }
 
-do_image_teziimg_distro[prefuncs] += "tezi_deploy_bootfs_files create_tezi_bootfs rootfs_tezi_run_distro_json"
+do_image_teziimg_distro[prefuncs] += "rootfs_tezi_run_distro_json"
 
 IMAGE_CMD_teziimg-distro () {
 	bbnote "Create Toradex Easy Installer tarball"
@@ -411,9 +407,9 @@ IMAGE_CMD_teziimg-distro () {
 		--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
 		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
 		${TEZI_IMAGE_JSON_FILES} toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-		${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.bootfs.tar.xz \
+		${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 }
 do_image_teziimg_distro[vardepsexclude] = "DATE"
 
-IMAGE_TYPEDEP_teziimg-distro += "${TEZI_ROOT_SUFFIX}"
+IMAGE_TYPEDEP_teziimg-distro += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
