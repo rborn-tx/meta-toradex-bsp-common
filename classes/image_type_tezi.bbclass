@@ -16,6 +16,7 @@ DEPENDS += "${WKS_FILE_DEPENDS}"
 
 RM_WORK_EXCLUDE += "${PN}"
 
+TEZI_VERSION ?= "${PV}-${DATE}"
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
@@ -259,10 +260,10 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     deploydir = d.getVar('DEPLOY_DIR_IMAGE')
     data = OrderedDict({ "config_format": 2, "autoinstall": False })
 
-    # Use image recipes SUMMARY/DESCRIPTION/PV...
+    # Use image recipes SUMMARY/DESCRIPTION...
     data["name"] = d.getVar('SUMMARY')
     data["description"] = d.getVar('DESCRIPTION')
-    data["version"] = d.getVar('PV')
+    data["version"] = d.getVar('TEZI_VERSION')
     data["release_date"] = datetime.strptime(d.getVar('DATE', False), '%Y%m%d').date().isoformat()
     data["u_boot_env"] = uenv_file
     if os.path.exists(os.path.join(deploydir, "prepare.sh")):
@@ -338,22 +339,22 @@ IMAGE_CMD_teziimg () {
 	case "${TORADEX_FLASH_TYPE}" in
 		rawnand)
 		# The first transform strips all folders from the files to tar, the
-		# second transform "moves" them in a subfolder ${IMAGE_NAME}_${PV}.
+		# second transform "moves" them in a subfolder ${IMAGE_NAME}_${TEZI_VERSION}.
 		${IMAGE_CMD_TAR} \
 			--transform='s/.*\///' \
-			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
-			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
+			--transform 's,^,${IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
+			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${SPL_BINARY} ${UBOOT_BINARY_TEZI_RAWNAND} ${UBOOT_ENV_TEZI_RAWNAND} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
 		*)
 		# The first transform strips all folders from the files to tar, the
-		# second transform "moves" them in a subfolder ${IMAGE_NAME}-Tezi_${PV}.
+		# second transform "moves" them in a subfolder ${IMAGE_NAME}-Tezi_${TEZI_VERSION}.
 		${IMAGE_CMD_TAR} \
 			--transform='s/.*\///' \
-			--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
-			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
+			--transform 's,^,${IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
+			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${SPL_BINARY} ${UBOOT_BINARY_TEZI_EMMC} ${UBOOT_ENV_TEZI_EMMC} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
@@ -361,7 +362,7 @@ IMAGE_CMD_teziimg () {
 	esac
 }
 do_image_teziimg[prefuncs] += "rootfs_tezi_run_json"
-do_image_teziimg[vardepsexclude] = "DATE"
+IMAGE_TYPEDEP_teziimg[vardepsexclude] = "TEZI_VERSION"
 
 IMAGE_TYPEDEP_teziimg += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
 
@@ -404,12 +405,12 @@ IMAGE_CMD_teziimg-distro () {
 	cd ${DEPLOY_DIR_IMAGE}
 	${IMAGE_CMD_TAR} \
 		--transform='s/.*\///' \
-		--transform 's,^,${IMAGE_NAME}-Tezi_${PV}/,' \
-		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${PV}-${DATE}.tar \
+		--transform 's,^,${IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
+		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
 		${TEZI_IMAGE_JSON_FILES} toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 		${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 }
-do_image_teziimg_distro[vardepsexclude] = "DATE"
+IMAGE_CMD_teziimg-distro[vardepsexclude] = "TEZI_VERSION"
 
 IMAGE_TYPEDEP_teziimg-distro += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
