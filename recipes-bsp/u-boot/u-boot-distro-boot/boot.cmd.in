@@ -14,7 +14,7 @@ if test -n ${setup}
 then
     run setup
 else
-    env set setupargs 'console=tty1 consoleblank=0'
+    env set setupargs 'console=${console},${baudrate} console=tty1 consoleblank=0'
 fi
 test -n ${m4boot} || env set m4boot ';'
 test -n ${fdtfile} || env set fdtfile $fdt_file
