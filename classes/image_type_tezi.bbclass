@@ -117,8 +117,7 @@ def rootfs_tezi_emmc(d):
 
     bootpart_rawfiles = []
 
-    has_spl = d.getVar('SPL_BINARY')
-    if has_spl:
+    if offset_spl:
         bootpart_rawfiles.append(
               {
                 "filename": d.getVar('SPL_BINARY'),
@@ -127,7 +126,7 @@ def rootfs_tezi_emmc(d):
     bootpart_rawfiles.append(
               {
                 "filename": d.getVar('UBOOT_BINARY_TEZI_EMMC'),
-                "dd_options": "seek=" + (offset_spl if has_spl else offset_bootrom)
+                "dd_options": "seek=" + (offset_spl if offset_spl else offset_bootrom)
               })
 
     return [
@@ -320,7 +319,7 @@ python rootfs_tezi_run_json() {
         uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
         uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
         # TODO: Multi image/raw NAND with SPL currently not supported
-        if d.getVar('SPL_BINARY'):
+        if d.getVar('OFFSET_SPL_PAYLOAD'):
             uboot_file += " " + d.getVar('SPL_BINARY')
     else:
         bb.fatal("Toradex flash type unknown")
@@ -396,7 +395,7 @@ python rootfs_tezi_run_distro_json() {
             uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
             uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
             # TODO: Multi image/raw NAND with SPL currently not supported
-            if d.getVar('SPL_BINARY'):
+            if d.getVar('OFFSET_SPL_PAYLOAD'):
                 uboot_file += " " + d.getVar('SPL_BINARY')
         else:
             bb.fatal("Toradex flash type unknown")
