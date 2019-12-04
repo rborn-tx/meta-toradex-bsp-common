@@ -311,13 +311,19 @@ python rootfs_tezi_run_json() {
     if flash_type == "rawnand":
         flash_data = rootfs_tezi_rawnand(d)
         uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND')
+        uboot_file = d.getVar('UBOOT_BINARY_TEZI_RAWNAND')
     elif flash_type == "emmc":
         flash_data = rootfs_tezi_emmc(d)
         uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
+        uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
+        # TODO: Multi image/raw NAND with SPL currently not supported
+        if d.getVar('SPL_BINARY'):
+            uboot_file += " " + d.getVar('SPL_BINARY')
     else:
         bb.fatal("Toradex flash type unknown")
 
     rootfs_tezi_json(d, flash_type, flash_data, "image.json", uenv_file)
+    d.appendVar("TEZI_IMAGE_UBOOT_FILES", uenv_file + " " + uboot_file + " ")
 }
 
 python tezi_deploy_bootfs_files() {
@@ -345,7 +351,7 @@ IMAGE_CMD_teziimg () {
 			--transform 's,^,${IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${SPL_BINARY} ${UBOOT_BINARY_TEZI_RAWNAND} ${UBOOT_ENV_TEZI_RAWNAND} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
+			${TEZI_IMAGE_UBOOT_FILES} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
 		*)
@@ -356,7 +362,7 @@ IMAGE_CMD_teziimg () {
 			--transform 's,^,${IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
 			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${SPL_BINARY} ${UBOOT_BINARY_TEZI_EMMC} ${UBOOT_ENV_TEZI_EMMC} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
+			${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
 	esac
