@@ -322,7 +322,7 @@ python rootfs_tezi_run_json() {
         bb.fatal("Toradex flash type unknown")
 
     rootfs_tezi_json(d, flash_type, flash_data, "image.json", uenv_file)
-    d.appendVar("TEZI_IMAGE_UBOOT_FILES", uenv_file + " " + uboot_file + " ")
+    d.appendVar("TEZI_IMAGE_UBOOT_FILES", ' ' + uenv_file + ' ' + uboot_file)
 }
 
 python tezi_deploy_bootfs_files() {
@@ -398,8 +398,8 @@ python rootfs_tezi_run_distro_json() {
             json_file = "image.json"
 
         rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file)
-        d.appendVar("TEZI_IMAGE_JSON_FILES", json_file + " ")
-        d.appendVar("TEZI_IMAGE_UBOOT_FILES", uenv_file + " " + uboot_file + " ")
+        d.appendVar("TEZI_IMAGE_JSON_FILES", ' ' + json_file)
+        d.appendVar("TEZI_IMAGE_UBOOT_FILES", ' ' + uenv_file + ' ' + uboot_file)
 }
 
 do_image_teziimg_distro[prefuncs] += "rootfs_tezi_run_distro_json"
