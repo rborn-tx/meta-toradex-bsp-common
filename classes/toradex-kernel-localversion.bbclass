@@ -13,7 +13,7 @@
 SCMVERSION ??= "y"
 LOCALVERSION ?= "-${TDX_VERSION}"
 
-do_configure_prepend() {
+kernel_do_configure_append() {
 	sed -i -e /CONFIG_LOCALVERSION/d ${B}/.config
 	echo "CONFIG_LOCALVERSION=\"${LOCALVERSION}\"" >> ${B}/.config
 
