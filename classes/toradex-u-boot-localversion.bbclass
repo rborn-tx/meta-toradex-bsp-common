@@ -11,6 +11,7 @@
 # Copyright 2014 (C) O.S. Systems Software LTDA.
 # Copyright 2017-2019 (C) Toradex Inc.
 
+TDX_VERSION ??= "0"
 SCMVERSION ??= "y"
 LOCALVERSION ??= "-${TDX_VERSION}"
 
