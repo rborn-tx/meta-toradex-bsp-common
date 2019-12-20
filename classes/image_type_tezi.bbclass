@@ -17,6 +17,7 @@ DEPENDS += "${WKS_FILE_DEPENDS}"
 RM_WORK_EXCLUDE += "${PN}"
 
 TEZI_VERSION ?= "${DISTRO_VERSION}"
+TEZI_IMAGE_NAME ?= "${IMAGE_NAME}"
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
@@ -344,22 +345,22 @@ IMAGE_CMD_teziimg () {
 	case "${TORADEX_FLASH_TYPE}" in
 		rawnand)
 		# The first transform strips all folders from the files to tar, the
-		# second transform "moves" them in a subfolder ${IMAGE_NAME}_${TEZI_VERSION}.
+		# second transform "moves" them in a subfolder ${TEZI_IMAGE_NAME}_${TEZI_VERSION}.
 		${IMAGE_CMD_TAR} \
 			--transform='s/.*\///' \
-			--transform 's,^,${IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
-			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
+			--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
+			-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${TEZI_IMAGE_UBOOT_FILES} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
 		*)
 		# The first transform strips all folders from the files to tar, the
-		# second transform "moves" them in a subfolder ${IMAGE_NAME}-Tezi_${TEZI_VERSION}.
+		# second transform "moves" them in a subfolder ${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.
 		${IMAGE_CMD_TAR} \
 			--transform='s/.*\///' \
-			--transform 's,^,${IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
-			-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
+			--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
+			-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
 			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
@@ -410,8 +411,8 @@ IMAGE_CMD_teziimg-distro () {
 	cd ${DEPLOY_DIR_IMAGE}
 	${IMAGE_CMD_TAR} \
 		--transform='s/.*\///' \
-		--transform 's,^,${IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
-		-chf ${IMGDEPLOYDIR}/${IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
+		--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
+		-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
 		${TEZI_IMAGE_JSON_FILES} toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 		${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
