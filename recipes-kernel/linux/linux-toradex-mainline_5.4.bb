@@ -3,7 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-5.4:"
 LINUX_VERSION ?= "5.4.5"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-SRCREV_machine = "a4d179b488dc0c5ebb054bebe68011940d60629a"
+SRCREV_machine = "a592a95575cdfa3f04fbfd7c10cd7baef5e0125e"
 
 KBRANCH = "toradex_5.4.y"
 
