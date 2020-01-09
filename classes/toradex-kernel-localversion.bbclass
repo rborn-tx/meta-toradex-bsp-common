@@ -17,11 +17,14 @@ LOCALVERSION ?= "-${TDX_VERSION}"
 kernel_do_configure_append() {
 	sed -i -e /CONFIG_LOCALVERSION/d ${B}/.config
 	echo "CONFIG_LOCALVERSION=\"${LOCALVERSION}\"" >> ${B}/.config
-	echo "# CONFIG_LOCALVERSION_AUTO is not set" >> ${B}/.config
 
+	sed -i -e /CONFIG_LOCALVERSION_AUTO/d ${B}/.config
 	if [ "${SCMVERSION}" = "y" ]; then
 		# Add GIT revision to the local version
 		head=`git --git-dir=${S}/.git rev-parse --verify --short HEAD 2> /dev/null`
 		printf "+git.%s" $head > ${S}/.scmversion
+		echo "CONFIG_LOCALVERSION_AUTO=y" >> ${B}/.config
+	else
+		echo "# CONFIG_LOCALVERSION_AUTO is not set" >> ${B}/.config
 	fi
 }
