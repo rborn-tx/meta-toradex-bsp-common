@@ -296,7 +296,7 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     elif flash_type == "emmc":
         data["blockdevs"] = flash_data
 
-    with open(os.path.join(deploydir, json_file), 'w') as outfile:
+    with open(os.path.join(d.getVar('IMGDEPLOYDIR'), json_file), 'w') as outfile:
         json.dump(data, outfile, indent=4)
     bb.note("Toradex Easy Installer metadata file {0} written.".format(json_file))
 
@@ -322,7 +322,7 @@ python rootfs_tezi_run_json() {
     else:
         bb.fatal("Toradex flash type unknown")
 
-    rootfs_tezi_json(d, flash_type, flash_data, "image.json", uenv_file)
+    rootfs_tezi_json(d, flash_type, flash_data, "image-%s.json" % d.getVar('IMAGE_BASENAME'), uenv_file)
     d.appendVar("TEZI_IMAGE_UBOOT_FILES", ' ' + uenv_file + ' ' + uboot_file)
 }
 
@@ -341,7 +341,9 @@ do_image_bootfs[prefuncs] += "tezi_deploy_bootfs_files"
 IMAGE_CMD_teziimg () {
 	bbnote "Create Toradex Easy Installer tarball"
 
-	cd ${DEPLOY_DIR_IMAGE}
+	# Copy image json file to ${WORKDIR}/image-json
+	cp ${IMGDEPLOYDIR}/image*.json ${WORKDIR}/image-json/image.json
+
 	case "${TORADEX_FLASH_TYPE}" in
 		rawnand)
 		# The first transform strips all folders from the files to tar, the
@@ -350,7 +352,7 @@ IMAGE_CMD_teziimg () {
 			--transform='s/.*\///' \
 			--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
 			-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
-			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
+			${WORKDIR}/image-json/image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${TEZI_IMAGE_UBOOT_FILES} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
@@ -361,12 +363,14 @@ IMAGE_CMD_teziimg () {
 			--transform='s/.*\///' \
 			--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
 			-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
-			image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
+			${WORKDIR}/image-json/image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
 			${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 		;;
 	esac
 }
+do_image_teziimg[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
+do_image_teziimg[cleandirs] += "${WORKDIR}/image-json"
 do_image_teziimg[prefuncs] += "rootfs_tezi_run_json"
 IMAGE_TYPEDEP_teziimg[vardepsexclude] = "TEZI_VERSION"
 
@@ -394,27 +398,34 @@ python rootfs_tezi_run_distro_json() {
             bb.fatal("Toradex flash type unknown")
 
         if len(flash_types_list) > 1:
-            json_file = "image-{0}.json".format(flash_type)
+            json_file = "image-{0}-{1}.json".format(flash_type, d.getVar('IMAGE_BASENAME'))
         else:
-            json_file = "image.json"
+            json_file = "image-{0}.json".format(d.getVar('IMAGE_BASENAME'))
 
         rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file)
-        d.appendVar("TEZI_IMAGE_JSON_FILES", ' ' + json_file)
         d.appendVar("TEZI_IMAGE_UBOOT_FILES", ' ' + uenv_file + ' ' + uboot_file)
 }
 
+do_image_teziimg_distro[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
+do_image_teziimg_distro[cleandirs] += "${WORKDIR}/image-json"
 do_image_teziimg_distro[prefuncs] += "rootfs_tezi_run_distro_json"
 
 IMAGE_CMD_teziimg-distro () {
 	bbnote "Create Toradex Easy Installer tarball"
 
-	cd ${DEPLOY_DIR_IMAGE}
+	# Copy image json files to ${WORKDIR}/image-json
+	for image in ${IMGDEPLOYDIR}/image*.json; do
+		image_name=$(echo $(basename $image) | sed 's/-${IMAGE_BASENAME}//')
+		cp $image ${WORKDIR}/image-json/$image_name
+	done
+
 	${IMAGE_CMD_TAR} \
 		--transform='s/.*\///' \
 		--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
 		-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
-		${TEZI_IMAGE_JSON_FILES} toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-		${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
+		toradexlinux.png marketing.tar prepare.sh wrapup.sh \
+		${TEZI_IMAGE_UBOOT_FILES} ${WORKDIR}/image-json/image*.json \
+		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 }
 IMAGE_CMD_teziimg-distro[vardepsexclude] = "TEZI_VERSION"
