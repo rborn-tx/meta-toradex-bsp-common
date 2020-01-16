@@ -17,6 +17,7 @@ DEPENDS += "${WKS_FILE_DEPENDS}"
 RM_WORK_EXCLUDE += "${PN}"
 
 TEZI_VERSION ?= "${DISTRO_VERSION}"
+TEZI_DATE ?= "${TDX_MATRIX_BUILD_TIME}"
 TEZI_IMAGE_NAME ?= "${IMAGE_NAME}"
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
@@ -264,7 +265,7 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     data["name"] = d.getVar('SUMMARY')
     data["description"] = d.getVar('DESCRIPTION')
     data["version"] = d.getVar('TEZI_VERSION')
-    data["release_date"] = datetime.strptime(d.getVar('DATE', False), '%Y%m%d').date().isoformat()
+    data["release_date"] = datetime.strptime(d.getVar('TEZI_DATE'), '%Y%m%d%H%M%S').date().isoformat()
     data["u_boot_env"] = uenv_file
     if os.path.exists(os.path.join(deploydir, "prepare.sh")):
         data["prepare_script"] = "prepare.sh"
@@ -372,7 +373,7 @@ IMAGE_CMD_teziimg () {
 do_image_teziimg[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
 do_image_teziimg[cleandirs] += "${WORKDIR}/image-json"
 do_image_teziimg[prefuncs] += "rootfs_tezi_run_json"
-IMAGE_TYPEDEP_teziimg[vardepsexclude] = "TEZI_VERSION"
+IMAGE_TYPEDEP_teziimg[vardepsexclude] = "TEZI_VERSION TEZI_DATE"
 
 IMAGE_TYPEDEP_teziimg += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
 
@@ -428,6 +429,6 @@ IMAGE_CMD_teziimg-distro () {
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
 		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
 }
-IMAGE_CMD_teziimg-distro[vardepsexclude] = "TEZI_VERSION"
+IMAGE_CMD_teziimg-distro[vardepsexclude] = "TEZI_VERSION TEZI_DATE"
 
 IMAGE_TYPEDEP_teziimg-distro += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
