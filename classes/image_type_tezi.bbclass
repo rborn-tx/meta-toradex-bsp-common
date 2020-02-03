@@ -23,6 +23,7 @@ TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
 TEZI_BOOT_SUFFIX ??= "bootfs.tar.xz"
+TEZI_CONFIG_FORMAT ??= "2"
 TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY ??= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
@@ -263,7 +264,7 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     from datetime import datetime
 
     deploydir = d.getVar('DEPLOY_DIR_IMAGE')
-    data = OrderedDict({ "config_format": 2, "autoinstall": False })
+    data = OrderedDict({ "config_format": d.getVar('TEZI_CONFIG_FORMAT'), "autoinstall": False })
 
     # Use image recipes SUMMARY/DESCRIPTION...
     data["name"] = d.getVar('SUMMARY')
