@@ -21,7 +21,13 @@ kernel_do_configure_append() {
 	sed -i -e /CONFIG_LOCALVERSION_AUTO/d ${B}/.config
 	if [ "${SCMVERSION}" = "y" ]; then
 		# Add GIT revision to the local version
-		head=`git --git-dir=${S}/.git rev-parse --verify --short HEAD 2> /dev/null`
+		if [ -n "${KBRANCH}" ]; then
+			head=`git --git-dir=${S}/.git rev-parse --verify --short origin/${KBRANCH} 2> /dev/null`
+		elif [ -n "${SRCBRANCH}" ]; then
+			head=`git --git-dir=${S}/.git rev-parse --verify --short origin/${SRCBRANCH} 2> /dev/null`
+		else
+			head=`git --git-dir=${S}/.git rev-parse --verify --short HEAD 2> /dev/null`
+		fi
 		printf "+git.%s" $head > ${S}/.scmversion
 		echo "CONFIG_LOCALVERSION_AUTO=y" >> ${B}/.config
 	else
