@@ -163,6 +163,7 @@ def rootfs_tezi_emmc(d, distro=False):
         }),
         OrderedDict({
           "name": "mmcblk0boot0",
+          "erase": True,
           "content": {
             "filesystem_type": "raw",
             "rawfiles": bootpart_rawfiles
@@ -193,6 +194,11 @@ def rootfs_tezi_rawnand(d, distro=False):
                  }
                }
              })
+    env = OrderedDict({
+        "name": "u-boot-env",
+        "erase": True,
+        "content": {}
+    })
 
     rootfs = {
                "name": "rootfs",
@@ -255,7 +261,7 @@ def rootfs_tezi_rawnand(d, distro=False):
             "ubivolumes": ubivolumes
           })
 
-    return [uboot1, uboot2, ubi]
+    return [uboot1, uboot2, env, ubi]
 
 def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     import json
