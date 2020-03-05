@@ -23,6 +23,9 @@ kernel_do_configure_append() {
 		# Add GIT revision to the local version
 		if [ -n "${SRCREV_machine}" -a "${SRCREV_machine}" != "INVALID" ]; then
 			head=`git --git-dir=${S}/.git rev-parse --verify --short ${SRCREV_machine} 2> /dev/null`
+		elif [ -n "${SRCREV}" -a "${SRCREV}" = "AUTOINC" ]; then
+			branch=`git --git-dir=${S}/.git  symbolic-ref --short -q HEAD`
+			head=`git --git-dir=${S}/.git rev-parse --verify --short origin/${branch} 2> /dev/null`
 		elif [ -n "${SRCREV}" -a "${SRCREV}" != "INVALID" ]; then
 			head=`git --git-dir=${S}/.git rev-parse --verify --short ${SRCREV} 2> /dev/null`
 		else
