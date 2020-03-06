@@ -21,8 +21,16 @@ kernel_do_configure_append() {
 	sed -i -e /CONFIG_LOCALVERSION_AUTO/d ${B}/.config
 	if [ "${SCMVERSION}" = "y" ]; then
 		# Add GIT revision to the local version
-		if [ -n "${SRCREV_machine}" -a "${SRCREV_machine}" != "INVALID" ]; then
-			head=`git --git-dir=${S}/.git rev-parse --verify --short ${SRCREV_machine} 2> /dev/null`
+		# SRCREV_machine is used in kernel recipes using kernel-yocto.bbclass,
+		# e.g. our linux-toradex-mainline recipe
+		if [ -n "${SRCREV_machine}" ]; then
+			if [ "${SRCREV_machine}" = "AUTOINC" ]; then
+				branch=`git --git-dir=${S}/.git  symbolic-ref --short -q HEAD`
+				head=`git --git-dir=${S}/.git rev-parse --verify --short origin/${branch} 2> /dev/null`
+			else
+				head=`git --git-dir=${S}/.git rev-parse --verify --short ${SRCREV_machine} 2> /dev/null`
+			fi
+		# SRCREV is used by linux-toradex recipes
 		elif [ -n "${SRCREV}" -a "${SRCREV}" = "AUTOINC" ]; then
 			branch=`git --git-dir=${S}/.git  symbolic-ref --short -q HEAD`
 			head=`git --git-dir=${S}/.git rev-parse --verify --short origin/${branch} 2> /dev/null`
