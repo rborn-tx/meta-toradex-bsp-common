@@ -1,0 +1,6 @@
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="30a50000.i2c", SYMLINK+="colibri-i2c"
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="30a20000.i2c", SYMLINK+="colibri-i2c-on-module"
+ACTION=="add", ATTRS{iomem_base}=="0x30860000", SYMLINK+="colibri-ttya"
+ACTION=="add", ATTRS{iomem_base}=="0x30890000", SYMLINK+="colibri-ttyb"
+ACTION=="add", ATTRS{iomem_base}=="0x30880000", SYMLINK+="colibri-ttyc"
+ACTION=="add", KERNEL=="watchdog", DRIVERS=="rn5t618-wdt", SYMLINK+="colibri-watchdog"
