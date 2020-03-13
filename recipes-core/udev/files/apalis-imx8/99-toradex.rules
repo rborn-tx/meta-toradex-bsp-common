@@ -1,0 +1,8 @@
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="5a820000.i2c", SYMLINK+="apalis-i2c1"
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="5a830000.i2c", SYMLINK+="apalis-i2c3"
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="5a810000.i2c", SYMLINK+="apalis-i2c-on-module"
+ACTION=="add", ATTRS{iomem_base}=="0x5A070010", SYMLINK+="apalis-tty1"
+ACTION=="add", ATTRS{iomem_base}=="0x5A090010", SYMLINK+="apalis-tty2"
+ACTION=="add", ATTRS{iomem_base}=="0x5A060010", SYMLINK+="apalis-tty3"
+ACTION=="add", ATTRS{iomem_base}=="0x5A080010", SYMLINK+="apalis-tty4"
+ACTION=="add", KERNELS=="watchdog", SYMLINK+="apalis-watchdog"

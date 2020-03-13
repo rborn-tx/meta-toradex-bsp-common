@@ -1,0 +1,8 @@
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="30a50000.i2c", SYMLINK+="verdin-i2c1"
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="30a30000.i2c", SYMLINK+="verdin-i2c2"
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="30a40000.i2c", SYMLINK+="verdin-i2c4"
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="30a20000.i2c", SYMLINK+="verdin-i2c-on-module"
+ACTION=="add", ATTRS{iomem_base}=="0x30890000", SYMLINK+="verdin-tty1"
+ACTION=="add", ATTRS{iomem_base}=="0x30880000", SYMLINK+="verdin-tty2"
+ACTION=="add", ATTRS{iomem_base}=="0x30860000", SYMLINK+="verdin-tty3"
+ACTION=="add", KERNELS=="watchdog", SYMLINK+="verdin-watchdog"

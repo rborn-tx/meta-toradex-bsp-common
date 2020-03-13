@@ -1,0 +1,6 @@
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="5a810000.i2c", SYMLINK+="colibri-i2c"
+ACTION=="add", KERNEL=="i2c-[0-9]*", ATTRS{name}=="5a800000.i2c", SYMLINK+="colibri-i2c-on-module"
+ACTION=="add", ATTRS{iomem_base}=="0x5A090010", SYMLINK+="colibri-ttya"
+ACTION=="add", ATTRS{iomem_base}=="0x5A060010", SYMLINK+="colibri-ttyb"
+ACTION=="add", ATTRS{iomem_base}=="0x5A080010", SYMLINK+="colibri-ttyc"
+ACTION=="add", KERNELS=="watchdog", SYMLINK+="colibri-watchdog"
