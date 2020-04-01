@@ -19,7 +19,7 @@ UBOOT_LOCALVERSION = "${LOCALVERSION}"
 
 do_compile_prepend() {
 	if [ "${SCMVERSION}" = "y" ]; then
-		head=`cd ${S} ; git rev-parse --verify --short HEAD 2> /dev/null`
+		head=`cd ${S} ; git rev-parse --verify --short=12 HEAD 2> /dev/null`
 		printf "%s+git.%s" "${UBOOT_LOCALVERSION}" $head > ${S}/.scmversion
 		printf "%s+git.%s" "${UBOOT_LOCALVERSION}" $head > ${B}/.scmversion
 	fi

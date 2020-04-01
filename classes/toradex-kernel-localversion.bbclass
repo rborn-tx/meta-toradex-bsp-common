@@ -26,18 +26,18 @@ kernel_do_configure_append() {
 		if [ -n "${SRCREV_machine}" ]; then
 			if [ "${SRCREV_machine}" = "AUTOINC" ]; then
 				branch=`git --git-dir=${S}/.git  symbolic-ref --short -q HEAD`
-				head=`git --git-dir=${S}/.git rev-parse --verify --short origin/${branch} 2> /dev/null`
+				head=`git --git-dir=${S}/.git rev-parse --verify --short=12 origin/${branch} 2> /dev/null`
 			else
-				head=`git --git-dir=${S}/.git rev-parse --verify --short ${SRCREV_machine} 2> /dev/null`
+				head=`git --git-dir=${S}/.git rev-parse --verify --short=12 ${SRCREV_machine} 2> /dev/null`
 			fi
 		# SRCREV is used by linux-toradex recipes
 		elif [ -n "${SRCREV}" -a "${SRCREV}" = "AUTOINC" ]; then
 			branch=`git --git-dir=${S}/.git  symbolic-ref --short -q HEAD`
-			head=`git --git-dir=${S}/.git rev-parse --verify --short origin/${branch} 2> /dev/null`
+			head=`git --git-dir=${S}/.git rev-parse --verify --short=12 origin/${branch} 2> /dev/null`
 		elif [ -n "${SRCREV}" -a "${SRCREV}" != "INVALID" ]; then
-			head=`git --git-dir=${S}/.git rev-parse --verify --short ${SRCREV} 2> /dev/null`
+			head=`git --git-dir=${S}/.git rev-parse --verify --short=12 ${SRCREV} 2> /dev/null`
 		else
-			head=`git --git-dir=${S}/.git rev-parse --verify --short HEAD 2> /dev/null`
+			head=`git --git-dir=${S}/.git rev-parse --verify --short=12 HEAD 2> /dev/null`
 		fi
 		printf "+git.%s" $head > ${S}/.scmversion
 		kernel_configure_variable LOCALVERSION_AUTO y
