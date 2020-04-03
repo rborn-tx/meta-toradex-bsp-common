@@ -1,5 +1,3 @@
-#https://github.com/mangOH/meta-mangoh/blob/master/recipes-kernel/backports/backports_4.14.bb
-
 DESCRIPTION = "Linux Backports"
 HOMEPAGE = "https://backports.wiki.kernel.org"
 SECTION = "kernel/modules"
@@ -10,8 +8,8 @@ inherit module-base
 
 # To generate the backports tree yourself, so you can make modifications:
 # Generate the backport tree using:
-#    https://github.com/mangOH/linux-backports-generated/blob/master/README.md
-# git init, add/commit the generated tree
+#    git clone git://git.toradex.com/backports-sources-toradex.git -b linux-5.4.y
+# add/commit the generated tree
 # Change SRCREV = to point to your generated tree
 # Under SRC_URI point this at your generated tree as such:
 #    git:///home/user/linux-backports-generated;protocol=file
@@ -30,12 +28,7 @@ DEPENDS += "bison-native coreutils-native flex-native"
 
 S = "${WORKDIR}/git"
 
-# TODO: Is there a better way to set KLIB_BUILD?
-#KLIB_BUILD=${B}/../../../linux-toradex/${KERNEL_VERSION}-r1/build
-#KLIB_BUILD=${B}/../../../linux-toradex/4.14-2.3.x+gitAUTOINC+fdcb9ec95d-r0/build
 EXTRA_OEMAKE = " \
-    ARCH=${TARGET_ARCH} \
-    CROSS_COMPILE=${TARGET_PREFIX} \
     KLIB_BUILD=${KBUILD_OUTPUT} \
     KLIB=${B} \
     "
@@ -50,7 +43,9 @@ do_configure() {
     oe_runmake oldconfig
 }
 
+# LDFLAGS are not suitable for direct ld use as with the kernel build system
 do_compile() {
+    unset LDFLAGS
     oe_runmake
 }
 
