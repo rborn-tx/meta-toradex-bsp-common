@@ -21,9 +21,9 @@ SRC_URI = " \
     file://config \
     "
 
-# Depend on linux-toradex to ensure that the kernel is built before we try to
+# Depend on virtual/kernel to ensure that the kernel is built before we try to
 # build the backports
-DEPENDS += "linux-toradex"
+DEPENDS += "virtual/kernel"
 DEPENDS += "bison-native coreutils-native flex-native"
 
 S = "${WORKDIR}/git"
