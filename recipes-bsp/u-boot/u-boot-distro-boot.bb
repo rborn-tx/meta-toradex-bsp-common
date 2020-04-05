@@ -19,9 +19,11 @@ do_deploy() {
         "${WORKDIR}/boot.cmd.in" > boot.cmd
     mkimage -T script -C none -n "Distro boot script" -d boot.cmd boot.scr
 
-    install -m 0644 boot.scr ${DEPLOYDIR}
+    install -m 0644 boot.scr ${DEPLOYDIR}/boot.scr-${MACHINE}
 }
 
 addtask deploy after do_install before do_build
+
+PROVIDES += "u-boot-default-script"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
