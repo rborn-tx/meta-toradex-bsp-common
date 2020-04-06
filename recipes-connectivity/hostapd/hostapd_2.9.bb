@@ -1,15 +1,10 @@
+SUMMARY = "User space daemon for extended IEEE 802.11 management"
 HOMEPAGE = "http://w1.fi/hostapd/"
 SECTION = "kernel/userland"
-LICENSE = "GPLv2 | BSD"
-LIC_FILES_CHKSUM = "file://${B}/README;md5=9f542dba9d227d1a51f4405a415cc2b2"
+LICENSE = "BSD-3-Clause"
+LIC_FILES_CHKSUM = "file://hostapd/README;md5=1ec986bec88070e2a59c68c95d763f89"
+
 DEPENDS = "libnl openssl"
-SUMMARY = "User space daemon for extended IEEE 802.11 management"
-
-inherit update-rc.d systemd
-INITSCRIPT_NAME = "hostapd"
-
-SYSTEMD_SERVICE_${PN} = "hostapd.service"
-SYSTEMD_AUTO_ENABLE_${PN} = "disable"
 
 SRC_URI = " \
     http://w1.fi/releases/hostapd-${PV}.tar.gz \
@@ -18,16 +13,29 @@ SRC_URI = " \
     file://hostapd.service \
 "
 
+SRC_URI[md5sum] = "f188fc53a495fe7af3b6d77d3c31dee8"
+SRC_URI[sha256sum] = "881d7d6a90b2428479288d64233151448f8990ab4958e0ecaca7eeb3c9db2bd7"
+
 S = "${WORKDIR}/hostapd-${PV}"
 B = "${WORKDIR}/hostapd-${PV}/hostapd"
 
-do_configure() {
+inherit update-rc.d systemd pkgconfig features_check
+
+CONFLICT_DISTRO_FEATURES = "openssl-no-weak-ciphers"
+
+INITSCRIPT_NAME = "hostapd"
+
+SYSTEMD_SERVICE_${PN} = "hostapd.service"
+SYSTEMD_AUTO_ENABLE_${PN} = "disable"
+
+do_configure_append() {
     install -m 0644 ${WORKDIR}/defconfig ${B}/.config
 }
 
 do_compile() {
-    export CFLAGS="-MMD -O2 -Wall -g -I${STAGING_INCDIR}/libnl3"
-    make
+    export CFLAGS="-MMD -O2 -Wall -g"
+    export EXTRA_CFLAGS="${CFLAGS}"
+    make V=1
 }
 
 do_install() {
@@ -41,7 +49,3 @@ do_install() {
 }
 
 CONFFILES_${PN} += "${sysconfdir}/hostapd.conf"
-
-SRC_URI[md5sum] = "8d3799f3a3c247cff47d41503698721b"
-SRC_URI[sha256sum] = "21b0dda3cc3abe75849437f6b9746da461f88f0ea49dd621216936f87440a141"
-
