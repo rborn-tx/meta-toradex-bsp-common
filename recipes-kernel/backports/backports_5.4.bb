@@ -14,7 +14,7 @@ inherit module-base
 # Under SRC_URI point this at your generated tree as such:
 #    git:///home/user/linux-backports-generated;protocol=file
 
-SRCREV = "87d308708712ff6075c4dd54b0519b47fdad8816"
+SRCREV = "e8ef623db4bd6fb85df341d583000e1b12a64a63"
 SRCREV_use-head-next = "${AUTOREV}"
 SRC_URI = " \
     git://git.toradex.com/backports-toradex.git;protocol=git;branch=toradex-${PV} \
