@@ -19,6 +19,7 @@ SRCREV_use-head-next = "${AUTOREV}"
 SRC_URI = " \
     git://git.toradex.com/backports-toradex.git;protocol=git;branch=toradex-${PV} \
     file://config \
+    file://99-backports.conf \
     "
 
 # Depend on virtual/kernel to ensure that the kernel is built before we try to
@@ -50,6 +51,9 @@ do_compile() {
 }
 
 do_install() {
+    install -d ${D}/etc/depmod.d/
+    install -m 0644 ${WORKDIR}/99-backports.conf ${D}/etc/depmod.d/
+
     install -d ${D}/lib/modules/${KERNEL_VERSION}/backports
     for ko in $(find ${S} -type f -name "*.ko")
     do
@@ -85,5 +89,6 @@ fi
 }
 
 FILES_${PN} = " \
+    /etc/depmod.d/99-backports.conf \
     /lib/modules/${KERNEL_VERSION}/backports/ \
     "
