@@ -62,30 +62,19 @@ do_install() {
 }
 
 pkg_postinst_${PN} () {
-#!/bin/sh
-set -e
-if [ -z "$D" ]; then
-    CPWD=`pwd`
-    depmod -a ${KERNEL_VERSION}
-    cd /lib/modules/${KERNEL_VERSION}/
-    cp modules.order modules.order.save
-    ls -d backports/*.ko >modules.order
-    cat modules.order.save >> modules.order
-    cd $CPWD
-else
+    if [ -z "$D" ]; then
+        depmod -a ${KERNEL_VERSION}
+    else
         # image.bbclass will call depmodwrapper after everything is installed,
         # no need to do it here as well
         :
-fi
+    fi
 }
 
 pkg_postrm_${PN} () {
-#!/bin/sh
-set -e
-if [ -z "$D" ]; then
-    mv /lib/modules/${KERNEL_VERSION}/modules.order.save /lib/modules/${KERNEL_VERSION}/modules.order
-    depmod -a ${KERNEL_VERSION}
-fi
+    if [ -z "$D" ]; then
+        depmod -a ${KERNEL_VERSION}
+    fi
 }
 
 FILES_${PN} = " \
