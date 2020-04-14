@@ -6,6 +6,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
 inherit module-base
 
+DEPMOD_CONF = "99-backports.conf"
+
 # To generate the backports tree yourself, so you can make modifications:
 # Generate the backport tree using:
 #    git clone git://git.toradex.com/backports-sources-toradex.git -b linux-5.4.y
@@ -19,7 +21,7 @@ SRCREV_use-head-next = "${AUTOREV}"
 SRC_URI = " \
     git://git.toradex.com/backports-toradex.git;protocol=git;branch=toradex-${PV} \
     file://config \
-    file://99-backports.conf \
+    file://${DEPMOD_CONF} \
     "
 
 # Depend on virtual/kernel to ensure that the kernel is built before we try to
@@ -52,7 +54,7 @@ do_compile() {
 
 do_install() {
     install -d ${D}/etc/depmod.d/
-    install -m 0644 ${WORKDIR}/99-backports.conf ${D}/etc/depmod.d/
+    install -m 0644 ${WORKDIR}/${DEPMOD_CONF} ${D}/etc/depmod.d/${DEPMOD_CONF}
 
     install -d ${D}/lib/modules/${KERNEL_VERSION}/backports
     for ko in $(find ${S} -type f -name "*.ko")
@@ -78,6 +80,6 @@ pkg_postrm_${PN} () {
 }
 
 FILES_${PN} = " \
-    /etc/depmod.d/99-backports.conf \
+    /etc/depmod.d/${DEPMOD_CONF} \
     /lib/modules/${KERNEL_VERSION}/backports/ \
     "
