@@ -1,0 +1,11 @@
+[Match]
+Name=disabled_en* disabled_eth*
+KernelCommandLine=!nfsroot
+
+[Network]
+DHCP=yes
+
+[DHCP]
+CriticalConnection=true
+RouteMetric=10
+ClientIdentifier=mac
