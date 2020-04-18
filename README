@@ -15,20 +15,20 @@ Dependencies
 This layer depends on:
 
   URI: git://git.openembedded.org/bitbake
-  branch: 1.36
+  branch: 1.40
   revision: HEAD
 
   URI: git://git.openembedded.org/openembedded-core
   layers: meta
-  branch: rocko
+  branch: thud
   revision: HEAD
 
   URI: git://git.toradex.com/meta-toradex-nxp
-  branch: rocko
+  branch: thud
   revision: HEAD
 and/or
   URI: git://git.toradex.com/meta-toradex-tegra
-  branch: rocko
+  branch: thud
   revision: HEAD
 
 Patches
@@ -49,7 +49,7 @@ Building
 ========
 
 See the README in either meta-toradex-nxp or meta-toradex-tegra depending
-your SoC.
+on your SoC.
 
 License
 =======
@@ -58,4 +58,4 @@ All metadata is MIT licensed unless otherwise stated. Source code and
 binaries included in tree for individual recipes is under the LICENSE
 stated in each recipe (.bb file) unless otherwise stated.
 
-This README document is Copyright (C) 2016 Toradex AG.
+This README document is Copyright (C) 2016-2020 Toradex AG.
