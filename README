@@ -9,32 +9,26 @@ For more information on available Toradex COMs please visit:
 
 https://www.toradex.com/computer-on-modules
 
-Note that the master branch of the layers is where the development is
-happening. Do expect build breakage and do not expect us to give a solution.
-If you need a more stable base use one of the release branches.
-toradex-bsp-platform may have a master manifest tagged to specific layer
-versions which likely is more stable than using HEAD.
-
 Dependencies
 ============
 
 This layer depends on:
 
   URI: git://git.openembedded.org/bitbake
-  branch: master
+  branch: 1.44
   revision: HEAD
 
   URI: git://git.openembedded.org/openembedded-core
-  layers: meta
-  branch: master
+  layer: meta
+  branch: zeus
   revision: HEAD
 
   URI: git://git.toradex.com/meta-toradex-nxp
-  branch: master
+  branch: zeus
   revision: HEAD
 and/or
   URI: git://git.toradex.com/meta-toradex-tegra
-  branch: master
+  branch: zeus
   revision: HEAD
 
 Patches
@@ -54,8 +48,7 @@ To send patches, use
 Building
 ========
 
-See the README in either meta-toradex-nxp or meta-toradex-tegra depending
-on your SoC.
+See the README in meta-toradex-demos.
 
 License
 =======
@@ -64,4 +57,4 @@ All metadata is MIT licensed unless otherwise stated. Source code and
 binaries included in tree for individual recipes is under the LICENSE
 stated in each recipe (.bb file) unless otherwise stated.
 
-This README document is Copyright (C) 2016-2019 Toradex AG.
+This README document is Copyright (C) 2016-2020 Toradex AG.
