@@ -4,7 +4,7 @@ LICENSE = "GPLv2"
 
 LIC_FILES_CHKSUM ?= "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
-inherit kernel toradex-kernel-localversion
+inherit kernel toradex-kernel-config toradex-kernel-localversion
 
 SRC_URI = " \
     git://git.toradex.com/linux-toradex.git;protocol=https;branch=${KBRANCH};name=machine \
@@ -13,6 +13,15 @@ SRC_URI = " \
 S = "${WORKDIR}/git"
 
 DEPENDS += "coreutils-native"
+
+kernel_do_configure_append_preempt-rt() {
+    # switch to use PREEMPT_RT
+    kernel_configure_variable PREEMPT_NONE n
+    kernel_configure_variable PREEMPT_VOLUNTARY n
+    kernel_configure_variable PREEMPT n
+    kernel_configure_variable PREEMPT_RT y
+    oe_runmake olddefconfig
+}
 
 do_install_append() {
     install -d ${D}/boot
@@ -30,4 +39,3 @@ do_deploy_append() {
     cp -a ${B}/.config ${DEPLOYDIR}/${KERNEL_CONFIG_NAME}
     ln -sf ${KERNEL_CONFIG_NAME} ${DEPLOYDIR}/${KERNEL_CONFIG_LINK_NAME}
 }
-
