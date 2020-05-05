@@ -22,7 +22,7 @@ SRC_URI = " \
     git://git.toradex.com/backports-toradex.git;protocol=git;branch=toradex-${PV} \
     file://config \
     file://${DEPMOD_CONF} \
-    "
+"
 
 # Depend on virtual/kernel to ensure that the kernel is built before we try to
 # build the backports
@@ -34,7 +34,7 @@ S = "${WORKDIR}/git"
 EXTRA_OEMAKE = " \
     KLIB_BUILD=${KBUILD_OUTPUT} \
     KLIB=${B} \
-    "
+"
 
 do_configure() {
     # Somehow lex does not automatically get linked to flex!
@@ -53,13 +53,13 @@ do_compile() {
 }
 
 do_install() {
-    install -d ${D}/etc/depmod.d/
-    install -m 0644 ${WORKDIR}/${DEPMOD_CONF} ${D}/etc/depmod.d/${DEPMOD_CONF}
+    install -d ${D}${sysconfdir}/depmod.d/
+    install -m 0644 ${WORKDIR}/${DEPMOD_CONF} ${D}${sysconfdir}/depmod.d/${DEPMOD_CONF}
 
-    install -d ${D}/lib/modules/${KERNEL_VERSION}/backports
+    install -d ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/backports
     for ko in $(find ${S} -type f -name "*.ko")
     do
-        install -m 0644 $ko ${D}/lib/modules/${KERNEL_VERSION}/backports/
+        install -m 0644 $ko ${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/backports/
     done
 }
 
@@ -80,6 +80,6 @@ pkg_postrm_${PN} () {
 }
 
 FILES_${PN} = " \
-    /etc/depmod.d/${DEPMOD_CONF} \
-    /lib/modules/${KERNEL_VERSION}/backports/ \
-    "
+    ${sysconfdir}/depmod.d/${DEPMOD_CONF} \
+    ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/backports/ \
+"
