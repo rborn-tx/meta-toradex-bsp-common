@@ -10,7 +10,6 @@ SRC_URI += " \
 
 BOARD_apalis-imx6 = "apalis-imx6"
 BOARD_apalis-tk1 = "apalis-tk1"
-BOARD_apalis-tk1-mainline = "apalis-tk1"
 BOARD_colibri-imx6 = "colibri-imx6"
 BOARD_colibri-imx6ull = "colibri-imx6ull"
 BOARD_colibri-imx7 = "colibri-imx7"
