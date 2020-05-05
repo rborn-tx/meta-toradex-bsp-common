@@ -17,17 +17,12 @@ BOARD_colibri-imx7-emmc = "colibri-imx7-emmc"
 
 PACKAGECONFIG_apalis-imx6 = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_apalis-tk1 = "allboardconfigs enableboardconfig python"
-PACKAGECONFIG_apalis-tk1_mainline = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-imx6 = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-imx6ull = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-imx7 = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-imx7-emmc = "allboardconfigs enableboardconfig python"
 
 pkg_postinst_ontarget_${PN}_colibri-imx6ull () {
-    # can't do this offline
-    if [ "x$D" != "x" ]; then
-        exit 1
-    fi
     IS_WIFI_DTB=`grep -c toradex,colibri_imx6ull-wifi /proc/device-tree/compatible`
     if [ $IS_WIFI_DTB -gt 0 ]; then
         mv -f ${datadir}/libsoc/colibri-imx6ull.conf ${datadir}/libsoc/colibri-imx6ull.conf.bak
