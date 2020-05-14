@@ -1,6 +1,14 @@
 [Unit]
 Description=Hostapd IEEE 802.11 AP, IEEE 802.1X/WPA/WPA2/EAP/RADIUS Authenticator
 After=network.target
+# If using Toradex's demo-image, the default After=network.target should be
+# overwritten with the below provided BindsTo and After lines to reliably start
+# hostapd.
+# Please refer to the developer website for further information:
+# https://developer.toradex.com/knowledge-base/wi-fi-access-point-mode
+#
+# BindsTo=sys-subsystem-net-devices-uap0.device
+# After=sys-subsystem-net-devices-uap0.device
 
 [Service]
 Type=forking
