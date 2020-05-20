@@ -1,0 +1,24 @@
+commit 9e0b7ead828993280955f71afa3ad689f5e6e0a8
+Author: Oleksandr Suvorov <oleksandr.suvorov@toradex.com>
+Date:   Wed May 20 10:56:56 2020 +0300
+
+    Makefile: fix getting kernel version
+    
+    When backports build as a recipe, there is no Makefile available
+    in STAGING_KERNEL_BUILDDIR. Instead use the preset KERNEL_VERSION.
+    
+    Signed-off-by: Oleksandr Suvorov <oleksandr.suvorov@toradex.com>
+
+diff --git a/Makefile b/Makefile
+index ee7df4ba..11044c0a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -84,7 +84,7 @@ mrproper:
+ 				echo ""							;\
+ 			done								\
+ 		) > Kconfig.kernel							;\
+-		kver=$$($(MAKE) --no-print-directory -C $(KLIB_BUILD) kernelversion |	\
++		kver=$$(echo $(KERNEL_VERSION) |	\
+ 			sed 's/^\(\([3-5]\|2\.6\)\.[0-9]\+\).*/\1/;t;d')		;\
+ 		test "$$kver" != "" || echo "Kernel version parse failed!"		;\
+ 		test "$$kver" != ""							;\

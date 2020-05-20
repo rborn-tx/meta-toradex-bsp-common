@@ -20,6 +20,7 @@ SRCREV = "e8ef623db4bd6fb85df341d583000e1b12a64a63"
 SRCREV_use-head-next = "${AUTOREV}"
 SRC_URI = " \
     git://git.toradex.com/backports-toradex.git;protocol=git;branch=toradex-${PV} \
+    file://makefile.patch \
     file://config \
     file://${DEPMOD_CONF} \
 "
@@ -32,17 +33,19 @@ DEPENDS += "bison-native coreutils-native flex-native"
 S = "${WORKDIR}/git"
 
 EXTRA_OEMAKE = " \
-    KLIB_BUILD=${KBUILD_OUTPUT} \
-    KLIB=${B} \
+    KLIB_BUILD=${STAGING_KERNEL_BUILDDIR} \
+    KLIB=${STAGING_KERNEL_DIR} \
 "
 
 do_configure() {
     # Somehow lex does not automatically get linked to flex!
     ln -fs flex ../recipe-sysroot-native/usr/bin/lex
-    make CFLAGS="" CPPFLAGS="" CXXFLAGS="" LDFLAGS="" CC="${BUILD_CC}" LD="${BUILD_LD}" \
-        AR="${BUILD_AR}" -C ${S}/kconf O=${S}/kconf conf
+    unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
+    make CC="${BUILD_CC}" LD="${BUILD_LD}" AR="${BUILD_AR}" \
+        -C ${S}/kconf O=${S}/kconf conf
 
     cp ${WORKDIR}/config ${S}/.config
+    unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
     oe_runmake oldconfig
 }
 
