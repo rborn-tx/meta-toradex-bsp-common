@@ -1,0 +1,42 @@
+SUMMARY = "Backported kernel drivers v4.19 for T20/T30/VF"
+HOMEPAGE = "https://backports.wiki.kernel.org"
+SECTION = "kernel/modules"
+LICENSE = "GPLv2"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
+INC_PR = "r1"
+
+DEPENDS_append = " coreutils-native"
+
+SRCREV = "cf2620f8c3bbbcc7ad33452e685cafd727997866"
+SRCREV_use-head-next = "${AUTOREV}"
+SRC_URI = " \
+    git://git.toradex.com/backports-toradex.git;protocol=git;branch=toradex-${PV} \
+    file://makefile-legacy.patch \
+    file://config-legacy \
+    "
+
+S = "${WORKDIR}/git"
+
+inherit module cml1
+
+MAKE_TARGETS = "modules"
+MODULES_INSTALL_TARGET = "modules_install"
+PACKAGES_DYNAMIC += "^${BPN}-kernel-module-.*"
+
+KERNEL_MODULE_PACKAGE_PREFIX = "${BPN}-"
+
+EXTRA_OEMAKE = " KLIB=${STAGING_KERNEL_DIR} KLIB_BUILD=${STAGING_KERNEL_BUILDDIR} "
+
+KCONFIG_CONFIG_COMMAND = "CC=${BUILD_CC} LD=${BUILD_LD} AR=${BUILD_AR} menuconfig"
+
+do_configure() {
+
+    unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
+    make CC="${BUILD_CC}" LD="${BUILD_LD}" AR="${BUILD_AR}" \
+         -C ${S}/kconf  O=${S}/kconf conf
+
+    cp ${WORKDIR}/config-legacy ${S}/.config
+    unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
+    oe_runmake oldconfig
+}
+
