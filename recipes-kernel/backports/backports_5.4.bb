@@ -39,14 +39,14 @@ EXTRA_OEMAKE = " \
 
 do_configure() {
     # Somehow lex does not automatically get linked to flex!
-    ln -fs flex ../recipe-sysroot-native/usr/bin/lex
+    ln -fs `which flex` ../recipe-sysroot-native/usr/bin/lex
     unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
     make CC="${BUILD_CC}" LD="${BUILD_LD}" AR="${BUILD_AR}" \
         -C ${S}/kconf O=${S}/kconf conf
 
-    cp ${WORKDIR}/config ${S}/.config
+    cp ${WORKDIR}/config ${S}/defconfig
     unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
-    oe_runmake oldconfig
+    oe_runmake usedefconfig
 }
 
 # LDFLAGS are not suitable for direct ld use as with the kernel build system
