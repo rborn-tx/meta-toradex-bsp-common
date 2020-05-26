@@ -11,7 +11,7 @@
 do_image_teziimg[recrdeptask] += "do_deploy"
 do_image_teziimg_distro[recrdeptask] += "do_deploy"
 
-WKS_FILE_DEPENDS_append = " tezi-metadata"
+WKS_FILE_DEPENDS_append = " tezi-metadata virtual/dtb "
 DEPENDS += "${WKS_FILE_DEPENDS}"
 
 RM_WORK_EXCLUDE += "${PN}"
@@ -23,6 +23,8 @@ TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
 TEZI_BOOT_SUFFIX ??= "bootfs.tar.xz"
+TEZI_EXTERNAL_KERNEL_DEVICETREE ??= ""
+TEZI_EXTERNAL_KERNEL_DEVICETREE_BOOT ??= ""
 TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY ??= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
@@ -343,7 +345,29 @@ tezi_deploy_bootfs_files[cleandirs] += "${WORKDIR}/bootfs"
 
 TAR_IMAGE_ROOTFS_task-image-bootfs = "${WORKDIR}/bootfs"
 IMAGE_CMD_bootfs () {
-	:
+	deploy_dt_dir=${DEPLOY_DIR_IMAGE}/devicetree/
+	dtbos=
+	if [ -z "${TEZI_EXTERNAL_KERNEL_DEVICETREE}"] ; then
+		machine_dtbos=`cd $deploy_dt_dir && ls ${MACHINE}_*.dtbo`
+		common_dtbos=`cd $deploy_dt_dir && ls *.dtbo | grep -v -e 'imx[6-8]' -e 'tk1' | xargs`
+		dtbos="$machine_dtbos $common_dtbos"
+	else
+		dtbos=${TEZI_EXTERNAL_KERNEL_DEVICETREE}
+	fi
+
+	# overlays to copy to bootfs/devicetree
+	mkdir -p ${WORKDIR}/bootfs/devicetree/
+	for dtbo in $dtbos; do
+		cp $deploy_dt_dir/$dtbo ${WORKDIR}/bootfs/devicetree/
+	done
+
+	# overlays that we want to be applied during boot time
+	overlays=
+	for dtbo in ${TEZI_EXTERNAL_KERNEL_DEVICETREE_BOOT}; do
+		overlays="$overlays devicetree/$dtbo"
+	done
+
+	echo "fdt_overlays=\"$(echo $overlays)\"" > ${WORKDIR}/bootfs/overlays.txt
 }
 do_image_bootfs[prefuncs] += "tezi_deploy_bootfs_files"
 
