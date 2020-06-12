@@ -38,11 +38,6 @@ do_install() {
     install -m 0644 ${WORKDIR}/usb-rndis.service ${D}${systemd_unitdir}/system
 }
 
-FILES_${PN} += " \
-    ${systemd_unitdir}/system \
-"
-
-NATIVE_SYSTEMD_SUPPORT = "1"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE_${PN} = "usb-rndis.service"
 SYSTEMD_AUTO_ENABLE_mx6 = "disable"
