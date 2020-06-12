@@ -36,9 +36,8 @@ do_install_append () {
     install -m 0644 ${WORKDIR}/g1.schema ${D}${sysconfdir}/usbg/g1.schema
 }
 
-NATIVE_SYSTEMD_SUPPORT = "1"
-SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "usbg.service"
+SYSTEMD_PACKAGES = "${PN}-examples"
+SYSTEMD_SERVICE_${PN}-examples = "usbg.service"
 
 PACKAGES =+ "${PN}-examples"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -47,6 +46,5 @@ FILES_${PN}-examples = " \
     ${bindir}/gadget-* \
     ${bindir}/show-gadgets \
     ${bindir}/show-udcs \
-    ${systemd_unitdir}/system/usbg.service \
     ${sysconfdir}/usbg/g1.schema \
 "
