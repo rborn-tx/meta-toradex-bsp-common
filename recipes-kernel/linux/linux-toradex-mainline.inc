@@ -25,7 +25,7 @@ kernel_do_configure_append_preempt-rt() {
 
 do_install_append() {
     install -d ${D}/boot
-    make -C ${S} O=${B} ARCH=$ARCH dtbs || true
+    make -C ${S} O=${B} ARCH=$ARCH DTC_FLAGS="-@" dtbs || true
     install -m 0644 "${B}/arch/$ARCH/boot/dts/*.dtb" ${D}/boot || true
 }
 
