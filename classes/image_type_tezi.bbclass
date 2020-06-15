@@ -368,7 +368,7 @@ IMAGE_CMD_bootfs () {
 		overlays="$overlays devicetree/$dtbo"
 	done
 
-	echo "fdt_overlays=\"$(echo $overlays)\"" > ${WORKDIR}/bootfs/overlays.txt
+	echo "fdt_overlays=$(echo $overlays)" > ${WORKDIR}/bootfs/overlays.txt
 }
 do_image_bootfs[prefuncs] += "tezi_deploy_bootfs_files"
 
