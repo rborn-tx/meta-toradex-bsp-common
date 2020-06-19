@@ -23,12 +23,6 @@ kernel_do_configure_append_preempt-rt() {
     oe_runmake olddefconfig
 }
 
-do_install_append() {
-    install -d ${D}/boot
-    make -C ${S} O=${B} ARCH=$ARCH DTC_FLAGS="-@" dtbs || true
-    install -m 0644 "${B}/arch/$ARCH/boot/dts/*.dtb" ${D}/boot || true
-}
-
 # Additional file deployed by recent mainline kernels
 FILES_${KERNEL_PACKAGE_NAME}-base += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.builtin.modinfo"
 
