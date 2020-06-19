@@ -50,10 +50,10 @@ def get_uncompressed_size(d, type):
     return float(size) / 1024
 
 # Make an educated guess of the needed boot partition size
-# max(16MB, twice the size of the payload rounded up to the next 2^x number)
+# max(16MB, 3x the size of the payload rounded up to the next 2^x number)
 def get_bootfs_part_size(d):
     from math import log
-    part_size = 2 ** (2 + int(log(get_uncompressed_size(d, 'bootfs'), 2)))
+    part_size = 3 * 2 ** (1 + int(log(get_uncompressed_size(d, 'bootfs'), 2)))
     return max(16, part_size)
 
 # Whitespace separated list of files declared by 'deploy_var' variable
