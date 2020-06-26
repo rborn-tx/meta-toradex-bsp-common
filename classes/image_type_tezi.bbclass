@@ -355,16 +355,16 @@ IMAGE_CMD_bootfs () {
 		dtbos=${TEZI_EXTERNAL_KERNEL_DEVICETREE}
 	fi
 
-	# overlays to copy to bootfs/devicetree
-	mkdir -p ${WORKDIR}/bootfs/devicetree/
+	# overlays to copy to bootfs/overlays
+	mkdir -p ${WORKDIR}/bootfs/overlays/
 	for dtbo in $dtbos; do
-		cp $deploy_dt_dir/$dtbo ${WORKDIR}/bootfs/devicetree/
+		cp $deploy_dt_dir/$dtbo ${WORKDIR}/bootfs/overlays/
 	done
 
 	# overlays that we want to be applied during boot time
 	overlays=
 	for dtbo in ${TEZI_EXTERNAL_KERNEL_DEVICETREE_BOOT}; do
-		overlays="$overlays devicetree/$dtbo"
+		overlays="$overlays overlays/$dtbo"
 	done
 
 	echo "fdt_overlays=$(echo $overlays)" > ${WORKDIR}/bootfs/overlays.txt
