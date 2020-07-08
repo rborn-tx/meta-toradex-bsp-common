@@ -1,0 +1,6 @@
+[Match]
+Driver=mwifiex_pcie
+
+[Link]
+NamePolicy=keep kernel
+
