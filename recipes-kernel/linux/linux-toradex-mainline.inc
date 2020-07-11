@@ -12,7 +12,7 @@ SRC_URI = " \
 
 S = "${WORKDIR}/git"
 
-DEPENDS += "coreutils-native"
+DEPENDS += "coreutils-native lzop-native"
 
 kernel_do_configure_append_preempt-rt() {
     # switch to use PREEMPT_RT
