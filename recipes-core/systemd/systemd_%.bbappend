@@ -1,5 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/systemd:"
-
-SRC_URI += " \
-    file://0001-systemd-udevd.service.in-set-MountFlags-shared.patch \
-"
+# This allows for udevd automounting with mounts accessible to all.
+do_configure_prepend () {
+    sed -i '/PrivateMounts=yes/d' ${S}/units/systemd-udevd.service.in
+}
