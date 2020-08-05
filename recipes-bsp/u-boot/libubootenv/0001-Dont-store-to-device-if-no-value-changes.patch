@@ -1,0 +1,68 @@
+From ad5444c5498cb8e12c874488be45a29369fc6532 Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Thu, 30 Jul 2020 14:16:24 +0200
+Subject: [PATCH] Dont store to device if no value changes
+
+Upstream-Status: Submitted
+
+When fw_setenv is called, it could happen that the new value is same
+with the old one, in which case, we should avoid storing data to
+device.
+
+Reference:
+http://patchwork.ozlabs.org/project/swupdate/patch/20200804202120.31374-1-liu.ming50@gmail.com/
+
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ src/fw_printenv.c | 31 ++++++++++++++++++++++---------
+ 1 file changed, 22 insertions(+), 9 deletions(-)
+
+diff --git a/src/fw_printenv.c b/src/fw_printenv.c
+index 18887f9..8b830d5 100644
+--- a/src/fw_printenv.c
++++ b/src/fw_printenv.c
+@@ -151,19 +151,32 @@ int main (int argc, char **argv) {
+ 			}
+ 		}
+ 	} else { /* setenv branch */
+-		if (scriptfile)
++		bool need_store = false;
++		if (scriptfile) {
+ 			libuboot_load_file(ctx, scriptfile);
+-		else {
++			need_store = true;
++		} else {
+ 			for (i = 0; i < argc; i += 2) {
+-				if (i + 1 == argc)
+-					libuboot_set_env(ctx, argv[i], NULL);
+-				else
+-					libuboot_set_env(ctx, argv[i], argv[i+1]);
++				value = libuboot_get_env(ctx, argv[i]);
++				if (i + 1 == argc) {
++					if (value != NULL) {
++						libuboot_set_env(ctx, argv[i], NULL);
++						need_store = true;
++					}
++				} else {
++					if (value == NULL || strcmp(value, argv[i+1]) != 0) {
++						libuboot_set_env(ctx, argv[i], argv[i+1]);
++						need_store = true;
++					}
++				}
+ 			}
+ 		}
+-		ret = libuboot_env_store(ctx);
+-		if (ret)
+-			fprintf(stderr, "Error storing the env\n");
++
++		if (need_store) {
++			ret = libuboot_env_store(ctx);
++			if (ret)
++				fprintf(stderr, "Error storing the env\n");
++		}
+ 	}
+ 
+ 	libuboot_close(ctx);
+-- 
+2.28.0
+

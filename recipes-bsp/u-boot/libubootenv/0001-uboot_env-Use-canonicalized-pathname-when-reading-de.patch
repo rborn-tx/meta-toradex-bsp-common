@@ -1,0 +1,60 @@
+From 7f8564ad2702a95b496ffaae86afe33ee987af29 Mon Sep 17 00:00:00 2001
+From: Ming Liu <liu.ming50@gmail.com>
+Date: Sat, 30 May 2020 20:56:42 +0200
+Subject: [PATCH] uboot_env: Use canonicalized pathname when reading device
+
+Upstream-Status: Submitted
+
+Some platform uses softlinks to the devices that hold environment
+data. The mechanism used to read device type from config is not robust
+in this case. Calculating the canonicalized absolute pathname of the
+device could fix the problem.
+
+Reference:
+https://patchwork.ozlabs.org/project/swupdate/patch/20200729193959.23115-1-liu.ming50@gmail.com/
+
+Signed-off-by: Mathias Thore <mathias.thore@atlascopco.com>
+Signed-off-by: Ming Liu <liu.ming50@gmail.com>
+---
+ src/uboot_env.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/src/uboot_env.c b/src/uboot_env.c
+index f9ffeda..934f1bf 100644
+--- a/src/uboot_env.c
++++ b/src/uboot_env.c
+@@ -20,6 +20,7 @@
+ #include <stddef.h>
+ #include <dirent.h>
+ #include <unistd.h>
++#include <limits.h>
+ #include <linux/fs.h>
+ #include <string.h>
+ #include <fcntl.h>
+@@ -1103,6 +1104,7 @@ int libuboot_read_config(struct uboot_ctx *ctx, const char *config)
+ 	int ndev = 0;
+ 	struct uboot_flash_env *dev;
+ 	char *tmp;
++	char *path;
+ 	int retval = 0;
+ 
+ 	if (!config)
+@@ -1145,8 +1147,14 @@ int libuboot_read_config(struct uboot_ctx *ctx, const char *config)
+ 			ctx->size = dev->envsize;
+ 
+ 		if (tmp) {
+-			strncpy(dev->devname, tmp, sizeof(dev->devname));
++			if ((path = realpath(tmp, NULL)) == NULL) {
++				free(tmp);
++				retval = -EINVAL;
++				break;
++			}
++			strncpy(dev->devname, path, sizeof(dev->devname));
+ 			free(tmp);
++			free(path);
+ 		}
+ 
+ 		if (check_env_device(ctx, dev) < 0) {
+-- 
+2.28.0
+
