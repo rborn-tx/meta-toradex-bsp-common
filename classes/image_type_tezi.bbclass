@@ -30,8 +30,9 @@ TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY ??= "u-boot.${UBOOT_SUFFIX}"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
 UBOOT_BINARY_TEZI_RAWNAND ?= "${UBOOT_BINARY}"
-UBOOT_ENV_TEZI_EMMC ?= "uEnv.txt"
-UBOOT_ENV_TEZI_RAWNAND ?= "uEnv.txt"
+UBOOT_ENV_TEZI ?= "${@ 'u-boot-initial-env-%s' % d.getVar('UBOOT_CONFIG') if d.getVar('UBOOT_CONFIG') else 'u-boot-initial-env'}"
+UBOOT_ENV_TEZI_EMMC ?= "${UBOOT_ENV_TEZI}"
+UBOOT_ENV_TEZI_RAWNAND ?= "${UBOOT_ENV_TEZI}"
 
 # use DISTRO_FLAVOUR to append to the image name displayed in TEZI
 DISTRO_FLAVOUR ??= ""
