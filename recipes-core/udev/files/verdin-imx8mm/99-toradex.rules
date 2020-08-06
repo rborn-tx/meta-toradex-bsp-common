@@ -10,3 +10,4 @@ ACTION=="add", SUBSYSTEM=="spidev", KERNELS=="30830000.ecspi", SYMLINK+="verdin-
 KERNEL=="mmcblk[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="30b40000.mmc", SYMLINK+="emmc"
 KERNEL=="mmcblk[0-9]boot[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="30b40000.mmc", SYMLINK+="emmc-boot%n"
 KERNEL=="mmcblk[0-9]p[0-9]", ENV{DEVTYPE}=="partition", KERNELS=="30b40000.mmc", SYMLINK+="emmc-part%n"
+SUBSYSTEM=="iio", KERNELS=="iio:device0", RUN+="/etc/udev/scripts/toradex-adc.sh"
