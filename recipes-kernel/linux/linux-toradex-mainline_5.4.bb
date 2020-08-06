@@ -15,7 +15,7 @@ SRC_URI += " \
 "
 
 SRC_URI_append_preempt-rt = " \
-    ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/older/patch-5.4.54-rt32.patch.xz \
+    ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/older/patch-5.4.54-rt32.patch.xz;name=rt-patch \
 "
 SRC_URI[rt-patch.md5sum] = "f83f14b18f66873f6a3a26925a62d0c4"
 SRC_URI[rt-patch.sha256sum] = "3385c8a64233f7f34c509626aaa6b5084bf75b1b27a0dc0dd5024d9736270b03"
