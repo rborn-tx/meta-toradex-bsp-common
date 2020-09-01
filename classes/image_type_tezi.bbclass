@@ -11,8 +11,7 @@
 do_image_teziimg[recrdeptask] += "do_deploy"
 do_image_teziimg_distro[recrdeptask] += "do_deploy"
 
-WKS_FILE_DEPENDS_append_use-mainline-bsp = " tezi-metadata virtual/dtb "
-WKS_FILE_DEPENDS_append = " tezi-metadata "
+WKS_FILE_DEPENDS_append = " tezi-metadata virtual/dtb "
 DEPENDS += "${WKS_FILE_DEPENDS}"
 
 RM_WORK_EXCLUDE += "${PN}"
