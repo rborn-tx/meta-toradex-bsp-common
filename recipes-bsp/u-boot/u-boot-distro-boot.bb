@@ -15,7 +15,7 @@ KERNEL_BOOTCMD_aarch64 ?= "booti"
 inherit deploy nopackages
 
 do_deploy() {
-    sed -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
+    sed -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/;s/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         "${WORKDIR}/boot.cmd.in" > boot.cmd
     mkimage -T script -C none -n "Distro boot script" -d boot.cmd boot.scr
 
