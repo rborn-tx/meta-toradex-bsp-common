@@ -5,7 +5,7 @@ SRC_URI = "git://git.toradex.com/device-tree-overlays.git;branch=${SRCBRANCH};pr
 
 SRCBRANCH = "toradex_5.4.y"
 
-SRCREV = "e1d0ef7ecc9503c3cfb8300ad33f372fc78094cb"
+SRCREV = "6e8f6f00a8723c1262b918d662d79882e416db5e"
 SRCREV_use-head-next = "${AUTOREV}"
 
 PV = "${SRCBRANCH}+git${SRCPV}"
