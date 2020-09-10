@@ -1,9 +1,9 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-5.4:"
 
-LINUX_VERSION ?= "5.4.54"
+LINUX_VERSION ?= "5.4.61"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-SRCREV_machine = "c0969469ee07b570b054df2d47a787f2732a362a"
+SRCREV_machine = "fc5f79d304d7323762a2378f787b39e2256ad546"
 SRCREV_machine_use-head-next = "${AUTOREV}"
 
 KBRANCH = "toradex_5.4.y"
@@ -15,7 +15,7 @@ SRC_URI += " \
 "
 
 SRC_URI_append_preempt-rt = " \
-    ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/older/patch-5.4.54-rt32.patch.xz;name=rt-patch \
+    ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/older/patch-5.4.61-rt37.patch.xz;name=rt-patch \
 "
-SRC_URI[rt-patch.md5sum] = "f83f14b18f66873f6a3a26925a62d0c4"
-SRC_URI[rt-patch.sha256sum] = "3385c8a64233f7f34c509626aaa6b5084bf75b1b27a0dc0dd5024d9736270b03"
+SRC_URI[rt-patch.md5sum] = "5a72e4f56ffdd79c8c668197f989f8d1"
+SRC_URI[rt-patch.sha256sum] = "b2b52be0ef8b56a44a898ffc6a54515508e3cc9b2faece7a7d9f5d617a29ede1"
