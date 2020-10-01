@@ -1,0 +1,4 @@
+define KFEATURE_DESCRIPTION "Enable Features needed by preempt-rt"
+define KFEATURE_COMPATIBILITY board
+
+kconf non-hardware preempt-rt.cfg
