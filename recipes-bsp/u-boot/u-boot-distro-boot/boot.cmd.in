@@ -39,6 +39,7 @@ test -n ${boot_part} || env set boot_part ${distro_bootpart}
 test -n ${root_part} || env set root_part 2
 test -n ${boot_devnum} || env set boot_devnum ${devnum}
 test -n ${root_devnum} || env set root_devnum ${devnum}
+test -n ${kernel_image} || env set kernel_image @@KERNEL_IMAGETYPE@@
 test -n ${boot_devtype} || env set boot_devtype ${devtype}
 test -n ${root_devtype} || env set root_devtype ${devtype}
 test -n ${overlays_file} || env set overlays_file "overlays.txt"
@@ -56,9 +57,6 @@ else
     env set kernel_addr_load ${kernel_addr_r}
     env set bootcmd_unzip ';'
 fi
-
-# Workaround Toradex Easy Installer issue causing kernel_image to be wrongly set to ancient default
-env set kernel_image @@KERNEL_IMAGETYPE@@
 
 # Set dynamic commands
 env set set_bootcmd_kernel 'env set bootcmd_kernel "${load_cmd} \\${kernel_addr_load} \\${kernel_image}"'
