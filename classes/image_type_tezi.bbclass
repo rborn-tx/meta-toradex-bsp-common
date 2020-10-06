@@ -24,6 +24,8 @@ TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
 TEZI_BOOT_SUFFIX ??= "bootfs.tar.xz"
 TEZI_CONFIG_FORMAT ??= "2"
+# Require newer Tezi for mx8 Socs with the u-boot environment bugfix
+TEZI_CONFIG_FORMAT_mx8 ??= "4"
 TEZI_EXTERNAL_KERNEL_DEVICETREE ??= ""
 TEZI_EXTERNAL_KERNEL_DEVICETREE_BOOT ??= ""
 TORADEX_FLASH_TYPE ??= "emmc"
