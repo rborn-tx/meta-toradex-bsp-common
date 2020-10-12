@@ -12,7 +12,7 @@ SRC_URI = " \
 KERNEL_BOOTCMD ??= "bootz"
 KERNEL_BOOTCMD_aarch64 ?= "booti"
 
-inherit deploy nopackages
+inherit deploy
 
 do_deploy() {
     sed -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/;s/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
