@@ -346,12 +346,11 @@ python tezi_deploy_bootfs_files() {
 tezi_deploy_bootfs_files[dirs] =+ "${WORKDIR}/bootfs"
 tezi_deploy_bootfs_files[cleandirs] += "${WORKDIR}/bootfs"
 
-TAR_IMAGE_ROOTFS_task-image-bootfs = "${WORKDIR}/bootfs"
 MACHINE_PREFIX = "${MACHINE}"
 MACHINE_PREFIX_apalis-imx8x-v11a = "apalis-imx8x"
 MACHINE_PREFIX_colibri-imx8x-v10b = "colibri-imx8x"
 MACHINE_PREFIX_colibri-imx7-emmc = "colibri-imx7"
-IMAGE_CMD_bootfs () {
+tezi_deploy_dt_overlays() {
 	deploy_dt_dir=${DEPLOY_DIR_IMAGE}/devicetree/
 	dtbos=
 	if [ -z "${TEZI_EXTERNAL_KERNEL_DEVICETREE}" -a -d "$deploy_dt_dir" ] ; then
@@ -359,7 +358,7 @@ IMAGE_CMD_bootfs () {
 		common_dtbos=`cd $deploy_dt_dir && ls *.dtbo 2>/dev/null | grep -v -e 'imx[6-8]' -e 'tk1' | xargs || true`
 		dtbos="$machine_dtbos $common_dtbos"
 	else
-		dtbos=${TEZI_EXTERNAL_KERNEL_DEVICETREE}
+		dtbos="${TEZI_EXTERNAL_KERNEL_DEVICETREE}"
 	fi
 
 	# overlays to copy to bootfs/overlays
@@ -376,7 +375,13 @@ IMAGE_CMD_bootfs () {
 
 	echo "fdt_overlays=$(echo $overlays)" > ${WORKDIR}/bootfs/overlays.txt
 }
-do_image_bootfs[prefuncs] += "tezi_deploy_bootfs_files"
+
+TAR_IMAGE_ROOTFS_task-image-bootfs = "${WORKDIR}/bootfs"
+IMAGE_CMD_bootfs () {
+       :
+}
+TEZI_IMAGE_BOOTFS_PREFUNCS ??= "tezi_deploy_bootfs_files tezi_deploy_dt_overlays"
+do_image_bootfs[prefuncs] += "${TEZI_IMAGE_BOOTFS_PREFUNCS}"
 
 IMAGE_CMD_teziimg () {
 	bbnote "Create Toradex Easy Installer tarball"
@@ -409,12 +414,13 @@ IMAGE_CMD_teziimg () {
 		;;
 	esac
 }
+IMAGE_TYPEDEP_teziimg[vardepsexclude] = "TEZI_VERSION TEZI_DATE"
+IMAGE_TYPEDEP_teziimg += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
+TEZI_IMAGE_TEZIIMG_PREFUNCS ??= "rootfs_tezi_run_json"
+
 do_image_teziimg[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
 do_image_teziimg[cleandirs] += "${WORKDIR}/image-json"
-do_image_teziimg[prefuncs] += "rootfs_tezi_run_json"
-IMAGE_TYPEDEP_teziimg[vardepsexclude] = "TEZI_VERSION TEZI_DATE"
-
-IMAGE_TYPEDEP_teziimg += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
+do_image_teziimg[prefuncs] += "${TEZI_IMAGE_TEZIIMG_PREFUNCS}"
 
 python rootfs_tezi_run_distro_json() {
     flash_types = d.getVar('TORADEX_FLASH_TYPE')
@@ -446,9 +452,10 @@ python rootfs_tezi_run_distro_json() {
         d.appendVar("TEZI_IMAGE_UBOOT_FILES", ' ' + uenv_file + ' ' + uboot_file)
 }
 
+TEZI_IMAGE_TEZIIMG_DISTRO_PREFUNCS ??= "rootfs_tezi_run_distro_json"
 do_image_teziimg_distro[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
 do_image_teziimg_distro[cleandirs] += "${WORKDIR}/image-json"
-do_image_teziimg_distro[prefuncs] += "rootfs_tezi_run_distro_json"
+do_image_teziimg_distro[prefuncs] += "${TEZI_IMAGE_TEZIIMG_DISTRO_PREFUNCS}"
 
 IMAGE_CMD_teziimg-distro () {
 	bbnote "Create Toradex Easy Installer tarball"
