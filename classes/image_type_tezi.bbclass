@@ -347,11 +347,14 @@ tezi_deploy_bootfs_files[dirs] =+ "${WORKDIR}/bootfs"
 tezi_deploy_bootfs_files[cleandirs] += "${WORKDIR}/bootfs"
 
 TAR_IMAGE_ROOTFS_task-image-bootfs = "${WORKDIR}/bootfs"
+MACHINE_PREFIX = "${MACHINE}"
+MACHINE_PREFIX_colibri-imx8x-v10b = "colibri-imx8x"
+MACHINE_PREFIX_apalis-imx8x-v11a = "apalis-imx8x"
 IMAGE_CMD_bootfs () {
 	deploy_dt_dir=${DEPLOY_DIR_IMAGE}/devicetree/
 	dtbos=
 	if [ -z "${TEZI_EXTERNAL_KERNEL_DEVICETREE}" -a -d "$deploy_dt_dir" ] ; then
-		machine_dtbos=`cd $deploy_dt_dir && ls ${MACHINE}_*.dtbo 2>/dev/null || true`
+		machine_dtbos=`cd $deploy_dt_dir && ls ${MACHINE_PREFIX}_*.dtbo 2>/dev/null || true`
 		common_dtbos=`cd $deploy_dt_dir && ls *.dtbo 2>/dev/null | grep -v -e 'imx[6-8]' -e 'tk1' | xargs || true`
 		dtbos="$machine_dtbos $common_dtbos"
 	else
