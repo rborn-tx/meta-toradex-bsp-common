@@ -80,7 +80,7 @@ fi
 env set bootcmd_args 'run rootfsargs_set && env set bootargs ${defargs} ${rootfsargs} ${setupargs} ${vidargs} ${tdxargs}'
 env set fdt_resize 'fdt addr ${fdt_addr_r} && fdt resize 0x20000'
 env set bootcmd_overlays 'run load_overlays_file && run fdt_resize && run apply_overlays'
-env set bootcmd_boot '@@KERNEL_BOOTCMD@@ ${kernel_addr_r} - ${fdt_addr_r}'
+env set bootcmd_boot 'echo "Bootargs: \${bootargs}" && @@KERNEL_BOOTCMD@@ ${kernel_addr_r} - ${fdt_addr_r}'
 env set bootcmd_prepare 'run set_bootcmd_kernel; run set_bootcmd_dtb; run set_load_overlays_file; run set_apply_overlays'
 env set bootcmd_run 'run m4boot; run bootcmd_dtb && run bootcmd_overlays && run bootcmd_args && run bootcmd_kernel && run bootcmd_unzip && run bootcmd_boot; echo "Booting from ${devtype} failed!" && false'
 
