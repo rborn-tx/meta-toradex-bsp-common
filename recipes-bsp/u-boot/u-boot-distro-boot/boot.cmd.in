@@ -19,6 +19,11 @@
 #    boot_part = distro_bootpart
 #    root_part = 2
 #
+# Common variables used in tftp/dhcp modes:
+# - Static/dynamic IP mode: ip_dyn := {yes, no}
+# - Static IP-address of TFTP/NFS server: serverip := {legal IPv4 address}
+# - Static IP-address of the module: ipaddr := {legal IPv4 address}
+#
 # TODO:
 #  - support NFS in root_devtype
 
