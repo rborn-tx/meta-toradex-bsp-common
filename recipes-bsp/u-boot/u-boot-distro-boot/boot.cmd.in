@@ -9,9 +9,9 @@
 # - boot device type: boot_devtype := {mmc, usb, tftp, dhcp}
 # - boot device num (for mmc, usb types): boot_devnum := {0 .. MAX_DEV_NUM}
 # - boot partition (for mmc, usb types): boot_part := {1 .. MAX_PART_NUM}
-# - root device type: boot_devtype := {mmc, usb}
-# - root device num (for mmc, usb types): boot_devnum := {0 .. MAX_DEV_NUM}
-# - root partition (for mmc, usb types): boot_part := {1 .. MAX_PART_NUM}
+# - root device type: root_devtype := {mmc, usb}
+# - root device num (for mmc, usb types): root_devnum := {0 .. MAX_DEV_NUM}
+# - root partition (for mmc, usb types): root_part := {1 .. MAX_PART_NUM}
 #
 # Defaults:
 #    root_devtype = boot_devtype = devtype
