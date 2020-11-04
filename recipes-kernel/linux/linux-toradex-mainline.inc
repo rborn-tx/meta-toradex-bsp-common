@@ -1,4 +1,5 @@
 SUMMARY = "Toradex mainline Linux kernel"
+SUMMARY_preempt-rt = "Toradex mainline real-Time Linux kernel"
 SECTION = "kernel"
 LICENSE = "GPLv2"
 
