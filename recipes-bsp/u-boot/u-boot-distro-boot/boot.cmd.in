@@ -70,7 +70,7 @@ env set set_load_overlays_file 'env set load_overlays_file "${load_cmd} \\${load
 env set set_apply_overlays 'env set apply_overlays "for overlay_file in \\${fdt_overlays}; do echo Applying Overlay: \\${overlay_file} && ${load_cmd} \\${loadaddr} \\${overlay_file} && fdt apply \\${loadaddr}; env set overlay_file; done; true"'
 
 # Set static commands
-if test ${devtype} = "dhcp"; then
+if test ${root_devtype} = "dhcp"; then
     env set rootfsargs_set 'env set rootfsargs "root=/dev/nfs ip=dhcp nfsroot=${rootpath}"'
 else
     env set uuid_set 'part uuid ${root_devtype} ${root_devnum}:${root_part} uuid'
