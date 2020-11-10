@@ -1,15 +1,9 @@
 # This class implements Toradex Easy Installer image type
 # It allows to use OpenEmbedded to build images which can be consumed
 # by the Toradex Easy Installer.
+#
 # Since it also generates the image.json description file it is rather
 # interwind with the boot flow which is U-Boot target specific.
-#
-# Currently there are two image types implemented:
-# teziimg: Default Toradex boot flow
-# teziimg-distro: Distro boot boot flow
-
-do_image_teziimg[recrdeptask] += "do_deploy"
-do_image_teziimg_distro[recrdeptask] += "do_deploy"
 
 WKS_FILE_DEPENDS_append = " tezi-metadata virtual/dtb "
 DEPENDS += "${WKS_FILE_DEPENDS}"
@@ -21,8 +15,10 @@ TEZI_DATE ?= "${TDX_MATRIX_BUILD_TIME}"
 TEZI_IMAGE_NAME ?= "${IMAGE_NAME}"
 TEZI_ROOT_FSTYPE ??= "ext4"
 TEZI_ROOT_LABEL ??= "RFS"
+TEZI_ROOT_NAME ??= "rootfs"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
-TEZI_BOOT_SUFFIX ??= "bootfs.tar.xz"
+TEZI_USE_BOOTFILES ??= "true"
+TEZI_BOOT_SUFFIX ??= "${@'bootfs.tar.xz' if oe.types.boolean('${TEZI_USE_BOOTFILES}') else ''}"
 TEZI_CONFIG_FORMAT ??= "2"
 # Require newer Tezi for mx8 Socs with the u-boot environment bugfix
 TEZI_CONFIG_FORMAT_mx8 ??= "4"
@@ -48,7 +44,11 @@ CONVERSION_CMD_tar = "touch ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${
 CONVERSIONTYPES_append = " tar"
 
 def get_uncompressed_size(d, type):
-    with open(os.path.join(d.getVar('T'), "image-size.%s" % type), "r") as f:
+    path = os.path.join(d.getVar('T'), "image-size.%s" % type)
+    if not os.path.exists(path):
+        return 0
+
+    with open(path, "r") as f:
         size = f.read().strip()
     return float(size) / 1024
 
@@ -116,13 +116,14 @@ def tezi_deploy_files(d, deploy_var, deploy_dir, source_dir=None):
         except subprocess.CalledProcessError as e:
             bb.fatal("Command '%s' returned %d:\n%s" % (e.cmd, e.returncode, e.output))
 
-def rootfs_tezi_emmc(d, distro=False):
+def rootfs_tezi_emmc(d, use_bootfiles):
     from collections import OrderedDict
     offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD')
     offset_spl = d.getVar('OFFSET_SPL_PAYLOAD')
     imagename = d.getVar('IMAGE_LINK_NAME')
 
     bootpart_rawfiles = []
+    filesystem_partitions = []
 
     if offset_spl:
         bootpart_rawfiles.append(
@@ -136,33 +137,37 @@ def rootfs_tezi_emmc(d, distro=False):
                 "dd_options": "seek=" + (offset_spl if offset_spl else offset_bootrom)
               })
 
+    if use_bootfiles:
+        filesystem_partitions.append(
+              {
+                "partition_size_nominal": get_bootfs_part_size(d),
+                "want_maximised": False,
+                "content": {
+                  "label": "BOOT",
+                  "filesystem_type": "FAT",
+                  "mkfs_options": "",
+                  "filename": imagename + "." + d.getVar('TEZI_BOOT_SUFFIX'),
+                  "uncompressed_size": get_uncompressed_size(d, 'bootfs')
+                }
+              })
+
+    filesystem_partitions.append(
+          {
+            "partition_size_nominal": 512,
+            "want_maximised": True,
+            "content": {
+              "label": d.getVar('TEZI_ROOT_LABEL'),
+              "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
+              "mkfs_options": "-E nodiscard",
+              "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
+              "uncompressed_size": get_uncompressed_size(d, d.getVar('TEZI_ROOT_NAME'))
+            }
+          })
+
     return [
         OrderedDict({
           "name": "mmcblk0",
-          "partitions": [
-            {
-              "partition_size_nominal": get_bootfs_part_size(d),
-              "want_maximised": False,
-              "content": {
-                "label": "BOOT",
-                "filesystem_type": "FAT",
-                "mkfs_options": "",
-                "filename": imagename + "." + d.getVar('TEZI_BOOT_SUFFIX'),
-                "uncompressed_size": get_uncompressed_size(d, 'bootfs')
-              }
-            },
-            {
-              "partition_size_nominal": 512,
-              "want_maximised": True,
-              "content": {
-                "label": d.getVar('TEZI_ROOT_LABEL'),
-                "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
-                "mkfs_options": "-E nodiscard",
-                "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
-                "uncompressed_size": get_uncompressed_size(d, 'ota' if distro else "rootfs")
-              }
-            }
-          ]
+          "partitions": filesystem_partitions
         }),
         OrderedDict({
           "name": "mmcblk0boot0",
@@ -174,7 +179,7 @@ def rootfs_tezi_emmc(d, distro=False):
         })]
 
 
-def rootfs_tezi_rawnand(d, distro=False):
+def rootfs_tezi_rawnand(d):
     from collections import OrderedDict
     imagename = d.getVar('IMAGE_LINK_NAME')
 
@@ -197,6 +202,7 @@ def rootfs_tezi_rawnand(d, distro=False):
                  }
                }
              })
+
     env = OrderedDict({
         "name": "u-boot-env",
         "erase": True,
@@ -208,60 +214,46 @@ def rootfs_tezi_rawnand(d, distro=False):
                "content": {
                  "filesystem_type": "ubifs",
                  "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
-                 "uncompressed_size": get_uncompressed_size(d, 'ota' if distro else 'rootfs')
+                 "uncompressed_size": get_uncompressed_size(d, d.getVar('TEZI_ROOT_NAME'))
                }
              }
 
-    if distro:
-        boot = {
-                 "name": "boot",
-                 "size_kib": 16384,
-                 "content": {
-                   "filesystem_type": "ubifs",
-                   "filename": imagename + "." + d.getVar('TEZI_BOOT_SUFFIX'),
-                   "uncompressed_size": get_uncompressed_size(d, 'bootfs')
+    kernel = {
+               "name": "kernel",
+               "size_kib": 8192,
+               "type": "static",
+               "content": {
+                 "rawfile": {
+                   "filename": d.getVar('KERNEL_IMAGETYPE'),
+                   "size": 5
                  }
                }
-        ubivolumes = [boot, rootfs]
-    else:
-        kernel = {
-                   "name": "kernel",
-                   "size_kib": 8192,
-                   "type": "static",
-                   "content": {
-                     "rawfile": {
-                     "filename": d.getVar('KERNEL_IMAGETYPE'),
-                     "size": 5
-                     }
-                   }
+             }
+
+    # Use device tree mapping to create product id <-> device tree relationship
+    dtmapping = d.getVarFlags('TORADEX_PRODUCT_IDS')
+    dtfiles = []
+    for f, v in dtmapping.items():
+        dtfiles.append({ "filename": v, "product_ids": f })
+
+    dtb = {
+            "name": "dtb",
+            "content": {
+              "rawfiles": dtfiles
+            },
+            "size_kib": 128,
+            "type": "static"
+          }
+
+    m4firmware = {
+                   "name": "m4firmware",
+                   "size_kib": 896,
+                   "type": "static"
                  }
-
-        # Use device tree mapping to create product id <-> device tree relationship
-        dtmapping = d.getVarFlags('TORADEX_PRODUCT_IDS')
-        dtfiles = []
-        for f, v in dtmapping.items():
-            dtfiles.append({ "filename": v, "product_ids": f })
-
-        dtb = {
-                "name": "dtb",
-                "content": {
-                  "rawfiles": dtfiles
-                },
-                "size_kib": 128,
-                "type": "static"
-              }
-
-        m4firmware = {
-                       "name": "m4firmware",
-                       "size_kib": 896,
-                       "type": "static"
-                     }
-
-        ubivolumes = [kernel, dtb, m4firmware, rootfs]
 
     ubi = OrderedDict({
             "name": "ubi",
-            "ubivolumes": ubivolumes
+            "ubivolumes": [kernel, dtb, m4firmware, rootfs]
           })
 
     return [uboot1, uboot2, env, ubi]
@@ -315,9 +307,8 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     bb.note("Toradex Easy Installer metadata file {0} written.".format(json_file))
 
 python rootfs_tezi_run_json() {
+    artifacts = "%s/%s.%s" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME'), d.getVar('TEZI_ROOT_SUFFIX'))
     flash_type = d.getVar('TORADEX_FLASH_TYPE')
-    if flash_type is None:
-        bb.fatal("Toradex flash type not specified")
 
     if len(flash_type.split()) > 1:
         bb.fatal("This class only supports a single flash type.")
@@ -326,18 +317,22 @@ python rootfs_tezi_run_json() {
         flash_data = rootfs_tezi_rawnand(d)
         uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND')
         uboot_file = d.getVar('UBOOT_BINARY_TEZI_RAWNAND')
+        artifacts += " " + d.getVar('KERNEL_IMAGETYPE') + " " + d.getVar('KERNEL_DEVICETREE')
     elif flash_type == "emmc":
-        flash_data = rootfs_tezi_emmc(d)
+        use_bootfiles = oe.types.boolean(d.getVar('TEZI_USE_BOOTFILES'))
+        flash_data = rootfs_tezi_emmc(d, use_bootfiles)
         uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
         uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
         # TODO: Multi image/raw NAND with SPL currently not supported
-        if d.getVar('OFFSET_SPL_PAYLOAD'):
-            uboot_file += " " + d.getVar('SPL_BINARY')
+        uboot_file += " " + d.getVar('SPL_BINARY') if d.getVar('OFFSET_SPL_PAYLOAD') else ""
+        artifacts += " " + "%s/%s.%s" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME'), d.getVar('TEZI_BOOT_SUFFIX')) if use_bootfiles else ""
     else:
         bb.fatal("Toradex flash type unknown")
 
+    artifacts += " " + uenv_file + " " + uboot_file
+    d.setVar("TEZI_ARTIFACTS", artifacts)
+
     rootfs_tezi_json(d, flash_type, flash_data, "image-%s.json" % d.getVar('IMAGE_BASENAME'), uenv_file)
-    d.appendVar("TEZI_IMAGE_UBOOT_FILES", ' ' + uenv_file + ' ' + uboot_file)
 }
 
 python tezi_deploy_bootfs_files() {
@@ -383,98 +378,25 @@ IMAGE_CMD_bootfs () {
 TEZI_IMAGE_BOOTFS_PREFUNCS ??= "tezi_deploy_bootfs_files tezi_deploy_dt_overlays"
 do_image_bootfs[prefuncs] += "${TEZI_IMAGE_BOOTFS_PREFUNCS}"
 
+TEZI_IMAGE_TEZIIMG_PREFUNCS ??= "rootfs_tezi_run_json"
+IMAGE_TYPEDEP_teziimg += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
 IMAGE_CMD_teziimg () {
 	bbnote "Create Toradex Easy Installer tarball"
 
 	# Copy image json file to ${WORKDIR}/image-json
 	cp ${IMGDEPLOYDIR}/image*.json ${WORKDIR}/image-json/image.json
 
-	case "${TORADEX_FLASH_TYPE}" in
-		rawnand)
-		# The first transform strips all folders from the files to tar, the
-		# second transform "moves" them in a subfolder ${TEZI_IMAGE_NAME}_${TEZI_VERSION}.
-		${IMAGE_CMD_TAR} \
-			--transform='s/.*\///' \
-			--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
-			-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
-			${WORKDIR}/image-json/image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${TEZI_IMAGE_UBOOT_FILES} ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE} \
-			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
-		;;
-		*)
-		# The first transform strips all folders from the files to tar, the
-		# second transform "moves" them in a subfolder ${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.
-		${IMAGE_CMD_TAR} \
-			--transform='s/.*\///' \
-			--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
-			-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
-			${WORKDIR}/image-json/image.json toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-			${TEZI_IMAGE_UBOOT_FILES} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
-			${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
-		;;
-	esac
-}
-IMAGE_TYPEDEP_teziimg[vardepsexclude] = "TEZI_VERSION TEZI_DATE"
-IMAGE_TYPEDEP_teziimg += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
-TEZI_IMAGE_TEZIIMG_PREFUNCS ??= "rootfs_tezi_run_json"
-
-do_image_teziimg[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
-do_image_teziimg[cleandirs] += "${WORKDIR}/image-json"
-do_image_teziimg[prefuncs] += "${TEZI_IMAGE_TEZIIMG_PREFUNCS}"
-
-python rootfs_tezi_run_distro_json() {
-    flash_types = d.getVar('TORADEX_FLASH_TYPE')
-    if flash_types is None:
-        bb.fatal("Toradex flash type not specified")
-
-    flash_types_list = flash_types.split()
-    for flash_type in flash_types_list:
-        if flash_type == "rawnand":
-            flash_data = rootfs_tezi_rawnand(d, True)
-            uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND')
-            uboot_file = d.getVar('UBOOT_BINARY_TEZI_RAWNAND')
-        elif flash_type == "emmc":
-            flash_data = rootfs_tezi_emmc(d, True)
-            uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
-            uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
-            # TODO: Multi image/raw NAND with SPL currently not supported
-            if d.getVar('OFFSET_SPL_PAYLOAD'):
-                uboot_file += " " + d.getVar('SPL_BINARY')
-        else:
-            bb.fatal("Toradex flash type unknown")
-
-        if len(flash_types_list) > 1:
-            json_file = "image-{0}-{1}.json".format(flash_type, d.getVar('IMAGE_BASENAME'))
-        else:
-            json_file = "image-{0}.json".format(d.getVar('IMAGE_BASENAME'))
-
-        rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file)
-        d.appendVar("TEZI_IMAGE_UBOOT_FILES", ' ' + uenv_file + ' ' + uboot_file)
-}
-
-TEZI_IMAGE_TEZIIMG_DISTRO_PREFUNCS ??= "rootfs_tezi_run_distro_json"
-do_image_teziimg_distro[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
-do_image_teziimg_distro[cleandirs] += "${WORKDIR}/image-json"
-do_image_teziimg_distro[prefuncs] += "${TEZI_IMAGE_TEZIIMG_DISTRO_PREFUNCS}"
-
-IMAGE_CMD_teziimg-distro () {
-	bbnote "Create Toradex Easy Installer tarball"
-
-	# Copy image json files to ${WORKDIR}/image-json
-	for image in ${IMGDEPLOYDIR}/image*.json; do
-		image_name=$(echo $(basename $image) | sed 's/-${IMAGE_BASENAME}//')
-		cp $image ${WORKDIR}/image-json/$image_name
-	done
-
+	# The first transform strips all folders from the files to tar, the
+	# second transform "moves" them in a subfolder ${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.
 	${IMAGE_CMD_TAR} \
 		--transform='s/.*\///' \
 		--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
 		-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
 		toradexlinux.png marketing.tar prepare.sh wrapup.sh \
-		${TEZI_IMAGE_UBOOT_FILES} ${WORKDIR}/image-json/image*.json \
-		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_BOOT_SUFFIX} \
-		${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${TEZI_ROOT_SUFFIX}
+		${WORKDIR}/image-json/image.json ${TEZI_ARTIFACTS}
 }
-IMAGE_CMD_teziimg-distro[vardepsexclude] = "TEZI_VERSION TEZI_DATE"
-
-IMAGE_TYPEDEP_teziimg-distro += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
+do_image_teziimg[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
+do_image_teziimg[cleandirs] += "${WORKDIR}/image-json"
+do_image_teziimg[prefuncs] += "${TEZI_IMAGE_TEZIIMG_PREFUNCS}"
+do_image_teziimg[recrdeptask] += "do_deploy"
+do_image_teziimg[vardepsexclude] = "TEZI_VERSION TEZI_DATE"
