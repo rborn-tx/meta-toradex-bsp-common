@@ -39,6 +39,7 @@ test -n ${root_devnum} || env set root_devnum ${devnum}
 test -n ${kernel_image} || env set kernel_image @@KERNEL_IMAGETYPE@@
 test -n ${boot_devtype} || env set boot_devtype ${devtype}
 test -n ${overlays_file} || env set overlays_file "overlays.txt"
+test -n ${overlays_prefix} || env set overlays_prefix "overlays/"
 
 test ${boot_devtype} = "mmc" && env set load_cmd 'load ${boot_devtype} ${boot_devnum}:${boot_part}'
 test ${boot_devtype} = "usb" && env set load_cmd 'load ${boot_devtype} ${boot_devnum}:${boot_part}'
@@ -79,7 +80,7 @@ fi
 env set set_bootcmd_kernel 'env set bootcmd_kernel "${load_cmd} \\${kernel_addr_load} \\${kernel_image}"'
 env set set_bootcmd_dtb 'env set bootcmd_dtb "${load_cmd} \\${fdt_addr_r} \\${fdtfile}"'
 env set set_load_overlays_file 'env set load_overlays_file "${load_cmd} \\${loadaddr} \\${overlays_file}; env import -t \\${loadaddr} \\${filesize}"'
-env set set_apply_overlays 'env set apply_overlays "for overlay_file in \\${fdt_overlays}; do echo Applying Overlay: \\${overlay_file} && ${load_cmd} \\${loadaddr} \\${overlay_file} && fdt apply \\${loadaddr}; env set overlay_file; done; true"'
+env set set_apply_overlays 'env set apply_overlays "for overlay_file in \\${fdt_overlays}; do echo Applying Overlay: \\${overlay_file} && ${load_cmd} \\${loadaddr} \\${overlays_prefix}\\${overlay_file} && fdt apply \\${loadaddr}; env set overlay_file; done; true"'
 
 # Set static commands
 if test ${root_devtype} = "nfs-dhcp"; then
