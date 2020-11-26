@@ -1,0 +1,3 @@
+KERNEL=="mmcblk[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="700b0600.sdhci", SYMLINK+="emmc"
+KERNEL=="mmcblk[0-9]boot[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="700b0600.sdhci", SYMLINK+="emmc-boot%n"
+KERNEL=="mmcblk[0-9]p[0-9]", ENV{DEVTYPE}=="partition", KERNELS=="700b0600.sdhci", SYMLINK+="emmc-part%n"
