@@ -78,7 +78,7 @@ fi
 
 # Set dynamic commands
 env set set_bootcmd_kernel 'env set bootcmd_kernel "${load_cmd} \\${kernel_addr_load} \\${kernel_image}"'
-env set set_bootcmd_dtb 'env set bootcmd_dtb "${load_cmd} \\${fdt_addr_r} \\${fdtfile}"'
+env set set_bootcmd_dtb 'env set bootcmd_dtb "echo Loading DeviceTree: \\${fdtfile}; ${load_cmd} \\${fdt_addr_r} \\${fdtfile}"'
 env set set_load_overlays_file 'env set load_overlays_file "${load_cmd} \\${loadaddr} \\${overlays_file}; env import -t \\${loadaddr} \\${filesize}"'
 env set set_apply_overlays 'env set apply_overlays "for overlay_file in \\${fdt_overlays}; do echo Applying Overlay: \\${overlay_file} && ${load_cmd} \\${loadaddr} \\${overlays_prefix}\\${overlay_file} && fdt apply \\${loadaddr}; env set overlay_file; done; true"'
 
