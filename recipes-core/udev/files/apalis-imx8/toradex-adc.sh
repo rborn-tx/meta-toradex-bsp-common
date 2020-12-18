@@ -11,11 +11,11 @@ START=0
 
 if [ "$ACTION" = "add" ]; then
     for idx in `seq 0 $((LINES-1))`; do
-        ln -s "/sys$DEVPATH/in_voltage$((START+idx))_raw" /dev/apalis-ain$idx
+        ln -s "/sys$DEVPATH/in_voltage$((START+idx))_raw" /dev/apalis-adc$idx
     done
 elif [ "$ACTION" = "remove" ]; then
     for idx in `seq 0 $((LINES-1))`; do
-        rm -f /dev/apalis-ain$idx
+        rm -f /dev/apalis-adc$idx
     done
 fi
 
