@@ -10,6 +10,11 @@ DEPENDS += "${WKS_FILE_DEPENDS}"
 
 RM_WORK_EXCLUDE += "${PN}"
 
+# set defaults if not building with a Toradex distro
+TDX_RELEASE ??= "0.0.0"
+TDX_MATRIX_BUILD_TIME ??= "${DATETIME}"
+TDX_MATRIX_BUILD_TIME[vardepsexclude] = "DATETIME"
+
 TEZI_VERSION ?= "${DISTRO_VERSION}"
 TEZI_DATE ?= "${TDX_MATRIX_BUILD_TIME}"
 TEZI_IMAGE_NAME ?= "${IMAGE_NAME}"
