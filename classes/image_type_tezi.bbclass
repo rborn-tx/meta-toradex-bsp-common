@@ -5,8 +5,9 @@
 # Since it also generates the image.json description file it is rather
 # interwind with the boot flow which is U-Boot target specific.
 
-WKS_FILE_DEPENDS_append = " tezi-metadata virtual/dtb "
+WKS_FILE_DEPENDS_append = " tezi-metadata virtual/dtb"
 DEPENDS += "${WKS_FILE_DEPENDS}"
+IMAGE_BOOT_FILES_append = " overlays.txt overlays/*;overlays/ "
 
 RM_WORK_EXCLUDE += "${PN}"
 
@@ -27,8 +28,6 @@ TEZI_BOOT_SUFFIX ??= "${@'bootfs.tar.xz' if oe.types.boolean('${TEZI_USE_BOOTFIL
 TEZI_CONFIG_FORMAT ??= "2"
 # Require newer Tezi for mx8 Socs with the u-boot environment bugfix
 TEZI_CONFIG_FORMAT_mx8 ??= "4"
-TEZI_EXTERNAL_KERNEL_DEVICETREE ??= ""
-TEZI_EXTERNAL_KERNEL_DEVICETREE_BOOT ??= ""
 TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
 UBOOT_BINARY_TEZI_RAWNAND ?= "${UBOOT_BINARY}"
@@ -352,44 +351,11 @@ python tezi_deploy_bootfs_files() {
 tezi_deploy_bootfs_files[dirs] =+ "${WORKDIR}/bootfs"
 tezi_deploy_bootfs_files[cleandirs] += "${WORKDIR}/bootfs"
 
-MACHINE_PREFIX = "${MACHINE}"
-MACHINE_PREFIX_apalis-imx8x-v11a = "apalis-imx8x"
-MACHINE_PREFIX_colibri-imx8x-v10b = "colibri-imx8x"
-MACHINE_PREFIX_colibri-imx7-emmc = "colibri-imx7"
-tezi_deploy_dt_overlays() {
-	deploy_dt_dir=${DEPLOY_DIR_IMAGE}/devicetree/
-	dtbos=
-	if [ -z "${TEZI_EXTERNAL_KERNEL_DEVICETREE}" -a -d "$deploy_dt_dir" ] ; then
-		machine_dtbos=`cd $deploy_dt_dir && ls ${MACHINE_PREFIX}[_-]*.dtbo 2>/dev/null || true`
-		common_dtbos=`cd $deploy_dt_dir && ls *.dtbo 2>/dev/null | grep -v -e 'imx[6-8]' -e 'tk1' | xargs || true`
-		dtbos="$machine_dtbos $common_dtbos"
-	else
-		dtbos="${TEZI_EXTERNAL_KERNEL_DEVICETREE}"
-	fi
-
-	# overlays to copy to bootfs/overlays
-	mkdir -p ${WORKDIR}/bootfs/overlays/
-	for dtbo in $dtbos; do
-		cp $deploy_dt_dir/$dtbo ${WORKDIR}/bootfs/overlays/
-	done
-
-	# overlays that we want to be applied during boot time
-	overlays=
-	for dtbo in ${TEZI_EXTERNAL_KERNEL_DEVICETREE_BOOT}; do
-		if [ ! -e ${WORKDIR}/bootfs/overlays/$dtbo ]; then
-			bbfatal "$dtbo is not installed in your boot filesystem, please make sure it's in TEZI_EXTERNAL_KERNEL_DEVICETREE or being provided by virtual/dtb."
-		fi
-		overlays="$overlays $dtbo"
-	done
-
-	echo "fdt_overlays=$(echo $overlays)" > ${WORKDIR}/bootfs/overlays.txt
-}
-
 TAR_IMAGE_ROOTFS_task-image-bootfs = "${WORKDIR}/bootfs"
 IMAGE_CMD_bootfs () {
        :
 }
-TEZI_IMAGE_BOOTFS_PREFUNCS ??= "tezi_deploy_bootfs_files tezi_deploy_dt_overlays"
+TEZI_IMAGE_BOOTFS_PREFUNCS ??= "tezi_deploy_bootfs_files"
 do_image_bootfs[prefuncs] += "${TEZI_IMAGE_BOOTFS_PREFUNCS}"
 
 TEZI_IMAGE_TEZIIMG_PREFUNCS ??= "rootfs_tezi_run_json"
