@@ -5,7 +5,7 @@
 # Since it also generates the image.json description file it is rather
 # interwind with the boot flow which is U-Boot target specific.
 
-WKS_FILE_DEPENDS_append = " tezi-metadata device-tree-overlay-filter"
+WKS_FILE_DEPENDS_append = " tezi-metadata virtual/dtb"
 DEPENDS += "${WKS_FILE_DEPENDS}"
 IMAGE_BOOT_FILES_append = " overlays.txt overlays/*;overlays/ "
 
