@@ -78,15 +78,31 @@ then
     env set kernel_addr_load ${loadaddr}
     env set bootcmd_unzip 'unzip ${kernel_addr_load} ${kernel_addr_r}'
 else
-    env set kernel_addr_load ${kernel_addr_r}
     env set bootcmd_unzip ';'
+    if test ${kernel_image} = "fitImage"
+    then
+        env set kernel_addr_load ${ramdisk_addr_r}
+    else
+        env set kernel_addr_load ${kernel_addr_r}
+    fi
 fi
 
 # Set dynamic commands
 env set set_bootcmd_kernel 'env set bootcmd_kernel "${load_cmd} \\${kernel_addr_load} \\${kernel_image}"'
-env set set_bootcmd_dtb 'env set bootcmd_dtb "echo Loading DeviceTree: \\${fdtfile}; ${load_cmd} \\${fdt_addr_r} \\${fdtfile}"'
 env set set_load_overlays_file 'env set load_overlays_file "${load_cmd} \\${loadaddr} \\${overlays_file}; env import -t \\${loadaddr} \\${filesize}"'
-env set set_apply_overlays 'env set apply_overlays "for overlay_file in \\${fdt_overlays}; do echo Applying Overlay: \\${overlay_file} && ${load_cmd} \\${loadaddr} \\${overlays_prefix}\\${overlay_file} && fdt apply \\${loadaddr}; env set overlay_file; done; true"'
+if test ${kernel_image} = "fitImage"
+then
+    env set fdt_high
+    env set fdt_resize true
+    env set set_bootcmd_dtb 'env set bootcmd_dtb "true"'
+    env set set_apply_overlays 'env set apply_overlays "for overlay_file in \"\\${fdt_overlays}\"; do env set fitconf_fdt_overlays \"\\"\\${fitconf_fdt_overlays}#conf@\\${overlay_file}\\"\"; env set overlay_file; done; true"'
+    env set bootcmd_boot 'echo "Bootargs: \${bootargs}" && @@KERNEL_BOOTCMD@@ ${ramdisk_addr_r}#conf@\${fdtfile}\${fitconf_fdt_overlays}'
+else
+    env set fdt_resize 'fdt addr ${fdt_addr_r} && fdt resize 0x20000'
+    env set set_bootcmd_dtb 'env set bootcmd_dtb "echo Loading DeviceTree: \\${fdtfile}; ${load_cmd} \\${fdt_addr_r} \\${fdtfile}"'
+    env set set_apply_overlays 'env set apply_overlays "for overlay_file in \\${fdt_overlays}; do echo Applying Overlay: \\${overlay_file} && ${load_cmd} \\${loadaddr} \\${overlays_prefix}\\${overlay_file} && fdt apply \\${loadaddr}; env set overlay_file; done; true"'
+    env set bootcmd_boot 'echo "Bootargs: \${bootargs}" && @@KERNEL_BOOTCMD@@ ${kernel_addr_r} - ${fdt_addr_r}'
+fi
 
 # Set static commands
 if test ${root_devtype} = "nfs-dhcp"; then
@@ -101,13 +117,11 @@ else
 fi
 
 env set bootcmd_args 'run rootfsargs_set && env set bootargs ${defargs} ${rootfsargs} ${setupargs} ${vidargs} ${tdxargs}'
-env set fdt_resize 'fdt addr ${fdt_addr_r} && fdt resize 0x20000'
 if test ${skip_fdt_overlays} != 1; then
     env set bootcmd_overlays 'run load_overlays_file && run fdt_resize && run apply_overlays'
 else
     env set bootcmd_overlays true
 fi
-env set bootcmd_boot 'echo "Bootargs: \${bootargs}" && @@KERNEL_BOOTCMD@@ ${kernel_addr_r} - ${fdt_addr_r}'
 env set bootcmd_prepare 'run set_bootcmd_kernel; run set_bootcmd_dtb; run set_load_overlays_file; run set_apply_overlays'
 env set bootcmd_run 'run m4boot; run bootcmd_dtb && run bootcmd_overlays && run bootcmd_args && run bootcmd_kernel && run bootcmd_unzip && run bootcmd_boot; echo "Booting from ${devtype} failed!" && false'
 
