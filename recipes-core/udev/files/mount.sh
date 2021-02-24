@@ -4,6 +4,25 @@
 #
 # Attempt to mount any added block devices and umount any removed devices
 
+# By default we boot from a block device the BSP uses the first partition to
+# store the files used by U-Boot, aka. the bootfs. The second partition of the
+# same block device then contains the rootfs.
+# Read the PARTUUID of the rootfs from /proc/cmdline, check if that device
+# exists and then assume that the first partition on that device is the one
+# with the bootpartion on it.
+# Symlink that partition to /dev/boot-part, that then gets mounted to /boot,
+# compare with /etc/fstab.
+
+# expects 'root=PARTUUID=fe6beb3d-02' in /proc/cmdline
+
+BASEUUID=$(sed 's/root=\([^[:space:]]*\).*/\1/ ; s/PARTUUID=\([0-9a-f]*\)-02/\1/' /proc/cmdline)
+if [ -b /dev/disk/by-partuuid/${BASEUUID}-02 ]; then
+	BOOTPART=$(readlink -f /dev/disk/by-partuuid/${BASEUUID}-01)
+	if [ x$DEVNAME = x$BOOTPART ]; then
+		logger "$0 creating symlink"
+		ln -sf $BOOTPART /dev/boot-part
+	fi
+fi
 
 MOUNT="/bin/mount"
 PMOUNT="/usr/bin/pmount"
