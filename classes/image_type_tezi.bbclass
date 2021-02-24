@@ -7,7 +7,10 @@
 
 WKS_FILE_DEPENDS_append = " tezi-metadata virtual/dtb"
 DEPENDS += "${WKS_FILE_DEPENDS}"
-IMAGE_BOOT_FILES_append = " overlays.txt overlays/*;overlays/ "
+IMAGE_BOOT_FILES_REMOVE = "${@make_dtb_boot_files(d) if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else ''}"
+IMAGE_BOOT_FILES_REMOVE_apalis-tk1 = "${@ d.getVar('KERNEL_DEVICETREE') if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else ''}"
+IMAGE_BOOT_FILES_append = " overlays.txt ${@'' if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else 'overlays/*;overlays/'}"
+IMAGE_BOOT_FILES_remove = "${IMAGE_BOOT_FILES_REMOVE}"
 
 RM_WORK_EXCLUDE += "${PN}"
 
@@ -350,6 +353,7 @@ python tezi_deploy_bootfs_files() {
 }
 tezi_deploy_bootfs_files[dirs] =+ "${WORKDIR}/bootfs"
 tezi_deploy_bootfs_files[cleandirs] += "${WORKDIR}/bootfs"
+tezi_deploy_bootfs_files[vardeps] += "IMAGE_BOOT_FILES"
 
 TAR_IMAGE_ROOTFS_task-image-bootfs = "${WORKDIR}/bootfs"
 IMAGE_CMD_bootfs () {
