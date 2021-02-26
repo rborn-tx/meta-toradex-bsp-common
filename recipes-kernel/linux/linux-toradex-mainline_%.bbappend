@@ -1,1 +1,1 @@
-EXTRA_OEMAKE += "DTC_FLAGS=-@ "
+export DTC_FLAGS = "-@"
