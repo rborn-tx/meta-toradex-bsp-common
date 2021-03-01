@@ -284,6 +284,8 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
         data["marketing"] = "marketing.tar"
     if os.path.exists(os.path.join(deploydir, "toradexlinux.png")):
         data["icon"] = "toradexlinux.png"
+    if os.path.exists(os.path.join(deploydir, "LA_OPT_NXP_SW.html")):
+        data["license"] = "LA_OPT_NXP_SW.html"
 
     product_ids = d.getVar('TORADEX_PRODUCT_IDS')
     if product_ids is None:
@@ -360,13 +362,16 @@ IMAGE_CMD_teziimg () {
 	# Copy image json file to ${WORKDIR}/image-json
 	cp ${IMGDEPLOYDIR}/image*.json ${WORKDIR}/image-json/image.json
 
+	# Keep License up to date
+	curl -k -O https://www.nxp.com/docs/en/disclaimer/LA_OPT_NXP_SW.html
+
 	# The first transform strips all folders from the files to tar, the
 	# second transform "moves" them in a subfolder ${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.
 	${IMAGE_CMD_TAR} \
 		--transform='s/.*\///' \
 		--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
 		-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
-		toradexlinux.png marketing.tar prepare.sh wrapup.sh \
+		toradexlinux.png marketing.tar prepare.sh wrapup.sh LA_OPT_NXP_SW.html \
 		${WORKDIR}/image-json/image.json ${TEZI_ARTIFACTS}
 }
 do_image_teziimg[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"

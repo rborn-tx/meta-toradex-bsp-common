@@ -7,6 +7,7 @@ SRC_URI = " \
     file://wrapup.sh \
     file://toradexlinux.png \
     file://marketing.tar;unpack=false \
+    file://LA_OPT_NXP_SW.html \
 "
 
 inherit deploy nopackages
@@ -16,6 +17,7 @@ do_deploy () {
     install -m 644 ${WORKDIR}/wrapup.sh ${DEPLOYDIR}
     install -m 644 ${WORKDIR}/toradexlinux.png ${DEPLOYDIR}
     install -m 644 ${WORKDIR}/marketing.tar ${DEPLOYDIR}
+    install -m 644 ${WORKDIR}/LA_OPT_NXP_SW.html ${DEPLOYDIR}
 }
 
 addtask deploy before do_build after do_install
