@@ -15,7 +15,7 @@
 
 # expects 'root=PARTUUID=fe6beb3d-02' in /proc/cmdline
 
-BASEUUID=$(sed 's/root=\([^[:space:]]*\).*/\1/ ; s/PARTUUID=\([0-9a-f]*\)-02/\1/' /proc/cmdline)
+BASEUUID=$(sed -r 's/^.*\broot=PARTUUID=([0-9a-f]+)-02.*$/\1/' /proc/cmdline)
 if [ -b /dev/disk/by-partuuid/${BASEUUID}-02 ]; then
 	BOOTPART=$(readlink -f /dev/disk/by-partuuid/${BASEUUID}-01)
 	if [ x$DEVNAME = x$BOOTPART ]; then
