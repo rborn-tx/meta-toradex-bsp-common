@@ -370,8 +370,7 @@ IMAGE_CMD_teziimg () {
 	# Copy image json file to ${WORKDIR}/image-json
 	cp ${IMGDEPLOYDIR}/image*.json ${WORKDIR}/image-json/image.json
 
-	# Keep License up to date
-	curl -k -O ${TEZI_EULA_URL}
+	curl -k --retry 5 -O ${TEZI_EULA_URL} || true
 	EULA_FILE=$(echo "${TEZI_EULA_URL##*/}")
 
 	# The first transform strips all folders from the files to tar, the
