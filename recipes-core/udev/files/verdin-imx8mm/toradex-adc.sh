@@ -5,13 +5,13 @@
 # Create/remove symlinks to/from the files with raw adc data.
 
 # Map the ADC lines:
-# verdin-adc{1..4} -> MAX11607 ADC{0,1,2,3}
+# verdin-adc{1..4} -> TLA2024 ADC{3,2,1,0}
 
 if [ "$ACTION" = "add" ]; then
-    ln -s "/sys$DEVPATH/in_voltage0_raw" /dev/verdin-adc1
-    ln -s "/sys$DEVPATH/in_voltage1_raw" /dev/verdin-adc2
-    ln -s "/sys$DEVPATH/in_voltage2_raw" /dev/verdin-adc3
-    ln -s "/sys$DEVPATH/in_voltage3_raw" /dev/verdin-adc4
+    ln -s "/sys$DEVPATH/in_voltage0_raw" /dev/verdin-adc4
+    ln -s "/sys$DEVPATH/in_voltage1_raw" /dev/verdin-adc3
+    ln -s "/sys$DEVPATH/in_voltage2_raw" /dev/verdin-adc2
+    ln -s "/sys$DEVPATH/in_voltage3_raw" /dev/verdin-adc1
 elif [ "$ACTION" = "remove" ]; then
     rm -f /dev/verdin-adc1
     rm -f /dev/verdin-adc2
