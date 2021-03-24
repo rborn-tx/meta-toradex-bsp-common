@@ -9,8 +9,8 @@ SRC_URI = " \
     file://boot.cmd.in \
 "
 
-KERNEL_BOOTCMD ??= "${@'bootm' if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else 'bootz'}"
-KERNEL_BOOTCMD_aarch64 ?= "${@'bootm' if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else 'booti'}"
+KERNEL_BOOTCMD ??= "bootz"
+KERNEL_BOOTCMD_aarch64 ?= "booti"
 
 inherit deploy
 
