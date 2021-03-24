@@ -115,6 +115,9 @@ fitimage_assemble() {
 			fi
 			i=`expr ${i} + 1`
 		done
+        else
+		defaultconfigcount=1
+		fitimage_emit_section_config ${1} "${kernelcount}" "" "${ramdiskcount}" "${setupcount}" "${defaultconfigcount}"
 	fi
 
 	fitimage_emit_section_maint ${1} sectend
