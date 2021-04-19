@@ -275,7 +275,7 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     from datetime import datetime
 
     deploydir = d.getVar('DEPLOY_DIR_IMAGE')
-    data = OrderedDict({ "config_format": d.getVar('TEZI_CONFIG_FORMAT'), "autoinstall": oe.types.boolean(d.getVar('TEZI_USE_BOOTFILES')) })
+    data = OrderedDict({ "config_format": d.getVar('TEZI_CONFIG_FORMAT'), "autoinstall": oe.types.boolean(d.getVar('TEZI_AUTO_INSTALL')) })
 
     # Use image recipes SUMMARY/DESCRIPTION...
     data["name"] = d.getVar('SUMMARY')
