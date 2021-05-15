@@ -11,3 +11,5 @@ KERNEL=="mmcblk[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="2198000.usdhc", SYMLINK+=
 KERNEL=="mmcblk[0-9]boot[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="2198000.usdhc", SYMLINK+="emmc-boot%n"
 KERNEL=="mmcblk[0-9]p[0-9]", ENV{DEVTYPE}=="partition", KERNELS=="2198000.usdhc", SYMLINK+="emmc-part%n"
 SUBSYSTEM=="iio", KERNELS=="iio:device0", RUN+="/etc/udev/scripts/toradex-adc.sh"
+ACTION=="add|change", KERNEL=="mmcblk[0-9]", KERNELS=="2190000.usdhc", SYMLINK+="colibri-sd"
+ACTION=="add|change", KERNEL=="mmcblk[0-9]p[0-9]*", KERNELS=="2190000.usdhc", SYMLINK+="colibri-sd-p$attr{partition}"
