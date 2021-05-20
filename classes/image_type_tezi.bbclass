@@ -19,6 +19,10 @@ TDX_RELEASE ??= "0.0.0"
 TDX_MATRIX_BUILD_TIME ??= "${DATETIME}"
 TDX_MATRIX_BUILD_TIME[vardepsexclude] = "DATETIME"
 
+EMMCDEV = "mmcblk0"
+EMMCDEV_verdin-imx8mp = "emmc"
+EMMCDEVBOOT0 = "mmcblk0boot0"
+EMMCDEVBOOT0_verdin-imx8mp = "emmc-boot0"
 TEZI_VERSION ?= "${DISTRO_VERSION}"
 TEZI_DATE ?= "${TDX_MATRIX_BUILD_TIME}"
 TEZI_IMAGE_NAME ?= "${IMAGE_NAME}"
@@ -129,9 +133,11 @@ def tezi_deploy_files(d, deploy_var, deploy_dir, source_dir=None):
 
 def rootfs_tezi_emmc(d, use_bootfiles):
     from collections import OrderedDict
+    emmcdev = d.getVar('EMMCDEV')
+    emmcdevboot0 = d.getVar('EMMCDEVBOOT0')
+    imagename = d.getVar('IMAGE_LINK_NAME')
     offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD')
     offset_spl = d.getVar('OFFSET_SPL_PAYLOAD')
-    imagename = d.getVar('IMAGE_LINK_NAME')
 
     bootpart_rawfiles = []
     filesystem_partitions = []
@@ -177,11 +183,11 @@ def rootfs_tezi_emmc(d, use_bootfiles):
 
     return [
         OrderedDict({
-          "name": "mmcblk0",
+          "name": emmcdev,
           "partitions": filesystem_partitions
         }),
         OrderedDict({
-          "name": "mmcblk0boot0",
+          "name": emmcdevboot0,
           "erase": True,
           "content": {
             "filesystem_type": "raw",
