@@ -25,3 +25,5 @@ KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains('COMBINED_FEATURES', 'usbgadget'
 
 KBUILD_DEFCONFIG ?= "toradex-imx_v6_v7_defconfig"
 KBUILD_DEFCONFIG_apalis-tk1 ?= "tegra_defconfig"
+
+export DTC_FLAGS = "-@"
