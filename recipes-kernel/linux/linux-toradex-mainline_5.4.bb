@@ -1,9 +1,9 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-5.4:"
 
-LINUX_VERSION ?= "5.4.77"
+LINUX_VERSION ?= "5.4.129"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-SRCREV_machine = "a2e5dc80229e114cee12a54c4717f9b2a31546c6"
+SRCREV_machine = "4235f990f3e9c3470ebc63c11ec0f7f934c64e9e"
 SRCREV_machine_use-head-next = "${AUTOREV}"
 
 KCONFIG_MODE="--alldefconfig"
@@ -13,12 +13,12 @@ KBRANCH = "toradex_5.4.y"
 require recipes-kernel/linux/linux-toradex-mainline.inc
 
 SRC_URI_append_preempt-rt = " \
-    ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/older/patch-5.4.77-rt43.patch.xz;name=rt-patch \
+    ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/patch-5.4.129-rt61.patch.xz;name=rt-patch \
     file://preempt-rt.scc \
     file://preempt-rt-less-latency.scc \
 "
-SRC_URI[rt-patch.md5sum] = "cf96e01e04ec8743e4b24caec76d2c2d"
-SRC_URI[rt-patch.sha256sum] = "a0966fb60ce26f28e4dea5eb9db2e62974e1391470ea1bdb88e2d884a3280dc4"
+SRC_URI[rt-patch.md5sum] = "a6c668577fdde9cca5060bd72a782d16"
+SRC_URI[rt-patch.sha256sum] = "f8ddc34c7765bb78c9f44c4e41dae7d4196c87201212ab4ec3723a7594b9702c"
 
 # Load USB functions configurable through configfs (CONFIG_USB_CONFIGFS)
 KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains('COMBINED_FEATURES', 'usbgadget', ' libcomposite', '',d)}"
