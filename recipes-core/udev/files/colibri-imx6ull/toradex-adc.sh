@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 #
-# Called from udev. Compatible to colibri-imx8x.
+# Called from udev. Compatible to colibri-imx6ull.
 #
 # Create/remove symlinks to/from the files with raw ain data.
 
