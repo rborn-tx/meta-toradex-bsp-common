@@ -11,7 +11,7 @@ DEPENDS = "libconfig"
 EXTRA_OECONF = "--includedir=${includedir}/usbgx"
 
 PV = "0.2.0+git${SRCPV}"
-SRCREV = "45c14ef4d5d7ced0fbf984208de44ced6d5ed898"
+SRCREV = "fa4e7e92260e33f78b72e7796b3df28c4c84b8e2"
 SRCBRANCH = "master"
 SRC_URI = " \
     git://github.com/libusbgx/libusbgx.git;branch=${SRCBRANCH} \
