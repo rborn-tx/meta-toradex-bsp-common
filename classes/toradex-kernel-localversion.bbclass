@@ -16,7 +16,7 @@ TDX_VERSION ??= "0"
 SCMVERSION ??= "y"
 LOCALVERSION ?= "-${TDX_VERSION}"
 
-kernel_do_configure_append() {
+kernel_do_configure:append() {
 	kernel_configure_variable LOCALVERSION "\"${LOCALVERSION}\""
 
 	if [ "${SCMVERSION}" = "y" ]; then

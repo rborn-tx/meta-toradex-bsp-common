@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/libsoc:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/libsoc:"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -8,23 +8,23 @@ SRC_URI += " \
         file://0001-libsoc-use-sane-board-naming.patch \
 "
 
-BOARD_apalis-imx6 = "apalis-imx6"
-BOARD_apalis-tk1 = "apalis-tk1"
-BOARD_colibri-imx6 = "colibri-imx6"
-BOARD_colibri-imx6ull = "colibri-imx6ull"
-BOARD_colibri-imx6ull-emmc = "colibri-imx6ull"
-BOARD_colibri-imx7 = "colibri-imx7"
-BOARD_colibri-imx7-emmc = "colibri-imx7-emmc"
+BOARD:apalis-imx6 = "apalis-imx6"
+BOARD:apalis-tk1 = "apalis-tk1"
+BOARD:colibri-imx6 = "colibri-imx6"
+BOARD:colibri-imx6ull = "colibri-imx6ull"
+BOARD:colibri-imx6ull-emmc = "colibri-imx6ull"
+BOARD:colibri-imx7 = "colibri-imx7"
+BOARD:colibri-imx7-emmc = "colibri-imx7-emmc"
 
-PACKAGECONFIG_apalis-imx6 = "allboardconfigs enableboardconfig python"
-PACKAGECONFIG_apalis-tk1 = "allboardconfigs enableboardconfig python"
-PACKAGECONFIG_colibri-imx6 = "allboardconfigs enableboardconfig python"
-PACKAGECONFIG_colibri-imx6ull = "allboardconfigs enableboardconfig python"
-PACKAGECONFIG_colibri-imx6ull-emmc = "allboardconfigs enableboardconfig python"
-PACKAGECONFIG_colibri-imx7 = "allboardconfigs enableboardconfig python"
-PACKAGECONFIG_colibri-imx7-emmc = "allboardconfigs enableboardconfig python"
+PACKAGECONFIG:apalis-imx6 = "allboardconfigs enableboardconfig python"
+PACKAGECONFIG:apalis-tk1 = "allboardconfigs enableboardconfig python"
+PACKAGECONFIG:colibri-imx6 = "allboardconfigs enableboardconfig python"
+PACKAGECONFIG:colibri-imx6ull = "allboardconfigs enableboardconfig python"
+PACKAGECONFIG:colibri-imx6ull-emmc = "allboardconfigs enableboardconfig python"
+PACKAGECONFIG:colibri-imx7 = "allboardconfigs enableboardconfig python"
+PACKAGECONFIG:colibri-imx7-emmc = "allboardconfigs enableboardconfig python"
 
-pkg_postinst_ontarget_${PN}_colibri-imx6ull () {
+pkg_postinst_ontarget:${PN}:colibri-imx6ull () {
     IS_WIFI_DTB=`grep -c toradex,colibri_imx6ull-wifi /proc/device-tree/compatible`
     if [ $IS_WIFI_DTB -gt 0 ]; then
         mv -f ${datadir}/libsoc/colibri-imx6ull.conf ${datadir}/libsoc/colibri-imx6ull.conf.bak

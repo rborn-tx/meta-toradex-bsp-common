@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-5.4:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-5.4:"
 
 LINUX_VERSION ?= "5.4.129"
 PV = "${LINUX_VERSION}+git${SRCPV}"
@@ -12,7 +12,7 @@ KBRANCH = "toradex_5.4.y"
 
 require recipes-kernel/linux/linux-toradex-mainline.inc
 
-SRC_URI_append_preempt-rt = " \
+SRC_URI:append:preempt-rt = " \
     ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/patch-5.4.129-rt61.patch.xz;name=rt-patch \
     file://preempt-rt.scc \
     file://preempt-rt-less-latency.scc \
@@ -24,6 +24,6 @@ SRC_URI[rt-patch.sha256sum] = "f8ddc34c7765bb78c9f44c4e41dae7d4196c87201212ab4ec
 KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains('COMBINED_FEATURES', 'usbgadget', ' libcomposite', '',d)}"
 
 KBUILD_DEFCONFIG ?= "toradex-imx_v6_v7_defconfig"
-KBUILD_DEFCONFIG_apalis-tk1 ?= "tegra_defconfig"
+KBUILD_DEFCONFIG:apalis-tk1 ?= "tegra_defconfig"
 
 export DTC_FLAGS = "-@"

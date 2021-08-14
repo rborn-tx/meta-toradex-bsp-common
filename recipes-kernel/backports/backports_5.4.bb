@@ -63,7 +63,7 @@ do_install() {
     done
 }
 
-pkg_postinst_${PN} () {
+pkg_postinst:${PN} () {
     if [ -z "$D" ]; then
         depmod -a ${KERNEL_VERSION}
     else
@@ -73,13 +73,13 @@ pkg_postinst_${PN} () {
     fi
 }
 
-pkg_postrm_${PN} () {
+pkg_postrm:${PN} () {
     if [ -z "$D" ]; then
         depmod -a ${KERNEL_VERSION}
     fi
 }
 
-FILES_${PN} = " \
+FILES:${PN} = " \
     ${sysconfdir}/depmod.d/${DEPMOD_CONF} \
     ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/backports/ \
 "

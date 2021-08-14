@@ -14,7 +14,7 @@ SRC_URI = " \
 # So we put LA_OPT_NXP_SW.html to sstate duplicate whitelist, this
 # ensures it could be deployed to ${DEPLOY_DIR_IMAGE} as a backup even
 # it's aleady existed.
-SSTATE_DUPWHITELIST_prepend = "${DEPLOY_DIR_IMAGE}/LA_OPT_NXP_SW.html "
+SSTATE_DUPWHITELIST:prepend = "${DEPLOY_DIR_IMAGE}/LA_OPT_NXP_SW.html "
 
 inherit deploy nopackages
 

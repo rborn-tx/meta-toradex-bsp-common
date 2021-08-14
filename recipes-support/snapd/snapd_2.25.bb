@@ -21,7 +21,7 @@ DEPENDS = " \
     xfsprogs \
 "
 
-RDEPENDS_${PN} = " \
+RDEPENDS:${PN} = " \
     ca-certificates \
     kernel-module-squashfs \
     squashfs-tools \
@@ -43,13 +43,13 @@ inherit systemd go autotools pkgconfig python3native
 # and we need to tell the autotools class to look in there.
 AUTOTOOLS_SCRIPT_PATH = "${S}/cmd"
 
-SYSTEMD_SERVICE_${PN} = "snapd.service"
+SYSTEMD_SERVICE:${PN} = "snapd.service"
 
-do_configure_prepend() {
+do_configure:prepend() {
     (cd ${S} ; ./mkversion.sh ${PV})
 }
 
-do_configure_append() {
+do_configure:append() {
     go_do_configure
 }
 
@@ -87,7 +87,7 @@ do_install() {
     echo "PATH=\$PATH:/snap/bin" > ${D}${sysconfdir}/profile.d/20-snap.sh
 }
 
-FILES_${PN} += " \
+FILES:${PN} += " \
     ${systemd_unitdir}/system/ \
     /var/lib/snapd \
     /var/snap \
@@ -96,4 +96,4 @@ FILES_${PN} += " \
 
 # ERROR: snapd-2.23.5-r0 do_package_qa: QA Issue: No GNU_HASH in the elf binary:
 # '.../snapd/usr/lib/snapd/snap-exec' [ldflags]
-INSANE_SKIP_${PN} = "ldflags"
+INSANE_SKIP:${PN} = "ldflags"

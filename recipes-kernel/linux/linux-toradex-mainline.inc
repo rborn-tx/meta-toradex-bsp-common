@@ -1,5 +1,5 @@
 SUMMARY = "Toradex mainline Linux kernel"
-SUMMARY_preempt-rt = "Toradex mainline real-Time Linux kernel"
+SUMMARY:preempt-rt = "Toradex mainline real-Time Linux kernel"
 SECTION = "kernel"
 LICENSE = "GPLv2"
 
@@ -16,12 +16,12 @@ S = "${WORKDIR}/git"
 DEPENDS += "coreutils-native lzop-native"
 
 # Additional file deployed by recent mainline kernels
-FILES_${KERNEL_PACKAGE_NAME}-base += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.builtin.modinfo"
+FILES:${KERNEL_PACKAGE_NAME}-base += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.builtin.modinfo"
 
 KERNEL_CONFIG_NAME ?= "${KERNEL_PACKAGE_NAME}-config-${KERNEL_ARTIFACT_NAME}"
 KERNEL_CONFIG_LINK_NAME ?= "${KERNEL_PACKAGE_NAME}-config"
 
-do_deploy_append() {
+do_deploy:append() {
     cp -a ${B}/.config ${DEPLOYDIR}/${KERNEL_CONFIG_NAME}
     ln -sf ${KERNEL_CONFIG_NAME} ${DEPLOYDIR}/${KERNEL_CONFIG_LINK_NAME}
 }

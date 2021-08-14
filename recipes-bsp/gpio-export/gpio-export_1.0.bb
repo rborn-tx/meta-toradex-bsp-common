@@ -21,6 +21,6 @@ do_install () {
 }
 
 SYSTEMD_PACKAGES = "${PN}"
-SYSTEMD_SERVICE_${PN} = "gpio-export.service"
+SYSTEMD_SERVICE:${PN} = "gpio-export.service"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

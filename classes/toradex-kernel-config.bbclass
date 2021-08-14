@@ -1,5 +1,5 @@
 # Assign a config variable in ${B}/.config.
-# Should be called in do_configure_append only.
+# Should be called in do_configure:append only.
 #
 # $1 - config variable to be set
 # $2 - value [n/y/value]

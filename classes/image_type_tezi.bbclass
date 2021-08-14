@@ -5,12 +5,12 @@
 # Since it also generates the image.json description file it is rather
 # interwind with the boot flow which is U-Boot target specific.
 
-WKS_FILE_DEPENDS_append = " tezi-metadata virtual/dtb"
+WKS_FILE_DEPENDS:append = " tezi-metadata virtual/dtb"
 DEPENDS += "${WKS_FILE_DEPENDS}"
 IMAGE_BOOT_FILES_REMOVE = "${@make_dtb_boot_files(d) if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else ''}"
-IMAGE_BOOT_FILES_REMOVE_apalis-tk1 = "${@ d.getVar('KERNEL_DEVICETREE') if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else ''}"
-IMAGE_BOOT_FILES_append = " overlays.txt ${@'' if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else 'overlays/*;overlays/'}"
-IMAGE_BOOT_FILES_remove = "${IMAGE_BOOT_FILES_REMOVE}"
+IMAGE_BOOT_FILES_REMOVE:apalis-tk1 = "${@ d.getVar('KERNEL_DEVICETREE') if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else ''}"
+IMAGE_BOOT_FILES:append = " overlays.txt ${@'' if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else 'overlays/*;overlays/'}"
+IMAGE_BOOT_FILES:remove = "${IMAGE_BOOT_FILES_REMOVE}"
 
 RM_WORK_EXCLUDE += "${PN}"
 
@@ -20,9 +20,9 @@ TDX_MATRIX_BUILD_TIME ??= "${DATETIME}"
 TDX_MATRIX_BUILD_TIME[vardepsexclude] = "DATETIME"
 
 EMMCDEV = "mmcblk0"
-EMMCDEV_verdin-imx8mp = "emmc"
+EMMCDEV:verdin-imx8mp = "emmc"
 EMMCDEVBOOT0 = "mmcblk0boot0"
-EMMCDEVBOOT0_verdin-imx8mp = "emmc-boot0"
+EMMCDEVBOOT0:verdin-imx8mp = "emmc-boot0"
 TEZI_VERSION ?= "${DISTRO_VERSION}"
 TEZI_DATE ?= "${TDX_MATRIX_BUILD_TIME}"
 TEZI_IMAGE_NAME ?= "${IMAGE_NAME}"
@@ -35,7 +35,7 @@ TEZI_AUTO_INSTALL ??= "false"
 TEZI_BOOT_SUFFIX ??= "${@'bootfs.tar.xz' if oe.types.boolean('${TEZI_USE_BOOTFILES}') else ''}"
 TEZI_CONFIG_FORMAT ??= "2"
 # Require newer Tezi for mx8 Socs with the u-boot environment bugfix
-TEZI_CONFIG_FORMAT_mx8 ??= "4"
+TEZI_CONFIG_FORMAT:mx8 ??= "4"
 TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
 UBOOT_BINARY_TEZI_RAWNAND ?= "${UBOOT_BINARY}"
@@ -45,7 +45,7 @@ UBOOT_ENV_TEZI_RAWNAND ?= "${UBOOT_ENV_TEZI}"
 
 # use DISTRO_FLAVOUR to append to the image name displayed in TEZI
 DISTRO_FLAVOUR ??= ""
-SUMMARY_append = "${DISTRO_FLAVOUR}"
+SUMMARY:append = "${DISTRO_FLAVOUR}"
 
 TEZI_EULA_URL ?= "https://www.nxp.com/docs/en/disclaimer/LA_OPT_NXP_SW.html"
 export TEZI_EULA_URL
@@ -53,10 +53,10 @@ export TEZI_EULA_URL
 # Append tar command to store uncompressed image size to ${T}.
 # If a custom rootfs type is used make sure this file is created
 # before compression.
-IMAGE_CMD_tar_append = "; du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar | cut -f 1 > ${T}/image-size${IMAGE_NAME_SUFFIX}"
-CONVERSION_CMD_tar_append = "; du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.tar | cut -f 1 > ${T}/image-size.${type}"
-CONVERSION_CMD_tar = "touch ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}; ${IMAGE_CMD_TAR} --numeric-owner -cf ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.tar -C ${TAR_IMAGE_ROOTFS} . || [ $? -eq 1 ]"
-CONVERSIONTYPES_append = " tar"
+IMAGE_CMD:tar:append = "; du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.tar | cut -f 1 > ${T}/image-size${IMAGE_NAME_SUFFIX}"
+CONVERSION_CMD:tar:append = "; du -ks ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.tar | cut -f 1 > ${T}/image-size.${type}"
+CONVERSION_CMD:tar = "touch ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}; ${IMAGE_CMD_TAR} --numeric-owner -cf ${IMGDEPLOYDIR}/${IMAGE_NAME}${IMAGE_NAME_SUFFIX}.${type}.tar -C ${TAR_IMAGE_ROOTFS} . || [ $? -eq 1 ]"
+CONVERSIONTYPES:append = " tar"
 
 def get_uncompressed_size(d, type):
     path = os.path.join(d.getVar('T'), "image-size.%s" % type)
@@ -363,15 +363,15 @@ tezi_deploy_bootfs_files[cleandirs] += "${WORKDIR}/bootfs"
 tezi_deploy_bootfs_files[vardeps] += "IMAGE_BOOT_FILES"
 
 TAR_IMAGE_ROOTFS_task-image-bootfs = "${WORKDIR}/bootfs"
-IMAGE_CMD_bootfs () {
+IMAGE_CMD:bootfs () {
        :
 }
 TEZI_IMAGE_BOOTFS_PREFUNCS ??= "tezi_deploy_bootfs_files"
 do_image_bootfs[prefuncs] += "${TEZI_IMAGE_BOOTFS_PREFUNCS}"
 
 TEZI_IMAGE_TEZIIMG_PREFUNCS ??= "rootfs_tezi_run_json"
-IMAGE_TYPEDEP_teziimg += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
-IMAGE_CMD_teziimg () {
+IMAGE_TYPEDEP:teziimg += "${TEZI_BOOT_SUFFIX} ${TEZI_ROOT_SUFFIX}"
+IMAGE_CMD:teziimg () {
 	bbnote "Create Toradex Easy Installer tarball"
 
 	# Copy image json file to ${WORKDIR}/image-json

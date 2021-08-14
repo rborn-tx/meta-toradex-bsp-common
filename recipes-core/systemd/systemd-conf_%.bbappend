@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/systemd-conf:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/systemd-conf:"
