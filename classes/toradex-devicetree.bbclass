@@ -42,6 +42,7 @@ DT_FILES_PATH = "${WORKDIR}/machine-overlays"
 # The machine specific recipes start with MACHINE_PREFIX}[_-]
 MACHINE_PREFIX = "${MACHINE}"
 MACHINE_PREFIX_colibri-imx7-emmc = "colibri-imx7"
+MACHINE_PREFIX_colibri-imx6ull-emmc = "colibri-imx6ull"
 MACHINE_PREFIX_apalis-imx8x-v11a = "apalis-imx8x"
 MACHINE_PREFIX_colibri-imx8x-v10b = "colibri-imx8x"
 
