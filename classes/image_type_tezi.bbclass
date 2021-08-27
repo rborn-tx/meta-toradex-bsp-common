@@ -362,7 +362,7 @@ tezi_deploy_bootfs_files[dirs] =+ "${WORKDIR}/bootfs"
 tezi_deploy_bootfs_files[cleandirs] += "${WORKDIR}/bootfs"
 tezi_deploy_bootfs_files[vardeps] += "IMAGE_BOOT_FILES"
 
-TAR_IMAGE_ROOTFS_task-image-bootfs = "${WORKDIR}/bootfs"
+TAR_IMAGE_ROOTFS:task-image-bootfs = "${WORKDIR}/bootfs"
 IMAGE_CMD:bootfs () {
        :
 }
