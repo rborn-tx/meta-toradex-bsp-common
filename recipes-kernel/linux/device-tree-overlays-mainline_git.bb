@@ -1,7 +1,7 @@
 inherit toradex-devicetree
 
 SRCBRANCH = "toradex_5.4.y"
-SRCREV = "f4b74d8a48e76a626d66cdd9d5e358f630940005"
+SRCREV = "653cb21b42a735b8dca99489837c0baa61ec1503"
 SRCREV_use-head-next = "${AUTOREV}"
 
 COMPATIBLE_MACHINE = ".*(mx[678]|tegra124).*"
