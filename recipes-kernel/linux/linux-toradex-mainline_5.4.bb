@@ -4,7 +4,7 @@ LINUX_VERSION ?= "5.4.129"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
 SRCREV_machine = "55192fb3c2355a8251ab3adb8043c57f0ad010fa"
-SRCREV_machine_use-head-next = "${AUTOREV}"
+SRCREV_machine:use-head-next = "${AUTOREV}"
 
 KCONFIG_MODE="--alldefconfig"
 

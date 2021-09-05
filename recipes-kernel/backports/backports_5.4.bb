@@ -17,7 +17,7 @@ DEPMOD_CONF = "99-backports.conf"
 #    git:///home/user/linux-backports-generated;protocol=file
 
 SRCREV = "4cb81c29dde242744eccf9f37f2014ea3b37ade2"
-SRCREV_use-head-next = "${AUTOREV}"
+SRCREV:use-head-next = "${AUTOREV}"
 SRC_URI = " \
     git://git.toradex.com/backports-toradex.git;protocol=https;branch=toradex-${PV} \
     file://config \
