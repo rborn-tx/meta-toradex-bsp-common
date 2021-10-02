@@ -1,0 +1,40 @@
+From 8f473db4c3a5abbf11dcb870b08df63d7e48d6d5 Mon Sep 17 00:00:00 2001
+From: Max Krummenacher <max.krummenacher@toradex.com>
+Date: Sun, 26 Sep 2021 11:45:56 +0000
+Subject: [PATCH] Revert "kbuild: Enable DT schema checks for %.dtb targets"
+
+This reverts commit 53182e81f47d4ea0c727c49ad23cb782173ab849.
+---
+ Makefile | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index aa46d25e4f90..82737001bdf7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1510,17 +1510,17 @@ endif
+ 
+ ifneq ($(dtstree),)
+ 
+-%.dtb: dt_binding_check include/config/kernel.release scripts_dtc
+-	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@ $(dtstree)/$*.dt.yaml
++%.dtb: include/config/kernel.release scripts_dtc
++	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
+ 
+-%.dtbo: dt_binding_check include/config/kernel.release scripts_dtc
+-	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@ $(dtstree)/$*.dt.yaml
++%.dtbo: include/config/kernel.release scripts_dtc
++	$(Q)$(MAKE) $(build)=$(dtstree) $(dtstree)/$@
+ 
+ PHONY += dtbs dtbs_install dtbs_check
+ dtbs: include/config/kernel.release scripts_dtc
+ 	$(Q)$(MAKE) $(build)=$(dtstree)
+ 
+-ifneq ($(filter dtbs_check %.dtb %.dtbo, $(MAKECMDGOALS)),)
++ifneq ($(filter dtbs_check, $(MAKECMDGOALS)),)
+ export CHECK_DTBS=y
+ dtbs: dt_binding_check
+ endif
+-- 
+2.20.1
+
