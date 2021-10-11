@@ -237,7 +237,7 @@ def rootfs_tezi_rawnand(d):
 
     kernel = {
                "name": "kernel",
-               "size_kib": 8192,
+               "size_kib": 12288,
                "type": "static",
                "content": {
                  "rawfile": {
