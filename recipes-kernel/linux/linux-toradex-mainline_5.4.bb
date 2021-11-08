@@ -1,9 +1,9 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-5.4:"
 
-LINUX_VERSION ?= "5.4.129"
+LINUX_VERSION ?= "5.4.154"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-SRCREV_machine = "ce72bea42c97c5bdb035fb15f43108a3ea68a38b"
+SRCREV_machine = "dd7439734dc9ea17674a9c36f0bfa725e7d10736"
 SRCREV_machine_use-head-next = "${AUTOREV}"
 
 KCONFIG_MODE="--alldefconfig"
@@ -15,12 +15,12 @@ require recipes-kernel/linux/linux-toradex-mainline.inc
 # Don't delete /older/ in the link as /older/ also contains the newest file and we have a stable
 # link
 SRC_URI_append_preempt-rt = " \
-    ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/older/patch-5.4.129-rt61.patch.xz;name=rt-patch \
+    ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/older/patch-5.4.154-rt65.patch.xz;name=rt-patch \
     file://preempt-rt.scc \
     file://preempt-rt-less-latency.scc \
 "
-SRC_URI[rt-patch.md5sum] = "a6c668577fdde9cca5060bd72a782d16"
-SRC_URI[rt-patch.sha256sum] = "f8ddc34c7765bb78c9f44c4e41dae7d4196c87201212ab4ec3723a7594b9702c"
+SRC_URI[rt-patch.md5sum] = "1626836fc6bbff42e463c6a07bfc79b7"
+SRC_URI[rt-patch.sha256sum] = "899037547ab272cbb835400633e9c96812c1172845b68479ececc3901eaf6c6d"
 
 # Load USB functions configurable through configfs (CONFIG_USB_CONFIGFS)
 KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains('COMBINED_FEATURES', 'usbgadget', ' libcomposite', '',d)}"
