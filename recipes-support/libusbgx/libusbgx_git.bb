@@ -14,7 +14,7 @@ PV = "0.2.0+git${SRCPV}"
 SRCREV = "fa4e7e92260e33f78b72e7796b3df28c4c84b8e2"
 SRCBRANCH = "master"
 SRC_URI = " \
-    git://github.com/libusbgx/libusbgx.git;branch=${SRCBRANCH} \
+    git://github.com/libusbgx/libusbgx.git;branch=${SRCBRANCH};protocol=https \
     file://usbg.service \
     file://g1.schema.in \
 "
