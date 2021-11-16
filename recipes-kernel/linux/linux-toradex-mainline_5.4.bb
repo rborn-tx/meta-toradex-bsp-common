@@ -15,7 +15,7 @@ require recipes-kernel/linux/linux-toradex-mainline.inc
 
 # Don't delete /older/ in the link as /older/ also contains the newest file and we have a stable
 # link
-SRC_URIL:append:preempt-rt = " \
+SRC_URI:append:preempt-rt = " \
     ${KERNELORG_MIRROR}/linux/kernel/projects/rt/5.4/older/patch-5.4.154-rt65.patch.xz;name=rt-patch \
     file://preempt-rt.scc \
     file://preempt-rt-less-latency.scc \
