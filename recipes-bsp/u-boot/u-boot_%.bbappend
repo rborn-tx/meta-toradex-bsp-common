@@ -1,4 +1,10 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
 SRCREV:use-head-next = "${AUTOREV}"
+
+SRC_URI:append:use-nxp-bsp = " \
+    file://0001-colibri_imx7-boot-linux-kernel-in-secure-mode.patch \
+"
 
 PADDING_DIR = "${B}"
 nand_padding () {
