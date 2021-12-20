@@ -1,5 +1,5 @@
 [Unit]
-ConditionPathExists=|!/etc/hostname
+ConditionFileNotEmpty=|!/etc/hostname
 Wants=network-pre.target
 Before=network-pre.target
 After=local-fs.target
