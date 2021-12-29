@@ -89,7 +89,7 @@ fi
 
 # Set dynamic commands
 env set set_bootcmd_kernel 'env set bootcmd_kernel "${load_cmd} \\${kernel_addr_load} \\${kernel_image}"'
-env set set_load_overlays_file 'env set load_overlays_file "${load_cmd} \\${loadaddr} \\${overlays_file}; env import -t \\${loadaddr} \\${filesize}"'
+env set set_load_overlays_file 'env set load_overlays_file "${load_cmd} \\${loadaddr} \\${overlays_file} && env import -t \\${loadaddr} \\${filesize}"'
 if test ${kernel_image} = "fitImage"
 then
     env set fdt_high
