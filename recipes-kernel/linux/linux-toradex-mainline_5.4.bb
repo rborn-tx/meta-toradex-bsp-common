@@ -3,7 +3,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-5.4:"
 LINUX_VERSION ?= "5.4.154"
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-SRCREV_machine = "05a40bd77ab83451bd4d96e1e1d09850f11cfd06"
+SRCREV_machine = "73d0438130d3728b034835168028bc44a94bd812"
 SRCREV_machine_use-head-next = "${AUTOREV}"
 
 KCONFIG_MODE="--alldefconfig"
