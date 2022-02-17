@@ -25,8 +25,7 @@ PACKAGECONFIG_colibri-imx7 = "allboardconfigs enableboardconfig python"
 PACKAGECONFIG_colibri-imx7-emmc = "allboardconfigs enableboardconfig python"
 
 pkg_postinst_ontarget_${PN}_colibri-imx6ull () {
-    IS_WIFI_DTB=`grep -c toradex,colibri_imx6ull-wifi /proc/device-tree/compatible`
-    if [ $IS_WIFI_DTB -gt 0 ]; then
+    if fgrep -q toradex,colibri_imx6ull-wifi /proc/device-tree/compatible; then
         mv -f ${datadir}/libsoc/colibri-imx6ull.conf ${datadir}/libsoc/colibri-imx6ull.conf.bak
         # SODIMM pins missing on Wi-Fi SKU
 	cat ${datadir}/libsoc/colibri-imx6ull.conf.bak | grep -E -v "(SODIMM_79|SODIMM_81|SODIMM_89|SODIMM_93|SODIMM_94|SODIMM_97|SODIMM_101|SODIMM_103|SODIMM_127|SODIMM_138)" > ${datadir}/libsoc/colibri-imx6ull.conf
