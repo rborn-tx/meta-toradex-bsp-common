@@ -33,8 +33,8 @@ do_compile:append:colibri-vf () {
     nand_padding
 }
 
-BOOT_TOOLS:mx8m = "imx-boot-tools"
-do_deploy:append:mx8m() {
+BOOT_TOOLS = "imx-boot-tools"
+do_deploy:append:mx8m-generic-bsp() {
     # Deploy u-boot-nodtb.bin and fsl-imx8m*-XX.dtb for mkimage to generate boot binary
     if [ -n "${UBOOT_CONFIG}" ]
     then
