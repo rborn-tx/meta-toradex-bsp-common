@@ -1,10 +1,10 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/files/:"
 
-SRC_URI_append = " file://hotplug.rules \
-                   file://hotplug.sh \
+SRC_URI_append_tdx = " file://hotplug.rules \
+                       file://hotplug.sh \
 "
 
-do_install_append() {
+do_install_append_tdx () {
     install -d ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${WORKDIR}/hotplug.rules    ${D}${sysconfdir}/udev/rules.d/hotplug.rules
 

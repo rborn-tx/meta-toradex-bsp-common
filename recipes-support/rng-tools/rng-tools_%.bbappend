@@ -1,1 +1,1 @@
-PACKAGECONFIG_remove = "libjitterentropy"
+PACKAGECONFIG_remove_tdx = "libjitterentropy"
