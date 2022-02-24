@@ -1,5 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI_append_ = " file://fstrim.service file://fstrim.timer"
+SRC_URI_append = " file://fstrim.service \
+                   file://fstrim.timer \
+"
 
 inherit systemd
 
