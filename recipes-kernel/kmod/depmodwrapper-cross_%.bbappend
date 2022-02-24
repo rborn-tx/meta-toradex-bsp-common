@@ -21,7 +21,7 @@ else
     FILESYMS=-F "${PKGDATA_DIR}/kernel-depmod/System.map-\$4"
 fi
 
-exec env depmod -C "\${3}/etc/depmod.d/" "\$1" "\$2" "\$3" ${FILESYMS} "\$4"
+exec env depmod -C "\$3${sysconfdir}/depmod.d" "\$1" "\$2" "\$3" ${FILESYMS} "\$4"
 
 EOF
 	chmod +x ${D}${bindir_crossscripts}/depmodwrapper
