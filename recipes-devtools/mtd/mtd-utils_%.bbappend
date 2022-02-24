@@ -1,5 +1,5 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
-SRC_URI_append_ = " file://ubihealthd.service"
+SRC_URI_append = " file://ubihealthd.service"
 
 inherit systemd
 
