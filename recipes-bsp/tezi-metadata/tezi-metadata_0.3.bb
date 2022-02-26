@@ -11,10 +11,10 @@ SRC_URI = " \
 "
 
 # We want to always check the latest EULA file in image_type_tezi.bbclass
-# So we put LA_OPT_NXP_SW.html to sstate duplicate whitelist, this
+# So we put LA_OPT_NXP_SW.html to sstate allow overlap files, this
 # ensures it could be deployed to ${DEPLOY_DIR_IMAGE} as a backup even
-# it's aleady existed.
-SSTATE_DUPWHITELIST:prepend = "${DEPLOY_DIR_IMAGE}/LA_OPT_NXP_SW.html "
+# it already existed.
+SSTATE_ALLOW_OVERLAP_FILES:prepend = "${DEPLOY_DIR_IMAGE}/LA_OPT_NXP_SW.html "
 
 inherit deploy nopackages
 
