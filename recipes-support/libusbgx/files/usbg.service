@@ -14,4 +14,4 @@ ExecStartPost=/bin/sh -c '/bin/echo `ls /sys/class/udc/` > \
                                     /sys/kernel/config/usb_gadget/g1/UDC'
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=usb-gadget.target
