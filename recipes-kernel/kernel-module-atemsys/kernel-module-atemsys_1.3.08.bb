@@ -4,7 +4,7 @@ SUMMARY = "Linux kernel driver allowing usermode access for EtherCAT Master Stac
 
 # The Kernel module under Sources/atemsys/ is licensed differently than the
 # rest, this recipe packs the Kernel module only
-LICENSE = "GPLv2"
+LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://atemsys.c;beginline=182;endline=182;md5=7865b9061132c2794f3fb205cda5bdf4"
 
 inherit module
