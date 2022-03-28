@@ -7,6 +7,8 @@
 
 inherit kernel-fitimage
 
+FIT_SUPPORTED_INITRAMFS_FSTYPES ?= "cpio.lz4 cpio.lzo cpio.lzma cpio.xz cpio.zst cpio.gz ext2.gz cpio squashfs"
+
 #
 # Override fitimage_assemble in kernel-fitimage.bbclass
 #
@@ -81,14 +83,20 @@ fitimage_assemble() {
 	#
 	if [ "x${ramdiskcount}" = "x1" ] ; then
 		# Find and use the first initramfs image archive type we find
-		for img in cpio.lz4 cpio.lzo cpio.lzma cpio.xz cpio.gz ext2.gz cpio; do
+		found=
+		for img in ${FIT_SUPPORTED_INITRAMFS_FSTYPES}; do
 			initramfs_path="${DEPLOY_DIR_IMAGE}/${INITRAMFS_IMAGE_NAME}.${img}"
 			echo "Using $initramfs_path"
 			if [ -e "${initramfs_path}" ]; then
+				found=true
 				fitimage_emit_section_ramdisk ${1} "${ramdiskcount}" "${initramfs_path}"
 				break
 			fi
 		done
+
+		if [ -z "$found" ]; then
+			bbfatal "Could not find a valid initramfs type for ${INITRAMFS_IMAGE_NAME}, the supported types are: ${FIT_SUPPORTED_INITRAMFS_FSTYPES}"
+		fi
 	fi
 
 	fitimage_emit_section_maint ${1} sectend
