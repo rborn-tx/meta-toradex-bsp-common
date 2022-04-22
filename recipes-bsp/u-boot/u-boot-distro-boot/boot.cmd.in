@@ -70,7 +70,7 @@ fi
 if test -n ${setup}; then
     run setup
 else
-    env set setupargs 'console=${console},${baudrate} console=tty1 consoleblank=0'
+    env set setupargs 'console=tty1 console=${console},${baudrate} consoleblank=0'
 fi
 
 if test ${kernel_image} = "Image.gz"
