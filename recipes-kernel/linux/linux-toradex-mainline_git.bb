@@ -26,10 +26,11 @@ SRC_URI = " \
     file://defconfig \
 "
 
-LINUX_VERSION ?= "5.16"
+LINUX_VERSION ?= "5.18-rc3"
+LINUX_VERSION:use-head-next ?= "5.18"
 KBRANCH = "master"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "2585cf9dfaaddf00b069673f27bb3f8530e2039c"
+SRCREV_machine = "b2d229d4ddb17db541098b83524d901257e93845"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
@@ -60,11 +61,11 @@ do_deploy:append() {
 #######################################################################
 
 LINUX_REPO:preempt-rt = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git"
-LINUX_VERSION:preempt-rt ?= "5.15.3-rt21"
-KBRANCH:preempt-rt = "linux-5.15.y-rt"
-SRCREV_machine:preempt-rt = "2534ec53a47a4b1ee5985534c24652b5c62abe62"
-LINUX_VERSION:use-head-next:preempt-rt ?= "5.16.0-rt"
-KBRANCH:use-head-next:preempt-rt = "linux-5.16.y-rt"
+LINUX_VERSION:preempt-rt ?= "v5.17.1-rt17"
+KBRANCH:preempt-rt = "linux-5.17.y-rt"
+SRCREV_machine:preempt-rt = "cc1f02f214d8d8eea9e4cc7ed2d8ff8d894ffee6"
+LINUX_VERSION:use-head-next:preempt-rt ?= "5.18.0-rt"
+KBRANCH:use-head-next:preempt-rt = "linux-5.18.y-rt"
 SRCREV_machine:preempt-rt:use-head-next = "${AUTOREV}"
 
 SRC_URI:append:preempt-rt = " \
