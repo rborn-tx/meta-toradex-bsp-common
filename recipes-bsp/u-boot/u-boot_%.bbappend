@@ -1,8 +1,9 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRCREV:use-head-next = "${AUTOREV}"
-
-SRC_URI:append:use-nxp-bsp = " \
+# See commit fba0882bcd ("Add valgrind headers to U-Boot") (after 2022.04)
+LIC_FILES_CHKSUM:use-head-next = "file://Licenses/README;md5=2ca5f2c35c8cc335f0a19756634782f1"
+SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \
     file://0001-colibri_imx7-boot-linux-kernel-in-secure-mode.patch \
 "
 
