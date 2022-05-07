@@ -1,3 +1,7 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
+SRC_URI += "file://weston.sh"
+
 PACKAGECONFIG:append:upstream:tdx = " no-idle-timeout"
 PACKAGECONFIG:append:upstream:colibri-imx6ull = " use-pixman"
 PACKAGECONFIG:append:upstream:colibri-imx6ull-emmc = " use-pixman"
@@ -5,9 +9,7 @@ PACKAGECONFIG:append:upstream:colibri-imx7 = " use-pixman"
 PACKAGECONFIG:append:upstream:colibri-imx7-emmc = " use-pixman"
 
 do_install:append:tdx() {
-    # profile is from meta-freescale-distro layer but only being installed for fsl,fslc distros
-    # we need install it for Toradex distros here.
-    install -Dm0755 ${WORKDIR}/profile ${D}${sysconfdir}/profile.d/weston.sh
+    install -Dm0755 ${WORKDIR}/weston.sh ${D}${sysconfdir}/profile.d/weston.sh
 
     # We need run weston systemd service with root user, or else it could not
     # access input devices and GPU acceleration hardwares
