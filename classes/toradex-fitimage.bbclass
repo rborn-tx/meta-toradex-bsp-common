@@ -7,7 +7,7 @@
 
 inherit kernel-fitimage
 
-FIT_SUPPORTED_INITRAMFS_FSTYPES ?= "cpio.lz4 cpio.lzo cpio.lzma cpio.xz cpio.zst cpio.gz ext2.gz cpio squashfs"
+FIT_SUPPORTED_INITRAMFS_FSTYPES:append = " squashfs"
 
 #
 # Override fitimage_assemble in kernel-fitimage.bbclass
