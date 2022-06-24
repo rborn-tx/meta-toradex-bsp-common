@@ -22,6 +22,14 @@ nand_padding () {
     dd bs=1024 count=1 if=/dev/zero | cat - ${PADDING_DIR}/u-boot.imx.zero-padded > ${PADDING_DIR}/u-boot-nand.imx
 }
 
+deploy_uboot_with_spl () {
+    for config in ${UBOOT_MACHINE}; do
+        if [ -f "${B}/${config}/u-boot-with-spl.imx" ]; then
+            install -D -m 644 ${B}/${config}/u-boot-with-spl.imx ${DEPLOYDIR}/u-boot-with-spl.imx
+        fi
+    done
+}
+
 # build imx-boot from within U-Boot
 inherit ${@oe.utils.ifelse(d.getVar('UBOOT_PROVIDES_BOOT_CONTAINER') == '1', 'imx-boot-container', '')}
 DEPENDS:imx-boot-container += "bc-native bison-native dtc-native lzop-native python3-setuptools-native swig-native"
@@ -36,6 +44,14 @@ do_compile:append:colibri-imx7 () {
 
 do_compile:append:colibri-vf () {
     nand_padding
+}
+
+do_deploy:append:colibri-imx6 () {
+    deploy_uboot_with_spl
+}
+
+do_deploy:append:apalis-imx6 () {
+    deploy_uboot_with_spl
 }
 
 BOOT_TOOLS = "imx-boot-tools"
