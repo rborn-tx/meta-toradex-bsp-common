@@ -30,8 +30,6 @@ functions :
         type = "rndis";
         attrs : 
         {
-            dev_addr = "00:14:2d:ff:ff:ff";
-            host_addr = "00:14:2d:ff:ff:fe";
             qmult = 5;
         };
         os_descs = ( 
