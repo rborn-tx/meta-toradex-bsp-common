@@ -1,1 +1,1 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/files/:"
+MOUNT_BASE = "/media"
