@@ -7,6 +7,19 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=2ca5f2c35c8cc335f0a19756634782f1"
 PV = "2022.07"
 SRCREV = "e092e3250270a1016c877da7bdd9384f14b1321e"
 SRCREV:use-head-next = "${AUTOREV}"
+# patches which are not (yet) in the used stable version
+TDX_PATCHES = " \
+    file://0001-toradex-tdx-cfg-block-use-only-snprintf.patch \
+    file://0002-toradex-tdx-cfg-block-use-defines-for-string-length.patch \
+    file://0003-toradex-tdx-cfg-block-extend-assembly-version.patch \
+    file://0004-toradex-tdx-cfg-block-add-new-toradex-oui-range.patch \
+    file://0005-toradex-tdx-cfg-block-add-0068-i.mx-8m-mini-sku.patch \
+"
+# patches which are not (yet) in the latest master
+TDX_PATCHES:use-head-next = " \
+    file://0005-toradex-tdx-cfg-block-add-0068-i.mx-8m-mini-sku.patch \
+"
+SRC_URI:append = " ${TDX_PATCHES}"
 SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \
     file://0001-colibri_imx7-boot-linux-kernel-in-secure-mode.patch \
 "
