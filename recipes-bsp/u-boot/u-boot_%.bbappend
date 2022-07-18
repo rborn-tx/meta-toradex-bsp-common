@@ -23,6 +23,8 @@ SRC_URI:append = " ${TDX_PATCHES}"
 SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \
     file://0001-colibri_imx7-boot-linux-kernel-in-secure-mode.patch \
 "
+# allready applied in 2022.07
+SRC_URI:remove = "file://0001-i2c-fix-stack-buffer-overflow-vulnerability-in-i2c-m.patch"
 
 PADDING_DIR = "${B}"
 nand_padding () {
