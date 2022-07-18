@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM ?= "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-git:"
 
-DEPENDS += "coreutils-native lzop-native"
+DEPENDS += "coreutils-native"
 
 # yaml and dtschema are required for 5.16+ device tree validation, libyaml is checked
 # via pkgconfig, so must always be present, but we can wrap the others to make them
