@@ -1,0 +1,6 @@
+# Toradex specific, to bind mount boot partition to /boot.
+#
+# To be noticed: Be careful if you want to change the rule file name, it must be loaded
+# by udevd after automount.rules, otherwise, the original mount point might be not present.
+#
+ACTION=="add", KERNEL=="mmcblk[0-9]p[0-9]*", RUN+="/etc/udev/scripts/toradex-mount-bootpart.sh"
