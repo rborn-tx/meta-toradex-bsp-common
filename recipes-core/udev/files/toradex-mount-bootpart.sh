@@ -8,8 +8,8 @@
 BASEUUID=$(sed -r 's/^.*\broot=PARTUUID=([0-9a-f]+)-02.*$/\1/' /proc/cmdline)
 BOOTPART=$(readlink -f /dev/disk/by-partuuid/"${BASEUUID}-01")
 if [ x"$DEVNAME" = x"$BOOTPART" ]; then
-	MOUNTPOINT="$(lsblk -o MOUNTPOINT -nr "$DEVNAME" | head -1)"
-	MOUNTNAME="$(basename "$MOUNTPOINT")"
+	MOUNTNAME="$(/sbin/blkid | grep "$DEVNAME:" | grep -o 'LABEL=".*"' | cut -d '"' -f2)-$(basename "$DEVNAME")"
+	MOUNTPOINT="$(sed -n 's/MOUNT_BASE=\"\(.*\)\"/\1/p' /etc/udev/scripts/mount.sh)/$MOUNTNAME"
 	BASE_INIT="$(readlink -f "@base_sbindir@/init")"
 	INIT_SYSTEMD="@systemd_unitdir@/systemd"
 
