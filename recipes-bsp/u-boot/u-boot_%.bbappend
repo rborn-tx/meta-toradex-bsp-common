@@ -17,7 +17,6 @@ TDX_PATCHES = " \
 "
 # patches which are not (yet) in the latest master
 TDX_PATCHES:use-head-next = " \
-    file://0005-toradex-tdx-cfg-block-add-0068-i.mx-8m-mini-sku.patch \
 "
 SRC_URI:append = " ${TDX_PATCHES}"
 SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \
