@@ -3,8 +3,7 @@ OpenEmbedded/Yocto BSP Layer for Toradex Modules
 
 This layer provides support for ARM based Toradex computer on modules (COM)
 common to all used SoCs for use with OpenEmbedded and/or Yocto.
-It is to be used together with meta-toradex-nxp and/or meta-toradex-tegra
-layers.
+It is to be used together with meta-toradex-nxp layer.
 For more information on available Toradex COMs please visit:
 
 https://www.toradex.com/computer-on-modules
@@ -32,10 +31,6 @@ This layer depends on:
   URI: git://git.toradex.com/meta-toradex-nxp
   branch: master
   revision: HEAD
-and/or
-  URI: git://git.toradex.com/meta-toradex-tegra
-  branch: master
-  revision: HEAD
 
 Patches
 =======
@@ -54,8 +49,7 @@ To send patches, use
 Building
 ========
 
-See the README in either meta-toradex-nxp or meta-toradex-tegra depending
-on your SoC.
+See the README in meta-toradex-nxp layer.
 
 License
 =======

@@ -38,9 +38,6 @@ fitimage_assemble() {
 
 	uboot_prep_kimage
 	fitimage_emit_section_kernel ${1} "${kernelcount}" linux.bin "${linux_comp}"
-	if [ "x${UBOOT_KERNEL_TYPE}" = "xkernel_noload" ]; then
-		sed 's/\(^\s*type.*\kernel\)\"/\1_noload\"/' -i ${1}
-	fi
 
 	#
 	# Step 2: Prepare a DTB image section

@@ -8,7 +8,6 @@
 WKS_FILE_DEPENDS:append = " tezi-metadata virtual/dtb"
 DEPENDS += "${WKS_FILE_DEPENDS}"
 IMAGE_BOOT_FILES_REMOVE = "${@make_dtb_boot_files(d) if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else ''}"
-IMAGE_BOOT_FILES_REMOVE:apalis-tk1 = "${@ d.getVar('KERNEL_DEVICETREE') if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else ''}"
 IMAGE_BOOT_FILES:append = " overlays.txt ${@'' if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else 'overlays/*;overlays/'}"
 IMAGE_BOOT_FILES:remove = "${IMAGE_BOOT_FILES_REMOVE}"
 

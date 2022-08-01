@@ -47,7 +47,7 @@ MACHINE_PREFIX:colibri-imx7-emmc = "colibri-imx7"
 do_collect_overlays () {
     if [ -z "${TEZI_EXTERNAL_KERNEL_DEVICETREE}" ] ; then
         machine_dts=`cd ${S} && ls ${MACHINE_PREFIX}[_-]*.dts 2>/dev/null || true`
-        common_dts=`cd ${S} && ls *.dts 2>/dev/null | grep -v -e 'imx[6-8]' -e 'tk1' | xargs || true`
+        common_dts=`cd ${S} && ls *.dts 2>/dev/null | grep -v -e 'imx[6-8]' | xargs || true`
         all_dts="$machine_dts $common_dts"
     else
         for dtbo in ${TEZI_EXTERNAL_KERNEL_DEVICETREE}; do

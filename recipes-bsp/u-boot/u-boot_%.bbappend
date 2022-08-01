@@ -70,10 +70,6 @@ do_compile:append:colibri-imx7 () {
     nand_padding
 }
 
-do_compile:append:colibri-vf () {
-    nand_padding
-}
-
 do_deploy:append:colibri-imx6 () {
     deploy_uboot_with_spl
 }
