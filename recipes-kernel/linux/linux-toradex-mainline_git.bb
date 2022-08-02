@@ -29,7 +29,7 @@ SRC_URI = " \
 LINUX_VERSION ?= "5.18.12"
 LINUX_VERSION:use-head-next ?= "5.19-rc"
 KBRANCH = "master"
-KERNEL_VERSION_SANITY_SKIP:use-head-next = "1"
+KERNEL_VERSION_SANITY_SKIP = "1"
 SRCREV_machine = "c2e9702659dfc309dfda6116da48f200fe425aab"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
