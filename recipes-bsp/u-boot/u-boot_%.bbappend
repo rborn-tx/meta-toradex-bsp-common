@@ -52,7 +52,7 @@ deploy_uboot_with_spl () {
 
 # build imx-boot from within U-Boot
 inherit ${@oe.utils.ifelse(d.getVar('UBOOT_PROVIDES_BOOT_CONTAINER') == '1', 'imx-boot-container', '')}
-DEPENDS:imx-boot-container += "bc-native bison-native dtc-native lzop-native python3-setuptools-native swig-native"
+DEPENDS:imx-boot-container += "bc-native bison-native dtc-native python3-setuptools-native swig-native"
 
 do_compile:append:colibri-imx6ull () {
     nand_padding
