@@ -21,6 +21,7 @@ TDX_PATCHES = " \
     file://0010-toradex-common-Remove-ifdef-usage-for-2nd-ethaddr.patch \
     file://0011-toradex-tdx-cfg-block-Use-official-SKU-names.patch \
     file://0012-toradex-common-Improve-product-serial-print-during-b.patch \
+    file://0013-configs-colibri-imx7-Enable-bootd-command.patch \
 "
 # patches which are not (yet) in the latest master
 TDX_PATCHES:use-head-next = " \
