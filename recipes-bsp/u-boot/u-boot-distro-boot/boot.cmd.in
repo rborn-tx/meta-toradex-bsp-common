@@ -73,17 +73,23 @@ else
     env set setupargs 'console=tty1 console=${console},${baudrate} consoleblank=0'
 fi
 
-if test ${kernel_image} = "Image.gz"
-then
+if test -n ${kernel_comp_addr_r}; then
+    # use booti automatic decompression
     env set kernel_addr_load ${loadaddr}
-    env set bootcmd_unzip 'unzip ${kernel_addr_load} ${kernel_addr_r}'
-else
     env set bootcmd_unzip ';'
-    if test ${kernel_image} = "fitImage"
+else
+    if test ${kernel_image} = "Image.gz"
     then
-        env set kernel_addr_load ${ramdisk_addr_r}
+        env set kernel_addr_load ${loadaddr}
+        env set bootcmd_unzip 'unzip ${kernel_addr_load} ${kernel_addr_r}'
     else
-        env set kernel_addr_load ${kernel_addr_r}
+        env set bootcmd_unzip ';'
+        if test ${kernel_image} = "fitImage"
+        then
+            env set kernel_addr_load ${ramdisk_addr_r}
+        else
+            env set kernel_addr_load ${kernel_addr_r}
+        fi
     fi
 fi
 
