@@ -1,7 +1,8 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+require recipes-bsp/u-boot/u-boot-common.inc
+require recipes-bsp/u-boot/u-boot.inc
 
-# See commit fba0882bcd ("Add valgrind headers to U-Boot")
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=2ca5f2c35c8cc335f0a19756634782f1"
+DEPENDS += "bc-native dtc-native python3-setuptools-native"
 
 # hash of release v2022.07"
 PV = "2022.07"
@@ -30,8 +31,6 @@ SRC_URI:append = " ${TDX_PATCHES}"
 SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \
     file://0001-colibri_imx7-boot-linux-kernel-in-secure-mode.patch \
 "
-# allready applied in 2022.07
-SRC_URI:remove = "file://0001-i2c-fix-stack-buffer-overflow-vulnerability-in-i2c-m.patch"
 
 inherit toradex-u-boot-localversion
 
