@@ -34,6 +34,8 @@ SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \
 
 inherit toradex-u-boot-localversion
 
+UBOOT_INITIAL_ENV = "u-boot-initial-env"
+
 PADDING_DIR = "${B}"
 nand_padding () {
     # pad the end of U-Boot with 0x00 up to the the end of the CSF area
