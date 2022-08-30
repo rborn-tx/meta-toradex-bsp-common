@@ -26,6 +26,10 @@ SRC_URI = " \
     file://defconfig \
 "
 
+SRC_URI:append = " \
+    file://0001-thermal-imx-Update-critical-temp-threshold.patch \
+"
+
 LINUX_VERSION ?= "5.19.1"
 LINUX_VERSION:use-head-next ?= "5.19"
 KBRANCH = "master"
