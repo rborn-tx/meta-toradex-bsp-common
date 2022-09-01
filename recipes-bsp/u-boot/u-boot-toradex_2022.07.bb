@@ -7,7 +7,6 @@ DEPENDS += "bc-native dtc-native python3-setuptools-native"
 # hash of release v2022.07"
 PV = "2022.07"
 SRCREV = "e092e3250270a1016c877da7bdd9384f14b1321e"
-SRCREV:use-head-next = "${AUTOREV}"
 # patches which are not (yet) in the used stable version
 TDX_PATCHES = " \
     file://0001-toradex-tdx-cfg-block-use-only-snprintf.patch \
@@ -23,9 +22,6 @@ TDX_PATCHES = " \
     file://0011-toradex-tdx-cfg-block-Use-official-SKU-names.patch \
     file://0012-toradex-common-Improve-product-serial-print-during-b.patch \
     file://0013-configs-colibri-imx7-Enable-bootd-command.patch \
-"
-# patches which are not (yet) in the latest master
-TDX_PATCHES:use-head-next = " \
 "
 SRC_URI:append = " ${TDX_PATCHES}"
 SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \
