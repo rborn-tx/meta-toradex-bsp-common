@@ -30,11 +30,11 @@ SRC_URI:append = " \
     file://0001-thermal-imx-Update-critical-temp-threshold.patch \
 "
 
-LINUX_VERSION ?= "5.19.1"
-LINUX_VERSION:use-head-next ?= "5.19"
+LINUX_VERSION ?= "6.0-rc3"
+LINUX_VERSION:use-head-next ?= "6.0"
 KBRANCH = "master"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "c2e9702659dfc309dfda6116da48f200fe425aab"
+SRCREV_machine = "b90cb1053190353cc30f0fef0ef1f378ccc063c5"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
