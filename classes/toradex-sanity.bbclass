@@ -22,14 +22,6 @@ def toradex_check_abichanges(status, d):
         with open(abifile, "w") as f:
             f.write(current_abi)
 
-#
-# Check fitimage bbclass
-#
-def toradex_check_fitimage(status, d):
-    if bb.utils.contains('KERNEL_IMAGETYPE', 'fitImage', True, False, d):
-        if bb.utils.contains('KERNEL_CLASSES', 'toradex-fitimage', False, True, d):
-            status.addresult("Error, to build fitImage within Toradex layers, please add toradex-fitimage rather than kernel-fitimage in KERNEL_CLASSES.\n")
-
 def toradex_raise_sanity_error(msg, d):
     if d.getVar("SANITY_USE_EVENTS") == "1":
         bb.event.fire(bb.event.SanityCheckFailed(msg), d)
@@ -53,7 +45,6 @@ def toradex_check_sanity(sanity_data):
     status = SanityStatus()
 
     toradex_check_abichanges(status, sanity_data)
-    toradex_check_fitimage(status, sanity_data)
 
     if status.messages != "":
         toradex_raise_sanity_error(sanity_data.expand(status.messages), sanity_data)
