@@ -28,6 +28,7 @@ SRC_URI = " \
 
 SRC_URI:append = " \
     file://0001-thermal-imx-Update-critical-temp-threshold.patch \
+    file://0001-Revert-drm-panel-simple-drop-use-of-data-mapping-pro.patch \
 "
 
 LINUX_VERSION ?= "6.0-rc3"

@@ -1,0 +1,57 @@
+From d0e9aca518b2255d0776a448dfae8ae977a3811e Mon Sep 17 00:00:00 2001
+From: Max Krummenacher <max.krummenacher@toradex.com>
+Date: Thu, 1 Sep 2022 14:04:50 +0200
+Subject: [PATCH] Revert "drm/panel-simple: drop use of data-mapping property"
+
+This reverts commit d021d751c14752a0266865700f6f212fab40a18c.
+
+Re-enable the data-mapping property which was already used in the
+5.4-2.3.0 downstream kernel.
+
+In addition to the revert set bpc from the data-mapping value
+as a WARN_ON is printed if missing.
+
+Upstream-Status: denied [Alternative solution being discused]
+https://lore.kernel.org/all/20220628181838.2031-1-max.oss.09@gmail.com/
+Signed-off-by: Max Krummenacher <max.krummenacher@toradex.com>
+---
+ drivers/gpu/drm/panel/panel-simple.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index ff5e1a44c43a..f94dd09cf76f 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -467,6 +467,7 @@ static int panel_dpi_probe(struct device *dev,
+ 	struct panel_desc *desc;
+ 	unsigned int bus_flags;
+ 	struct videomode vm;
++	const char *mapping;
+ 	int ret;
+ 
+ 	np = dev->of_node;
+@@ -491,6 +492,21 @@ static int panel_dpi_probe(struct device *dev,
+ 	of_property_read_u32(np, "width-mm", &desc->size.width);
+ 	of_property_read_u32(np, "height-mm", &desc->size.height);
+ 
++	of_property_read_string(np, "data-mapping", &mapping);
++	if (!strcmp(mapping, "rgb24")) {
++		desc->bus_format = MEDIA_BUS_FMT_RGB888_1X24;
++		desc->bpc = 8;
++	} else if (!strcmp(mapping, "rgb565")) {
++		desc->bus_format = MEDIA_BUS_FMT_RGB565_1X16;
++		desc->bpc = 6;
++	} else if (!strcmp(mapping, "bgr666")) {
++		desc->bus_format = MEDIA_BUS_FMT_RGB666_1X18;
++		desc->bpc = 6;
++	} else if (!strcmp(mapping, "lvds666")) {
++		desc->bus_format = MEDIA_BUS_FMT_RGB666_1X24_CPADHI;
++		desc->bpc = 6;
++	}
++
+ 	/* Extract bus_flags from display_timing */
+ 	bus_flags = 0;
+ 	vm.flags = timing->flags;
+-- 
+2.35.3
+
