@@ -1,0 +1,92 @@
+From 63e858052e78bae522f9cc674a863aa5781133a3 Mon Sep 17 00:00:00 2001
+From: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+Date: Mon, 19 Sep 2022 12:40:24 +0200
+Subject: [PATCH v1 2/4] arm: dts: colibri-imx6: move vbus-supply to module
+ level device tree
+
+Move USB VBUS supply from single carrier board to module level device
+tree. This pin is as per Colibri module family standard.
+
+Signed-off-by: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+Upstream-status: Submitted [https://lore.kernel.org/all/20220920092227.286306-1-marcel@ziswiler.com/]
+---
+
+ arch/arm/boot/dts/imx6dl-colibri-aster.dts   | 1 -
+ arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts | 1 -
+ arch/arm/boot/dts/imx6dl-colibri-iris.dts    | 1 -
+ arch/arm/boot/dts/imx6qdl-colibri.dtsi       | 9 +++++++--
+ 4 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6dl-colibri-aster.dts b/arch/arm/boot/dts/imx6dl-colibri-aster.dts
+index 74e8a6cd8bed..a28e083f29d5 100644
+--- a/arch/arm/boot/dts/imx6dl-colibri-aster.dts
++++ b/arch/arm/boot/dts/imx6dl-colibri-aster.dts
+@@ -99,7 +99,6 @@ &uart3 {
+ };
+ 
+ &usbh1 {
+-	vbus-supply = <&reg_usb_host_vbus>;
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts b/arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts
+index 7272edd85a49..a02981d4a3fc 100644
+--- a/arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts
++++ b/arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts
+@@ -111,7 +111,6 @@ &uart3 {
+ };
+ 
+ &usbh1 {
+-	vbus-supply = <&reg_usb_host_vbus>;
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm/boot/dts/imx6dl-colibri-iris.dts b/arch/arm/boot/dts/imx6dl-colibri-iris.dts
+index cf77d894f6d7..c5797ff35b71 100644
+--- a/arch/arm/boot/dts/imx6dl-colibri-iris.dts
++++ b/arch/arm/boot/dts/imx6dl-colibri-iris.dts
+@@ -138,7 +138,6 @@ &uart3 {
+ };
+ 
+ &usbh1 {
+-	vbus-supply = <&reg_usb_host_vbus>;
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm/boot/dts/imx6qdl-colibri.dtsi b/arch/arm/boot/dts/imx6qdl-colibri.dtsi
+index 3e98b5da0cc6..21c5049bda4e 100644
+--- a/arch/arm/boot/dts/imx6qdl-colibri.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-colibri.dtsi
+@@ -112,7 +112,7 @@ reg_module_3v3_audio: regulator-module-3v3-audio {
+ 
+ 	reg_usb_host_vbus: regulator-usb-host-vbus {
+ 		compatible = "regulator-fixed";
+-		gpio = <&gpio3 31 GPIO_ACTIVE_HIGH>; /* USBH_PEN */
++		gpio = <&gpio3 31 GPIO_ACTIVE_HIGH>; /* SODIMM 129 / USBH_PEN */
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&pinctrl_regulator_usbh_pwr>;
+ 		regulator-max-microvolt = <5000000>;
+@@ -677,6 +677,11 @@ &uart3 {
+ 	status = "disabled";
+ };
+ 
++/* Colibri USBH */
++&usbh1 {
++	vbus-supply = <&reg_usb_host_vbus>;
++};
++
+ /* Colibri USBC */
+ &usbotg {
+ 	disable-over-current;
+@@ -995,7 +1000,7 @@ MX6QDL_PAD_SD4_DAT2__PWM4_OUT	0x1b0b1
+ 
+ 	pinctrl_regulator_usbh_pwr: gpioregusbhpwrgrp {
+ 		fsl,pins = <
+-			/* USBH_EN */
++			/* SODIMM 129 / USBH_PEN */
+ 			MX6QDL_PAD_EIM_D31__GPIO3_IO31	0x0f058
+ 		>;
+ 	};
+-- 
+2.36.1
+

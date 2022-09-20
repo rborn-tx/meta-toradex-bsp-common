@@ -1,0 +1,37 @@
+From 60f86ce9192274e08c176da024650b8a3233b6b7 Mon Sep 17 00:00:00 2001
+From: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+Date: Mon, 19 Sep 2022 12:43:25 +0200
+Subject: [PATCH v1 3/4] arm: dts: colibri-imx6: specify usbh_pen gpio being
+ active-low
+
+Specify USBH_PEN GPIO being active-low rather than active-high.
+
+Note that this should not have any functional impact as for fixed
+regulators the regular GPIO polarity is ignored and a true active-high
+enable GPIO would need an additional enable-active-high property which
+is/was not the case here. However, this may be rather confusing which
+this patch fixes.
+
+Signed-off-by: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+Upstream-status: Submitted [https://lore.kernel.org/all/20220920092227.286306-1-marcel@ziswiler.com/]
+---
+
+ arch/arm/boot/dts/imx6qdl-colibri.dtsi | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-colibri.dtsi b/arch/arm/boot/dts/imx6qdl-colibri.dtsi
+index 21c5049bda4e..d8f985f297e4 100644
+--- a/arch/arm/boot/dts/imx6qdl-colibri.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-colibri.dtsi
+@@ -112,7 +112,7 @@ reg_module_3v3_audio: regulator-module-3v3-audio {
+ 
+ 	reg_usb_host_vbus: regulator-usb-host-vbus {
+ 		compatible = "regulator-fixed";
+-		gpio = <&gpio3 31 GPIO_ACTIVE_HIGH>; /* SODIMM 129 / USBH_PEN */
++		gpio = <&gpio3 31 GPIO_ACTIVE_LOW>; /* SODIMM 129 / USBH_PEN */
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&pinctrl_regulator_usbh_pwr>;
+ 		regulator-max-microvolt = <5000000>;
+-- 
+2.36.1
+
