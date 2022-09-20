@@ -29,6 +29,9 @@ SRC_URI = " \
 SRC_URI:append = " \
     file://0001-thermal-imx-Update-critical-temp-threshold.patch \
     file://0001-Revert-drm-panel-simple-drop-use-of-data-mapping-pro.patch \
+    file://0001-arm-dts-colibri-imx6-usb-dual-role-switching.patch \
+    file://0002-arm-dts-colibri-imx6-move-vbus-supply-to-module-leve.patch \
+    file://0003-arm-dts-colibri-imx6-specify-usbh_pen-gpio-being-act.patch \
 "
 
 LINUX_VERSION ?= "6.0-rc3"

@@ -1,0 +1,61 @@
+From 03c2e411827777a8c64b55ad9ee35d69e17c84ca Mon Sep 17 00:00:00 2001
+From: Philippe Schenker <philippe.schenker@toradex.com>
+Date: Fri, 8 Jul 2022 14:03:32 +0200
+Subject: [PATCH v1 1/4] arm: dts: colibri-imx6: usb dual-role switching
+
+Introduce USBC_DET GPIO based USB dual-role aka device/host switching.
+
+While at it re-work pinmux comment adding SODIMM number to the USBC_DET
+entry.
+
+Signed-off-by: Philippe Schenker <philippe.schenker@toradex.com>
+Signed-off-by: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+Upstream-status: Submitted [https://lore.kernel.org/all/20220920092227.286306-1-marcel@ziswiler.com/]
+---
+
+ arch/arm/boot/dts/imx6qdl-colibri.dtsi | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-colibri.dtsi b/arch/arm/boot/dts/imx6qdl-colibri.dtsi
+index 023e76215064..3e98b5da0cc6 100644
+--- a/arch/arm/boot/dts/imx6qdl-colibri.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-colibri.dtsi
+@@ -24,6 +24,13 @@ backlight: backlight {
+ 		status = "disabled";
+ 	};
+ 
++	extcon_usbc_det: usbc-det {
++		compatible = "linux,extcon-usb-gpio";
++		id-gpio = <&gpio7 12 GPIO_ACTIVE_HIGH>; /* SODIMM 137 / USBC_DET */
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_usbc_det>;
++	};
++
+ 	gpio-keys {
+ 		compatible = "gpio-keys";
+ 		pinctrl-names = "default";
+@@ -670,9 +677,11 @@ &uart3 {
+ 	status = "disabled";
+ };
+ 
++/* Colibri USBC */
+ &usbotg {
+ 	disable-over-current;
+-	dr_mode = "peripheral";
++	dr_mode = "otg";
++	extcon = <0>, <&extcon_usbc_det>;
+ 	status = "disabled";
+ };
+ 
+@@ -1055,7 +1064,7 @@ MX6QDL_PAD_SD4_CMD__UART3_RX_DATA	0x1b0b1
+ 
+ 	pinctrl_usbc_det: usbcdetgrp {
+ 		fsl,pins = <
+-			/* USBC_DET */
++			/* SODIMM 137 / USBC_DET */
+ 			MX6QDL_PAD_GPIO_17__GPIO7_IO12		0x1b0b0
+ 			/* USBC_DET_OVERWRITE */
+ 			MX6QDL_PAD_RGMII_RXC__GPIO6_IO30	0x0f058
+-- 
+2.36.1
+
