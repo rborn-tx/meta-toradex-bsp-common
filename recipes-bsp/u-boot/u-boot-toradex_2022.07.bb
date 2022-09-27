@@ -24,6 +24,7 @@ TDX_PATCHES = " \
     file://0012-toradex-common-Improve-product-serial-print-during-b.patch \
     file://0013-configs-colibri-imx7-Enable-bootd-command.patch \
     file://0001-ARM-imx8mp-verdin-imx8mp-Add-memory-size-detection.patch \
+    file://0001-apalis-colibri_imx6-imx6ull-_imx7-update-env-memory-.patch \
 "
 # patches which are not (yet) in the latest master
 TDX_PATCHES:use-head-next = " \
