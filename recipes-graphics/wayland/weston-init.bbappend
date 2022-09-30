@@ -17,5 +17,5 @@ do_install:append:tdx() {
     sed -i "s/User=weston/User=root/" ${D}${systemd_system_unitdir}/weston.service
     sed -i "s/Group=weston/Group=root/" ${D}${systemd_system_unitdir}/weston.service
     sed -i "s/SocketUser=weston/SocketUser=root/" ${D}${systemd_system_unitdir}/weston.socket
-    sed -i "s/SocketGroup=wayland/SocketUser=root/" ${D}${systemd_system_unitdir}/weston.socket
+    sed -i "s/SocketGroup=wayland/SocketGroup=root/" ${D}${systemd_system_unitdir}/weston.socket
 }
