@@ -38,6 +38,7 @@ inherit devicetree
 
 S = "${WORKDIR}/git/overlays"
 DT_FILES_PATH = "${WORKDIR}/machine-overlays"
+DT_INCLUDE:append = " ${S}"
 
 # The machine specific recipes start with MACHINE_PREFIX}[_-]
 MACHINE_PREFIX = "${MACHINE}"
