@@ -34,11 +34,11 @@ SRC_URI:append = " \
     file://0003-arm-dts-colibri-imx6-specify-usbh_pen-gpio-being-act.patch \
 "
 
-LINUX_VERSION ?= "6.0-rc3"
+LINUX_VERSION ?= "6.0.0"
 LINUX_VERSION:use-head-next ?= "6.0"
-KBRANCH = "master"
+KBRANCH = "linux-6.0.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "b90cb1053190353cc30f0fef0ef1f378ccc063c5"
+SRCREV_machine = "4fe89d07dcc2804c8b562f6c7896a45643d34b2f"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
