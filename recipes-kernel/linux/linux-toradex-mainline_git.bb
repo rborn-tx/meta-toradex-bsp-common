@@ -69,11 +69,11 @@ do_deploy:append() {
 #######################################################################
 
 LINUX_REPO:preempt-rt = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git"
-LINUX_VERSION:preempt-rt ?= "6.0-rc7-rt10"
-LINUX_VERSION:use-head-next:preempt-rt ?= "6.0-rc7-rt10"
+LINUX_VERSION:preempt-rt ?= "6.0-rt11"
+LINUX_VERSION:use-head-next:preempt-rt ?= "6.0-rt11"
 KBRANCH:preempt-rt = "linux-6.0.y-rt"
 KBRANCH:use-head-next:preempt-rt = "linux-6.0.y-rt"
-SRCREV_machine:preempt-rt = "9cd1036de86a91cf6c29ac56a9c5bbad9719f8c9"
+SRCREV_machine:preempt-rt = "16c33ae7f3d52020152dd01890a6e7c924a7485e"
 SRCREV_machine:preempt-rt:use-head-next = "${AUTOREV}"
 
 SRC_URI:append:preempt-rt = " \
