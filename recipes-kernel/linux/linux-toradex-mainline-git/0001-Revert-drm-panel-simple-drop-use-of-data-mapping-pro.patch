@@ -10,6 +10,9 @@ Re-enable the data-mapping property which was already used in the
 
 In addition to the revert set bpc from the data-mapping value
 as a WARN_ON is printed if missing.
+In addition to the revert have mapping pointing to the empty string to
+prevent a kernel panic if data-mapping can not be read from the dt and
+then an uninitialized pointer is used in strcmp.
 
 Upstream-Status: denied [Alternative solution being discused]
 https://lore.kernel.org/all/20220628181838.2031-1-max.oss.09@gmail.com/
@@ -26,7 +29,7 @@ index ff5e1a44c43a..f94dd09cf76f 100644
  	struct panel_desc *desc;
  	unsigned int bus_flags;
  	struct videomode vm;
-+	const char *mapping;
++	const char *mapping = "";
  	int ret;
  
  	np = dev->of_node;
