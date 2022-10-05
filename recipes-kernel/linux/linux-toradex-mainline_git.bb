@@ -32,6 +32,8 @@ SRC_URI:append = " \
     file://0001-arm-dts-colibri-imx6-usb-dual-role-switching.patch \
     file://0002-arm-dts-colibri-imx6-move-vbus-supply-to-module-leve.patch \
     file://0003-arm-dts-colibri-imx6-specify-usbh_pen-gpio-being-act.patch \
+    file://0001-arm-dts-colibri-imx6ull-keep-peripherals-disabled.patch \
+    file://0002-arm-dts-colibri-imx6ull-enable-default-peripherals.patch \
 "
 
 LINUX_VERSION ?= "6.0.0"

@@ -1,0 +1,359 @@
+From 6bc6d39f79b3e2a0cfaf3eb9e6abf432cc09666e Mon Sep 17 00:00:00 2001
+From: Philippe Schenker <philippe.schenker@toradex.com>
+Date: Mon, 3 Oct 2022 18:07:37 +0200
+Subject: [PATCH 2/4] arm: dts: colibri-imx6ull: enable default peripherals
+
+For NAND modules Toradex does not provide any device-tree overlays. But
+we always had a default display output enabled on NAND modules as well
+as touchscreens that are placed on displays which can easily be plugged
+into those carrier boards. Do reenable these displays and touchscreen
+output on all device-trees that are used on NAND modules.
+
+Upstream-Status: Submitted [https://lore.kernel.org/all/20221005133929.1243443-2-dev@pschenker.ch/]
+Signed-off-by: Philippe Schenker <philippe.schenker@toradex.com>
+---
+
+ arch/arm/boot/dts/imx6ull-colibri-aster.dts   | 40 +++++++++++++++++++
+ arch/arm/boot/dts/imx6ull-colibri-eval-v3.dts | 24 +++++++++++
+ arch/arm/boot/dts/imx6ull-colibri-iris-v2.dts | 40 +++++++++++++++++++
+ arch/arm/boot/dts/imx6ull-colibri-iris.dts    | 22 +++++++++-
+ .../boot/dts/imx6ull-colibri-wifi-aster.dts   | 40 +++++++++++++++++++
+ .../boot/dts/imx6ull-colibri-wifi-eval-v3.dts | 24 +++++++++++
+ .../boot/dts/imx6ull-colibri-wifi-iris-v2.dts | 24 +++++++++++
+ .../boot/dts/imx6ull-colibri-wifi-iris.dts    | 20 ++++++++++
+ 8 files changed, 233 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-aster.dts b/arch/arm/boot/dts/imx6ull-colibri-aster.dts
+index d3f2fb7c6c1e..3e0897c3a296 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-aster.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-aster.dts
+@@ -15,6 +15,46 @@ / {
+ 		     "fsl,imx6ull";
+ };
+ 
++&ad7879_ts {
++	status = "okay";
++};
++
+ &atmel_mxt_ts {
+ 	status = "okay";
+ };
++
++&backlight {
++	status = "okay";
++};
++
++&i2c1 {
++	status = "okay";
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&lcdif {
++	status = "okay";
++};
++
++&panel_dpi {
++	status = "okay";
++};
++
++&pwm4 {
++	status = "okay";
++};
++
++/* PWM <B> */
++&pwm5 {
++	/* Pin already used by atmel_mxt_ts touchscreen */
++	status = "disabled";
++};
++
++/* PWM <C> */
++&pwm6 {
++	/* Pin already used by atmel_mxt_ts touchscreen */
++	status = "disabled";
++};
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-eval-v3.dts b/arch/arm/boot/dts/imx6ull-colibri-eval-v3.dts
+index 9bf7111d7b00..d6da984e518d 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-eval-v3.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-eval-v3.dts
+@@ -12,3 +12,27 @@ / {
+ 	model = "Toradex Colibri iMX6ULL 256/512MB on Colibri Evaluation Board V3";
+ 	compatible = "toradex,colibri-imx6ull-eval", "fsl,imx6ull";
+ };
++
++&ad7879_ts {
++	status = "okay";
++};
++
++&backlight {
++	status = "okay";
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&lcdif {
++	status = "okay";
++};
++
++&panel_dpi {
++	status = "okay";
++};
++
++&pwm4 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-iris-v2.dts b/arch/arm/boot/dts/imx6ull-colibri-iris-v2.dts
+index afc1e0119783..fac7428685b4 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-iris-v2.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-iris-v2.dts
+@@ -15,10 +15,18 @@ / {
+ 		     "fsl,imx6ull";
+ };
+ 
++&ad7879_ts {
++	status = "okay";
++};
++
+ &atmel_mxt_ts {
+ 	status = "okay";
+ };
+ 
++&backlight {
++	status = "okay";
++};
++
+ &gpio1 {
+ 	/* This turns the LVDS transceiver on */
+ 	lvds-power-on {
+@@ -63,3 +71,35 @@ lvds-color-map {
+ 		output-low;
+ 	};
+ };
++
++&i2c1 {
++	status = "okay";
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&lcdif {
++	status = "okay";
++};
++
++&panel_dpi {
++	status = "okay";
++};
++
++&pwm4 {
++	status = "okay";
++};
++
++/* PWM <B> */
++&pwm5 {
++	/* Pin already used by atmel_mxt_ts touchscreen */
++	status = "disabled";
++};
++
++/* PWM <C> */
++&pwm6 {
++	/* Pin already used by atmel_mxt_ts touchscreen */
++	status = "disabled";
++};
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-iris.dts b/arch/arm/boot/dts/imx6ull-colibri-iris.dts
+index 4fb97b0fe30b..2a0d0fc3b9d6 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-iris.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-iris.dts
+@@ -15,6 +15,26 @@ / {
+ 		     "fsl,imx6ull";
+ };
+ 
+-&atmel_mxt_ts {
++&ad7879_ts {
++	status = "okay";
++};
++
++&backlight {
++	status = "okay";
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&lcdif {
++	status = "okay";
++};
++
++&panel_dpi {
++	status = "okay";
++};
++
++&pwm4 {
+ 	status = "okay";
+ };
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-wifi-aster.dts b/arch/arm/boot/dts/imx6ull-colibri-wifi-aster.dts
+index b4f65e8c5857..c7da5b41966f 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-wifi-aster.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-wifi-aster.dts
+@@ -15,6 +15,46 @@ / {
+ 		     "fsl,imx6ull";
+ };
+ 
++&ad7879_ts {
++	status = "okay";
++};
++
+ &atmel_mxt_ts {
+ 	status = "okay";
+ };
++
++&backlight {
++	status = "okay";
++};
++
++&i2c1 {
++	status = "okay";
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&lcdif {
++	status = "okay";
++};
++
++&panel_dpi {
++	status = "okay";
++};
++
++&pwm4 {
++	status = "okay";
++};
++
++/* PWM <B> */
++&pwm5 {
++	/* Pin already used by atmel_mxt_ts touchscreen */
++	status = "disabled";
++};
++
++/* PWM <C> */
++&pwm6 {
++	/* Pin already used by atmel_mxt_ts touchscreen */
++	status = "disabled";
++};
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-wifi-eval-v3.dts b/arch/arm/boot/dts/imx6ull-colibri-wifi-eval-v3.dts
+index 1d64d1a5d8a7..917f5dbe64ba 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-wifi-eval-v3.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-wifi-eval-v3.dts
+@@ -12,3 +12,27 @@ / {
+ 	model = "Toradex Colibri iMX6ULL 512MB on Colibri Evaluation Board V3";
+ 	compatible = "toradex,colibri-imx6ull-wifi-eval", "fsl,imx6ull";
+ };
++
++&ad7879_ts {
++	status = "okay";
++};
++
++&backlight {
++	status = "okay";
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&lcdif {
++	status = "okay";
++};
++
++&panel_dpi {
++	status = "okay";
++};
++
++&pwm4 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-wifi-iris-v2.dts b/arch/arm/boot/dts/imx6ull-colibri-wifi-iris-v2.dts
+index ce02f8a9ddd3..ed89d07beae5 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-wifi-iris-v2.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-wifi-iris-v2.dts
+@@ -15,10 +15,18 @@ / {
+ 		     "fsl,imx6ull";
+ };
+ 
++&ad7879_ts {
++	status = "okay";
++};
++
+ &atmel_mxt_ts {
+ 	status = "okay";
+ };
+ 
++&backlight {
++	status = "okay";
++};
++
+ &gpio1 {
+ 	/* This turns the LVDS transceiver on */
+ 	lvds-power-on {
+@@ -63,3 +71,19 @@ lvds-color-map {
+ 		output-low;
+ 	};
+ };
++
++&i2c2 {
++	status = "okay";
++};
++
++&lcdif {
++	status = "okay";
++};
++
++&panel_dpi {
++	status = "okay";
++};
++
++&pwm4 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/imx6ull-colibri-wifi-iris.dts b/arch/arm/boot/dts/imx6ull-colibri-wifi-iris.dts
+index 5ac1aa298ce7..e63253254754 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri-wifi-iris.dts
++++ b/arch/arm/boot/dts/imx6ull-colibri-wifi-iris.dts
+@@ -15,6 +15,26 @@ / {
+ 		     "fsl,imx6ull";
+ };
+ 
++&ad7879_ts {
++	status = "okay";
++};
++
+ &atmel_mxt_ts {
+ 	status = "okay";
+ };
++
++&backlight {
++	status = "okay";
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&lcdif {
++	status = "okay";
++};
++
++&panel_dpi {
++	status = "okay";
++};
+-- 
+2.37.3
+

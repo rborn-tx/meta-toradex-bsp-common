@@ -1,0 +1,70 @@
+From f1f97a6ad5ecf8bae7e84bee4641f0d91dc9d074 Mon Sep 17 00:00:00 2001
+From: Philippe Schenker <philippe.schenker@toradex.com>
+Date: Tue, 4 Oct 2022 16:29:34 +0200
+Subject: [PATCH 1/4] arm: dts: colibri-imx6ull: keep peripherals disabled
+
+Toradex does provide device-tree overlays to enable certain evaluation
+hardware. Keep the buses disabled by default to be enabled again with
+overlays.
+
+For customers including this device-tree this has also the advantage
+that the hardware we want by default running does not automatically
+enable signals on their end.
+
+Upstream-Status: Submitted [https://lore.kernel.org/all/20221005133929.1243443-1-dev@pschenker.ch/]
+Signed-off-by: Philippe Schenker <philippe.schenker@toradex.com>
+---
+
+ arch/arm/boot/dts/imx6ull-colibri.dtsi | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6ull-colibri.dtsi b/arch/arm/boot/dts/imx6ull-colibri.dtsi
+index 577a424b0e1d..a4429ba1f2ae 100644
+--- a/arch/arm/boot/dts/imx6ull-colibri.dtsi
++++ b/arch/arm/boot/dts/imx6ull-colibri.dtsi
+@@ -21,7 +21,7 @@ backlight: backlight {
+ 		pinctrl-0 = <&pinctrl_gpio_bl_on>;
+ 		power-supply = <&reg_3v3>;
+ 		pwms = <&pwm4 0 5000000 1>;
+-		status = "okay";
++		status = "disabled";
+ 	};
+ 
+ 	gpio-keys {
+@@ -42,7 +42,7 @@ panel_dpi: panel-dpi {
+ 		compatible = "edt,et057090dhu";
+ 		backlight = <&backlight>;
+ 		power-supply = <&reg_3v3>;
+-		status = "okay";
++		status = "disabled";
+ 
+ 		port {
+ 			lcd_panel_in: endpoint {
+@@ -159,7 +159,7 @@ &i2c1 {
+ 	pinctrl-1 = <&pinctrl_i2c1_gpio>;
+ 	sda-gpios = <&gpio1 29 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+ 	scl-gpios = <&gpio1 28 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+-	status = "okay";
++	status = "disabled";
+ 
+ 	/* Atmel maxtouch controller */
+ 	atmel_mxt_ts: touchscreen@4a {
+@@ -202,6 +202,7 @@ ad7879_ts: touchscreen@2c {
+ 		adi,median-filter-size = /bits/ 8 <2>;
+ 		adi,averaging = /bits/ 8 <1>;
+ 		adi,conversion-interval = /bits/ 8 <255>;
++		status = "disabled";
+ 	};
+ };
+ 
+@@ -209,6 +210,7 @@ &lcdif {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_lcdif_dat
+ 		     &pinctrl_lcdif_ctrl>;
++	status = "disabled";
+ 
+ 	port {
+ 		lcdif_out: endpoint {
+-- 
+2.37.3
+
