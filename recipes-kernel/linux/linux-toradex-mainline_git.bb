@@ -36,11 +36,11 @@ SRC_URI:append = " \
     file://0002-arm-dts-colibri-imx6ull-enable-default-peripherals.patch \
 "
 
-LINUX_VERSION ?= "6.0.0"
+LINUX_VERSION ?= "6.0.6"
 LINUX_VERSION:use-head-next ?= "6.0"
 KBRANCH = "linux-6.0.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "4fe89d07dcc2804c8b562f6c7896a45643d34b2f"
+SRCREV_machine = "e90fbe65c6b31ed48a6f13c232b0ca26688218d5"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
@@ -71,11 +71,11 @@ do_deploy:append() {
 #######################################################################
 
 LINUX_REPO:preempt-rt = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git"
-LINUX_VERSION:preempt-rt ?= "6.0-rt11"
-LINUX_VERSION:use-head-next:preempt-rt ?= "6.0-rt11"
+LINUX_VERSION:preempt-rt ?= "6.0.5-rt14"
+LINUX_VERSION:use-head-next:preempt-rt ?= "6.0-rt"
 KBRANCH:preempt-rt = "linux-6.0.y-rt"
 KBRANCH:use-head-next:preempt-rt = "linux-6.0.y-rt"
-SRCREV_machine:preempt-rt = "16c33ae7f3d52020152dd01890a6e7c924a7485e"
+SRCREV_machine:preempt-rt = "040e3123e9d93721de64a3df726871b57af204e9"
 SRCREV_machine:preempt-rt:use-head-next = "${AUTOREV}"
 
 SRC_URI:append:preempt-rt = " \
