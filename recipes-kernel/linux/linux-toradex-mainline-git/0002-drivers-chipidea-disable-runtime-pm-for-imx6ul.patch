@@ -1,0 +1,39 @@
+From 4fe56e7be311f93b67411ae092754af908c57d73 Mon Sep 17 00:00:00 2001
+From: Philippe Schenker <philippe.schenker@toradex.com>
+Date: Wed, 2 Nov 2022 14:25:56 +0100
+Subject: [PATCH 2/2] drivers: chipidea: disable runtime-pm for imx6ul
+
+Colibri iMX6ULL does not properly work with runtime-pm enabled. We see
+two issues with that enabled:
+
+1. Runtime PM disconnects the line as it thinks there is no VBUS -
+   because this signal is not hooked up in hardware. The driver gets a
+   wakeup signal from the attached hub after about 2s which leads to a
+   reset loop.
+2. In Dual-Role switching mode usb-device is not detected when plugged
+   in. The reason was never fully understood.
+
+Upstream-Status: Inappropriate [Configuration for colibri-imx6ull]
+
+Signed-off-by: Philippe Schenker <philippe.schenker@toradex.com>
+---
+ drivers/usb/chipidea/ci_hdrc_imx.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/usb/chipidea/ci_hdrc_imx.c b/drivers/usb/chipidea/ci_hdrc_imx.c
+index 9ffcecd3058c..de6de10dbd1b 100644
+--- a/drivers/usb/chipidea/ci_hdrc_imx.c
++++ b/drivers/usb/chipidea/ci_hdrc_imx.c
+@@ -56,8 +56,7 @@ static const struct ci_hdrc_imx_platform_flag imx6sx_usb_data = {
+ };
+ 
+ static const struct ci_hdrc_imx_platform_flag imx6ul_usb_data = {
+-	.flags = CI_HDRC_SUPPORTS_RUNTIME_PM |
+-		CI_HDRC_TURN_VBUS_EARLY_ON |
++	.flags = CI_HDRC_TURN_VBUS_EARLY_ON |
+ 		CI_HDRC_DISABLE_DEVICE_STREAMING,
+ };
+ 
+-- 
+2.38.0
+
