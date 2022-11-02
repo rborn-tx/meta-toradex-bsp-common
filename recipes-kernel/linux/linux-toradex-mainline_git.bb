@@ -34,6 +34,7 @@ SRC_URI:append = " \
     file://0003-arm-dts-colibri-imx6-specify-usbh_pen-gpio-being-act.patch \
     file://0001-arm-dts-colibri-imx6ull-keep-peripherals-disabled.patch \
     file://0002-arm-dts-colibri-imx6ull-enable-default-peripherals.patch \
+    file://0002-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
 "
 
 LINUX_VERSION ?= "6.1-rc"
