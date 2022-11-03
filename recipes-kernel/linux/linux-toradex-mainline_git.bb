@@ -35,6 +35,7 @@ SRC_URI:append = " \
     file://0002-arm-dts-colibri-imx6ull-enable-default-peripherals.patch \
     file://0001-ARM-dts-colibri-imx6ull-Enable-dual-role-switching.patch \
     file://0002-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
+    file://0001-rtc-snvs-Allow-a-time-difference-on-clock-register-r.patch \
 "
 
 LINUX_VERSION ?= "6.0.6"
