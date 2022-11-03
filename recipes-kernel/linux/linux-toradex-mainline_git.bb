@@ -36,11 +36,10 @@ SRC_URI:append = " \
     file://0002-arm-dts-colibri-imx6ull-enable-default-peripherals.patch \
 "
 
-LINUX_VERSION ?= "6.0.6"
-LINUX_VERSION:use-head-next ?= "6.0"
-KBRANCH = "linux-6.0.y"
+LINUX_VERSION ?= "6.1-rc"
+KBRANCH = "master"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "e90fbe65c6b31ed48a6f13c232b0ca26688218d5"
+SRCREV_machine = "094226ad94f471a9f19e8f8e7140a09c2625abaa"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
