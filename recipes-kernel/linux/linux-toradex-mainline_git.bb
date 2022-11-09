@@ -1,5 +1,4 @@
 SUMMARY = "Toradex mainline Linux kernel"
-SUMMARY:preempt-rt = "Toradex mainline real-time Linux kernel"
 SECTION = "kernel"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM ?= "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"
@@ -42,7 +41,7 @@ LINUX_VERSION ?= "6.0.6"
 LINUX_VERSION:use-head-next ?= "6.0"
 KBRANCH = "linux-6.0.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "e90fbe65c6b31ed48a6f13c232b0ca26688218d5"
+SRCREV_machine = "3a2fa3c01fc7c2183eb3278bd912e5bcec20eb2a"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
@@ -69,20 +68,3 @@ do_deploy:append() {
     cp -a ${B}/.config ${DEPLOYDIR}/${KERNEL_CONFIG_NAME}
     ln -sf ${KERNEL_CONFIG_NAME} ${DEPLOYDIR}/${KERNEL_CONFIG_LINK_NAME}
 }
-
-#######################################################################
-
-LINUX_REPO:preempt-rt = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git"
-LINUX_VERSION:preempt-rt ?= "6.0.5-rt14"
-LINUX_VERSION:use-head-next:preempt-rt ?= "6.0-rt"
-KBRANCH:preempt-rt = "linux-6.0.y-rt"
-KBRANCH:use-head-next:preempt-rt = "linux-6.0.y-rt"
-SRCREV_machine:preempt-rt = "040e3123e9d93721de64a3df726871b57af204e9"
-SRCREV_machine:preempt-rt:use-head-next = "${AUTOREV}"
-
-SRC_URI:append:preempt-rt = " \
-    file://preempt-rt.scc \
-    file://preempt-rt-less-latency.scc \
-"
-
-#######################################################################
