@@ -42,10 +42,10 @@ SRC_URI:append = " \
     file://0004-ARM-dts-colibri-imx7-Disable-usb-over-current.patch \
 "
 
-LINUX_VERSION ?= "6.0.6"
+LINUX_VERSION ?= "6.0.10"
 KBRANCH = "linux-6.0.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "3a2fa3c01fc7c2183eb3278bd912e5bcec20eb2a"
+SRCREV_machine = "dab0efee14dd1ca363ef5ceae36018b72fc52037"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
