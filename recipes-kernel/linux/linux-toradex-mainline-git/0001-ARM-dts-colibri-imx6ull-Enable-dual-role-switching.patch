@@ -1,50 +1,65 @@
-From 35f50699d4d17dbd3b116ea4d3c9f349567d3805 Mon Sep 17 00:00:00 2001
+From eb5259acd986ec6862bf709f551da187057471ae Mon Sep 17 00:00:00 2001
 From: Philippe Schenker <philippe.schenker@toradex.com>
-Date: Wed, 19 Oct 2022 17:59:13 +0200
-Subject: [PATCH 1/2] ARM: dts: colibri-imx6ull: Enable dual-role switching
+Date: Mon, 14 Nov 2022 16:04:47 +0100
+Subject: [PATCH] ARM: dts: colibri-imx6ull: Enable dual-role switching
 
 The Colibri standard provides a GPIO called USBC_DET to switch from
-USB Host to USB Device and back. The Colibri iMX6ULL does have the SoC
-ball USB_OTG1_VBUS connected in series with a capacitor to ground.
+USB Host to USB Device and back. Make use of this GPIO by adding it
+with usb-connector framework.
 
-This means that we need to provide to the extcon framework VBUS and ID
-events using the single GPIO we have. The Extcon USB GPIO driver does
-use id-gpio also for VBUS event, as in our case where vbus-gpio is
-absent.
-
-Upstream-Status: Submitted [https://lore.kernel.org/linux-devicetree/20221102155226.51587-1-dev@pschenker.ch]
-
+Upstream-Status: Submitted [https://lore.kernel.org/all/20221115180554.73696-1-dev@pschenker.ch/]
 Signed-off-by: Philippe Schenker <philippe.schenker@toradex.com>
 ---
- arch/arm/boot/dts/imx6ull-colibri.dtsi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm/boot/dts/imx6ull-colibri.dtsi | 29 ++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
 diff --git a/arch/arm/boot/dts/imx6ull-colibri.dtsi b/arch/arm/boot/dts/imx6ull-colibri.dtsi
-index 577a424b0e1d..feb1fcd9a684 100644
+index a4429ba1f2ae..336ab2e0534c 100644
 --- a/arch/arm/boot/dts/imx6ull-colibri.dtsi
 +++ b/arch/arm/boot/dts/imx6ull-colibri.dtsi
-@@ -24,6 +24,13 @@ backlight: backlight {
- 		status = "okay";
+@@ -24,6 +24,28 @@ backlight: backlight {
+ 		status = "disabled";
  	};
  
-+	extcon_usbc_det: usbc-det {
-+		compatible = "linux,extcon-usb-gpio";
-+		id-gpio = <&gpio5 2 GPIO_ACTIVE_HIGH>; /* SODIMM 137 / USBC_DET */
++	connector {
++		compatible = "gpio-usb-b-connector", "usb-b-connector";
 +		pinctrl-names = "default";
 +		pinctrl-0 = <&pinctrl_snvs_usbc_det>;
++		id-gpios = <&gpio5 2 GPIO_ACTIVE_HIGH>; /* SODIMM 137 / USBC_DET */
++		label = "USBC";
++		self-powered;
++		type = "micro";
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++				usb_dr_connector: endpoint {
++					remote-endpoint = <&usb1_drd_sw>;
++				};
++			};
++		};
 +	};
 +
  	gpio-keys {
  		compatible = "gpio-keys";
  		pinctrl-names = "default";
-@@ -275,6 +282,7 @@ &uart5 {
- /* Colibri USBC */
- &usbotg1 {
- 	dr_mode = "otg";
-+	extcon = <&extcon_usbc_det>, <&extcon_usbc_det>;
+@@ -280,6 +302,13 @@ &usbotg1 {
  	srp-disable;
  	hnp-disable;
  	adp-disable;
++	usb-role-switch;
++
++	port {
++		usb1_drd_sw: endpoint {
++			remote-endpoint = <&usb_dr_connector>;
++		};
++	};
+ };
+ 
+ /* Colibri USBH */
 -- 
-2.38.0
+2.38.1
 
