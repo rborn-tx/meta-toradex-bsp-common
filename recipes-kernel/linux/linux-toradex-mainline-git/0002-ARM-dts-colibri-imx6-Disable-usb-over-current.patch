@@ -1,0 +1,92 @@
+From 3e2299b86bce54c5ce070a177197595d2f2215f0 Mon Sep 17 00:00:00 2001
+From: Philippe Schenker <philippe.schenker@toradex.com>
+Date: Mon, 21 Nov 2022 18:11:51 +0100
+Subject: [PATCH 2/4] ARM: dts: colibri-imx6: Disable usb over-current
+
+Disable usb over-current of the chipidea driver on all Carrier-Boards
+used by Toradex. Do this as we don't want to use this functionality on
+our Carrier Boards and to leave it open to someone who includes our
+module-level device-trees.
+
+Remove the now obsolete disable-over-current flag from module-level
+device-tree imx6qdl-colibri.dtsi and leave it as already mentioned to
+the people actually implementing the carrier-board to implement this.
+
+This will prevent the warning "No over current polarity defined" from
+being printed on boot.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-devicetree/20221122155439.456142-3-dev@pschenker.ch/T/#u]
+Signed-off-by: Philippe Schenker <philippe.schenker@toradex.com>
+---
+ arch/arm/boot/dts/imx6dl-colibri-aster.dts   | 2 ++
+ arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts | 2 ++
+ arch/arm/boot/dts/imx6dl-colibri-iris.dts    | 2 ++
+ arch/arm/boot/dts/imx6qdl-colibri.dtsi       | 1 -
+ 4 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/imx6dl-colibri-aster.dts b/arch/arm/boot/dts/imx6dl-colibri-aster.dts
+index a28e083f29d5..82a0d1a28d12 100644
+--- a/arch/arm/boot/dts/imx6dl-colibri-aster.dts
++++ b/arch/arm/boot/dts/imx6dl-colibri-aster.dts
+@@ -99,10 +99,12 @@ &uart3 {
+ };
+ 
+ &usbh1 {
++	disable-over-current;
+ 	status = "okay";
+ };
+ 
+ &usbotg {
++	disable-over-current;
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts b/arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts
+index a02981d4a3fc..f50a26dd34c0 100644
+--- a/arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts
++++ b/arch/arm/boot/dts/imx6dl-colibri-eval-v3.dts
+@@ -111,10 +111,12 @@ &uart3 {
+ };
+ 
+ &usbh1 {
++	disable-over-current;
+ 	status = "okay";
+ };
+ 
+ &usbotg {
++	disable-over-current;
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm/boot/dts/imx6dl-colibri-iris.dts b/arch/arm/boot/dts/imx6dl-colibri-iris.dts
+index c5797ff35b71..4303c88bb2a9 100644
+--- a/arch/arm/boot/dts/imx6dl-colibri-iris.dts
++++ b/arch/arm/boot/dts/imx6dl-colibri-iris.dts
+@@ -138,10 +138,12 @@ &uart3 {
+ };
+ 
+ &usbh1 {
++	disable-over-current;
+ 	status = "okay";
+ };
+ 
+ &usbotg {
++	disable-over-current;
+ 	status = "okay";
+ };
+ 
+diff --git a/arch/arm/boot/dts/imx6qdl-colibri.dtsi b/arch/arm/boot/dts/imx6qdl-colibri.dtsi
+index d8f985f297e4..f894d6907604 100644
+--- a/arch/arm/boot/dts/imx6qdl-colibri.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-colibri.dtsi
+@@ -684,7 +684,6 @@ &usbh1 {
+ 
+ /* Colibri USBC */
+ &usbotg {
+-	disable-over-current;
+ 	dr_mode = "otg";
+ 	extcon = <0>, <&extcon_usbc_det>;
+ 	status = "disabled";
+-- 
+2.35.3
+

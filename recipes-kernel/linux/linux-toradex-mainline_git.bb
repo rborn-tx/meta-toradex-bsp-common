@@ -36,6 +36,10 @@ SRC_URI:append = " \
     file://0001-ARM-dts-colibri-imx6ull-Enable-dual-role-switching.patch \
     file://0002-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
     file://0001-rtc-snvs-Allow-a-time-difference-on-clock-register-r.patch \
+    file://0001-ARM-dts-apalis-imx6-Disable-usb-over-current.patch \
+    file://0002-ARM-dts-colibri-imx6-Disable-usb-over-current.patch \
+    file://0003-ARM-dts-colibri-imx6ull-Disable-usb-over-current.patch \
+    file://0004-ARM-dts-colibri-imx7-Disable-usb-over-current.patch \
 "
 
 LINUX_VERSION ?= "6.0.6"

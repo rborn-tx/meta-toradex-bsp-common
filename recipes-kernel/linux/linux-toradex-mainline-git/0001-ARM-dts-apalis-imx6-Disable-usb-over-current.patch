@@ -1,0 +1,95 @@
+From 4d3a1be57ebd27239e39a8129b9a8dbb20b5fca1 Mon Sep 17 00:00:00 2001
+From: Philippe Schenker <philippe.schenker@toradex.com>
+Date: Mon, 21 Nov 2022 18:15:44 +0100
+Subject: [PATCH 1/4] ARM: dts: apalis-imx6: Disable usb over-current
+
+Disable usb over-current of the chipidea driver on all Carrier-Boards
+used by Toradex. Do this as we don't want to use this functionality on
+our Carrier Boards and to leave it open to someone who includes our
+module-level device-trees.
+
+Remove the now obsolete disable-over-current flag from module-level
+device-tree imx6qdl-apalis.dtsi and leave it as already mentioned to
+the people actually implementing the carrier-board to implement this.
+
+This will prevent the warning "No over current polarity defined" from
+being printed on boot.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-devicetree/20221122155439.456142-2-dev@pschenker.ch/T/#u]
+Signed-off-by: Philippe Schenker <philippe.schenker@toradex.com>
+---
+ arch/arm/boot/dts/imx6q-apalis-eval.dts       | 2 ++
+ arch/arm/boot/dts/imx6q-apalis-ixora-v1.2.dts | 2 ++
+ arch/arm/boot/dts/imx6q-apalis-ixora.dts      | 2 ++
+ arch/arm/boot/dts/imx6qdl-apalis.dtsi         | 1 -
+ 4 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/imx6q-apalis-eval.dts b/arch/arm/boot/dts/imx6q-apalis-eval.dts
+index fa160a389870..3fc079dfd61e 100644
+--- a/arch/arm/boot/dts/imx6q-apalis-eval.dts
++++ b/arch/arm/boot/dts/imx6q-apalis-eval.dts
+@@ -147,11 +147,13 @@ &uart5 {
+ };
+ 
+ &usbh1 {
++	disable-over-current;
+ 	vbus-supply = <&reg_usb_host_vbus>;
+ 	status = "okay";
+ };
+ 
+ &usbotg {
++	disable-over-current;
+ 	vbus-supply = <&reg_usb_otg_vbus>;
+ 	status = "okay";
+ };
+diff --git a/arch/arm/boot/dts/imx6q-apalis-ixora-v1.2.dts b/arch/arm/boot/dts/imx6q-apalis-ixora-v1.2.dts
+index f9f7d99bd4db..717decda0ceb 100644
+--- a/arch/arm/boot/dts/imx6q-apalis-ixora-v1.2.dts
++++ b/arch/arm/boot/dts/imx6q-apalis-ixora-v1.2.dts
+@@ -202,11 +202,13 @@ &uart5 {
+ };
+ 
+ &usbh1 {
++	disable-over-current;
+ 	vbus-supply = <&reg_usb_host_vbus>;
+ 	status = "okay";
+ };
+ 
+ &usbotg {
++	disable-over-current;
+ 	vbus-supply = <&reg_usb_otg_vbus>;
+ 	status = "okay";
+ };
+diff --git a/arch/arm/boot/dts/imx6q-apalis-ixora.dts b/arch/arm/boot/dts/imx6q-apalis-ixora.dts
+index ce39c6a3f640..f338be435277 100644
+--- a/arch/arm/boot/dts/imx6q-apalis-ixora.dts
++++ b/arch/arm/boot/dts/imx6q-apalis-ixora.dts
+@@ -151,11 +151,13 @@ &uart5 {
+ };
+ 
+ &usbh1 {
++	disable-over-current;
+ 	vbus-supply = <&reg_usb_host_vbus>;
+ 	status = "okay";
+ };
+ 
+ &usbotg {
++	disable-over-current;
+ 	vbus-supply = <&reg_usb_otg_vbus>;
+ 	status = "okay";
+ };
+diff --git a/arch/arm/boot/dts/imx6qdl-apalis.dtsi b/arch/arm/boot/dts/imx6qdl-apalis.dtsi
+index 7c17b91f0965..f912697bfdb3 100644
+--- a/arch/arm/boot/dts/imx6qdl-apalis.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-apalis.dtsi
+@@ -824,7 +824,6 @@ &uart5 {
+ };
+ 
+ &usbotg {
+-	disable-over-current;
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_usbotg>;
+ 	status = "disabled";
+-- 
+2.35.3
+
