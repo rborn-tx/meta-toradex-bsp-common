@@ -43,7 +43,6 @@ SRC_URI:append = " \
 "
 
 LINUX_VERSION ?= "6.0.6"
-LINUX_VERSION:use-head-next ?= "6.0"
 KBRANCH = "linux-6.0.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
 SRCREV_machine = "3a2fa3c01fc7c2183eb3278bd912e5bcec20eb2a"
