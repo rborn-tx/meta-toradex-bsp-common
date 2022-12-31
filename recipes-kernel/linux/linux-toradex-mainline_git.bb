@@ -28,18 +28,13 @@ SRC_URI = " \
 SRC_URI:append = " \
     file://0001-thermal-imx-Update-critical-temp-threshold.patch \
     file://0001-Revert-drm-panel-simple-drop-use-of-data-mapping-pro.patch \
-    file://0001-arm-dts-colibri-imx6-usb-dual-role-switching.patch \
-    file://0002-arm-dts-colibri-imx6-move-vbus-supply-to-module-leve.patch \
-    file://0003-arm-dts-colibri-imx6-specify-usbh_pen-gpio-being-act.patch \
-    file://0001-arm-dts-colibri-imx6ull-keep-peripherals-disabled.patch \
-    file://0002-arm-dts-colibri-imx6ull-enable-default-peripherals.patch \
     file://0002-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
 "
 
-LINUX_VERSION ?= "6.1-rc"
+LINUX_VERSION ?= "6.2-rc"
 KBRANCH = "master"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "094226ad94f471a9f19e8f8e7140a09c2625abaa"
+SRCREV_machine = "1b929c02afd37871d5afb9d498426f83432e71c2"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
