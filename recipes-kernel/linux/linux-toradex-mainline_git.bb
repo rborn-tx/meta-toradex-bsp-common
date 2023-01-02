@@ -35,17 +35,16 @@ SRC_URI:append = " \
     file://0002-arm-dts-colibri-imx6ull-enable-default-peripherals.patch \
     file://0001-ARM-dts-colibri-imx6ull-Enable-dual-role-switching.patch \
     file://0002-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
-    file://0001-rtc-snvs-Allow-a-time-difference-on-clock-register-r.patch \
     file://0001-ARM-dts-apalis-imx6-Disable-usb-over-current.patch \
     file://0002-ARM-dts-colibri-imx6-Disable-usb-over-current.patch \
     file://0003-ARM-dts-colibri-imx6ull-Disable-usb-over-current.patch \
     file://0004-ARM-dts-colibri-imx7-Disable-usb-over-current.patch \
 "
 
-LINUX_VERSION ?= "6.0.10"
+LINUX_VERSION ?= "6.0.16"
 KBRANCH = "linux-6.0.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "dab0efee14dd1ca363ef5ceae36018b72fc52037"
+SRCREV_machine = "29e1bc6a55debd187afb6ec2e49beb7e57102b0a"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
