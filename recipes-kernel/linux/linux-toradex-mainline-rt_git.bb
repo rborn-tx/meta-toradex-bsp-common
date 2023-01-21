@@ -13,4 +13,5 @@ SRCREV_machine:use-head-next = "${AUTOREV}"
 SRC_URI:append = " \
     file://preempt-rt.scc \
     file://preempt-rt-less-latency.scc \
+    file://0001-Revert-ARM-dts-imx7-Fix-NAND-controller-size-cells.patch \
 "
