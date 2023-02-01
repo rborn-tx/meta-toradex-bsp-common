@@ -1,0 +1,268 @@
+From 8fdbd097bc942cb13195b619d54ead084bdc6704 Mon Sep 17 00:00:00 2001
+From: Philippe Schenker <philippe.schenker@toradex.com>
+Date: Mon, 23 Jan 2023 16:17:33 +0100
+Subject: [PATCH 1/2] arm64: dts: imx8mm-verdin: Add yavia carrier board
+
+Add new carrier board device tree Yavia for the Verdin iMX8M Mini SoM.
+
+Yavia is a compact carrier board providing easy access to the most
+common features of the Verdin family. The intended use of the carrier
+board is application software development. The board is compatible with
+all current and future Verdin SoMs.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-devicetree/20230123151734.44184-3-dev@pschenker.ch/]
+Co-developed-by: Aishwarya Kothari <aishwarya.kothari@toradex.com>
+Signed-off-by: Aishwarya Kothari <aishwarya.kothari@toradex.com>
+Signed-off-by: Philippe Schenker <philippe.schenker@toradex.com>
+Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+---
+ arch/arm64/boot/dts/freescale/Makefile        |   2 +
+ .../freescale/imx8mm-verdin-nonwifi-yavia.dts |  18 ++
+ .../freescale/imx8mm-verdin-wifi-yavia.dts    |  18 ++
+ .../dts/freescale/imx8mm-verdin-yavia.dtsi    | 169 ++++++++++++++++++
+ 4 files changed, 207 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/freescale/imx8mm-verdin-nonwifi-yavia.dts
+ create mode 100644 arch/arm64/boot/dts/freescale/imx8mm-verdin-wifi-yavia.dts
+ create mode 100644 arch/arm64/boot/dts/freescale/imx8mm-verdin-yavia.dtsi
+
+diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+index 3ea9edc87909..c2f57e69d6f3 100644
+--- a/arch/arm64/boot/dts/freescale/Makefile
++++ b/arch/arm64/boot/dts/freescale/Makefile
+@@ -73,8 +73,10 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mm-venice-gw7903.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mm-venice-gw7904.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mm-verdin-nonwifi-dahlia.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mm-verdin-nonwifi-dev.dtb
++dtb-$(CONFIG_ARCH_MXC) += imx8mm-verdin-nonwifi-yavia.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mm-verdin-wifi-dahlia.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mm-verdin-wifi-dev.dtb
++dtb-$(CONFIG_ARCH_MXC) += imx8mm-verdin-wifi-yavia.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mn-beacon-kit.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mn-bsh-smm-s2.dtb
+ dtb-$(CONFIG_ARCH_MXC) += imx8mn-bsh-smm-s2pro.dtb
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-verdin-nonwifi-yavia.dts b/arch/arm64/boot/dts/freescale/imx8mm-verdin-nonwifi-yavia.dts
+new file mode 100644
+index 000000000000..c71825ecf2ea
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx8mm-verdin-nonwifi-yavia.dts
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++/*
++ * Copyright 2023 Toradex
++ */
++
++/dts-v1/;
++
++#include "imx8mm-verdin.dtsi"
++#include "imx8mm-verdin-nonwifi.dtsi"
++#include "imx8mm-verdin-yavia.dtsi"
++
++/ {
++	model = "Toradex Verdin iMX8M Mini on Yavia Board";
++	compatible = "toradex,verdin-imx8mm-nonwifi-yavia",
++		     "toradex,verdin-imx8mm-nonwifi",
++		     "toradex,verdin-imx8mm",
++		     "fsl,imx8mm";
++};
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-verdin-wifi-yavia.dts b/arch/arm64/boot/dts/freescale/imx8mm-verdin-wifi-yavia.dts
+new file mode 100644
+index 000000000000..fe39de9310d6
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx8mm-verdin-wifi-yavia.dts
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++/*
++ * Copyright 2023 Toradex
++ */
++
++/dts-v1/;
++
++#include "imx8mm-verdin.dtsi"
++#include "imx8mm-verdin-wifi.dtsi"
++#include "imx8mm-verdin-yavia.dtsi"
++
++/ {
++	model = "Toradex Verdin iMX8M Mini WB on Yavia Board";
++	compatible = "toradex,verdin-imx8mm-wifi-yavia",
++		     "toradex,verdin-imx8mm-wifi",
++		     "toradex,verdin-imx8mm",
++		     "fsl,imx8mm";
++};
+diff --git a/arch/arm64/boot/dts/freescale/imx8mm-verdin-yavia.dtsi b/arch/arm64/boot/dts/freescale/imx8mm-verdin-yavia.dtsi
+new file mode 100644
+index 000000000000..1e28c78e381f
+--- /dev/null
++++ b/arch/arm64/boot/dts/freescale/imx8mm-verdin-yavia.dtsi
+@@ -0,0 +1,169 @@
++// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
++/*
++ * Copyright 2023 Toradex
++ */
++
++#include <dt-bindings/leds/common.h>
++
++/ {
++	leds {
++		compatible = "gpio-leds";
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_leds_yavia>;
++
++		/* SODIMM 52 - LD1_RED */
++		led-0 {
++			color = <LED_COLOR_ID_RED>;
++			function = LED_FUNCTION_DEBUG;
++			function-enumerator = <1>;
++			gpios = <&gpio3 0 GPIO_ACTIVE_HIGH>;
++		};
++		/* SODIMM 54 - LD1_GREEN */
++		led-1 {
++			color = <LED_COLOR_ID_GREEN>;
++			function = LED_FUNCTION_DEBUG;
++			function-enumerator = <1>;
++			gpios = <&gpio3 1 GPIO_ACTIVE_HIGH>;
++		};
++		/* SODIMM 56 - LD1_BLUE */
++		led-2 {
++			color = <LED_COLOR_ID_BLUE>;
++			function = LED_FUNCTION_DEBUG;
++			function-enumerator = <1>;
++			gpios = <&gpio3 6 GPIO_ACTIVE_HIGH>;
++		};
++		/* SODIMM 58 - LD2_RED */
++		led-3 {
++			color = <LED_COLOR_ID_RED>;
++			function = LED_FUNCTION_DEBUG;
++			function-enumerator = <2>;
++			gpios = <&gpio3 7 GPIO_ACTIVE_HIGH>;
++		};
++		/* SODIMM 60 - LD2_GREEN */
++		led-4 {
++			color = <LED_COLOR_ID_GREEN>;
++			function = LED_FUNCTION_DEBUG;
++			function-enumerator = <2>;
++			gpios = <&gpio3 8 GPIO_ACTIVE_HIGH>;
++		};
++		/* SODIMM 62 - LD2_BLUE */
++		led-5 {
++			color = <LED_COLOR_ID_BLUE>;
++			function = LED_FUNCTION_DEBUG;
++			function-enumerator = <2>;
++			gpios = <&gpio3 9 GPIO_ACTIVE_HIGH>;
++		};
++	};
++};
++
++/* Verdin SPI_1 */
++&ecspi2 {
++	status = "okay";
++};
++
++/* EEPROM on display adapter boards */
++&eeprom_display_adapter {
++	status = "okay";
++};
++
++/* EEPROM on Verdin yavia board */
++&eeprom_carrier_board {
++	status = "okay";
++};
++
++&fec1 {
++	status = "okay";
++};
++
++&gpio3 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_gpios_ext_yavia>;
++};
++
++&hwmon_temp {
++	status = "okay";
++};
++
++&i2c3 {
++	status = "okay";
++};
++
++/* Verdin I2C_1 */
++&i2c4 {
++	status = "okay";
++};
++
++/* Verdin PCIE_1 */
++&pcie0 {
++	status = "okay";
++};
++
++&pcie_phy {
++	status = "okay";
++};
++
++/* Verdin PWM_3_DSI */
++&pwm1 {
++	status = "okay";
++};
++
++/* Verdin PWM_1 */
++&pwm2 {
++	status = "okay";
++};
++
++/* Verdin PWM_2 */
++&pwm3 {
++	status = "okay";
++};
++
++/* Verdin UART_3 */
++&uart1 {
++	status = "okay";
++};
++
++/* Verdin UART_1 */
++&uart2 {
++	status = "okay";
++};
++
++/* Verdin UART_2 */
++&uart3 {
++	status = "okay";
++};
++
++/* Verdin USB_1 */
++&usbotg1 {
++	status = "okay";
++};
++
++/* Verdin USB_2 */
++&usbotg2 {
++	status = "okay";
++};
++
++/* Verdin SD_1 */
++&usdhc2 {
++	status = "okay";
++};
++
++&iomuxc {
++	pinctrl_leds_yavia: ledsyaviagrp {
++		fsl,pins = <
++			MX8MM_IOMUXC_NAND_ALE_GPIO3_IO0		0x106	/* SODIMM 52 */
++			MX8MM_IOMUXC_NAND_CE0_B_GPIO3_IO1	0x106	/* SODIMM 54 */
++			MX8MM_IOMUXC_NAND_DATA00_GPIO3_IO6	0x106	/* SODIMM 56 */
++			MX8MM_IOMUXC_NAND_DATA01_GPIO3_IO7	0x106	/* SODIMM 58 */
++			MX8MM_IOMUXC_NAND_DATA02_GPIO3_IO8	0x106	/* SODIMM 60 */
++			MX8MM_IOMUXC_NAND_DATA03_GPIO3_IO9	0x106	/* SODIMM 62 */
++		>;
++	};
++
++	pinctrl_gpios_ext_yavia: gpiosextyaviagrp {
++		fsl,pins = <
++			MX8MM_IOMUXC_NAND_CE1_B_GPIO3_IO2	0x106	/* SODIMM 64 */
++			MX8MM_IOMUXC_NAND_DQS_GPIO3_IO14	0x106	/* SODIMM 66 */
++		>;
++	};
++};
+-- 
+2.39.1
+

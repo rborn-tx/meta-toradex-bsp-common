@@ -39,6 +39,8 @@ SRC_URI:append = " \
     file://0002-ARM-dts-colibri-imx6-Disable-usb-over-current.patch \
     file://0003-ARM-dts-colibri-imx6ull-Disable-usb-over-current.patch \
     file://0004-ARM-dts-colibri-imx7-Disable-usb-over-current.patch \
+    file://0001-arm64-dts-imx8mm-verdin-Add-yavia-carrier-board.patch \
+    file://0002-arm64-dts-imx8mp-verdin-Add-yavia-carrier-board.patch \
 "
 
 LINUX_VERSION ?= "6.1.4"
