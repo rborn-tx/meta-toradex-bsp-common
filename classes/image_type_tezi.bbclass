@@ -34,7 +34,7 @@ TEZI_AUTO_INSTALL ??= "false"
 TEZI_BOOT_SUFFIX ??= "${@'bootfs.tar.xz' if oe.types.boolean('${TEZI_USE_BOOTFILES}') else ''}"
 TEZI_CONFIG_FORMAT ??= "2"
 # Require newer Tezi for mx8 Socs with the u-boot environment bugfix
-TEZI_CONFIG_FORMAT:mx8-nxp-bsp ??= "4"
+TEZI_CONFIG_FORMAT:mx8-generic-bsp ??= "4"
 TORADEX_FLASH_TYPE ??= "emmc"
 UBOOT_BINARY_TEZI_EMMC ?= "${UBOOT_BINARY}"
 UBOOT_BINARY_TEZI_RAWNAND ?= "${UBOOT_BINARY}"
