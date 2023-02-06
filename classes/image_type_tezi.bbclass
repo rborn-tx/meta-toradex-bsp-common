@@ -137,21 +137,31 @@ def rootfs_tezi_emmc(d, use_bootfiles):
     emmcdevboot0 = d.getVar('EMMCDEVBOOT0')
     imagename = d.getVar('IMAGE_LINK_NAME')
     offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD')
+    offset_tpl = d.getVar('OFFSET_TPL_PAYLOAD')
     offset_spl = d.getVar('OFFSET_SPL_PAYLOAD')
 
     bootpart_rawfiles = []
     filesystem_partitions = []
 
+    offset_payload = offset_bootrom
+    if offset_tpl:
+        bootpart_rawfiles.append(
+              {
+                "filename": d.getVar('TPL_BINARY'),
+                "dd_options": "seek=" + offset_payload
+              })
+        offset_payload = offset_tpl
     if offset_spl:
         bootpart_rawfiles.append(
               {
                 "filename": d.getVar('SPL_BINARY'),
-                "dd_options": "seek=" + offset_bootrom
+                "dd_options": "seek=" + offset_payload
               })
+        offset_payload = offset_spl
     bootpart_rawfiles.append(
               {
                 "filename": d.getVar('UBOOT_BINARY_TEZI_EMMC'),
-                "dd_options": "seek=" + (offset_spl if offset_spl else offset_bootrom)
+                "dd_options": "seek=" + offset_payload
               })
 
     if use_bootfiles:
@@ -344,6 +354,7 @@ python rootfs_tezi_run_json() {
         uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
         uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
         # TODO: Multi image/raw NAND with SPL currently not supported
+        uboot_file += " " + d.getVar('TPL_BINARY') if d.getVar('OFFSET_TPL_PAYLOAD') else ""
         uboot_file += " " + d.getVar('SPL_BINARY') if d.getVar('OFFSET_SPL_PAYLOAD') else ""
         artifacts += " " + "%s/%s.%s" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME'), d.getVar('TEZI_BOOT_SUFFIX')) if use_bootfiles else ""
     else:
