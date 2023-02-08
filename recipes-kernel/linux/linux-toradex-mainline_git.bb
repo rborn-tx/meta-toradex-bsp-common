@@ -43,10 +43,10 @@ SRC_URI:append = " \
     file://0002-arm64-dts-imx8mp-verdin-Add-yavia-carrier-board.patch \
 "
 
-LINUX_VERSION ?= "6.1.9"
+LINUX_VERSION ?= "6.1.14"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "68a95455c153f8adc513e5b688f4b348daa7c1b1"
+SRCREV_machine = "7d54cb2c26dad1264ecca85992bfe8984df4b7b5"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
