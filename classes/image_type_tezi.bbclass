@@ -26,6 +26,7 @@ TEZI_VERSION ?= "${DISTRO_VERSION}"
 TEZI_DATE ?= "${TDX_MATRIX_BUILD_TIME}"
 TEZI_IMAGE_NAME ?= "${IMAGE_NAME}"
 TEZI_ROOT_FSTYPE ??= "ext4"
+TEZI_ROOT_FSOPTS ?= "-E nodiscard"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_NAME ??= "rootfs"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
@@ -174,7 +175,7 @@ def rootfs_tezi_emmc(d, use_bootfiles):
             "content": {
               "label": d.getVar('TEZI_ROOT_LABEL'),
               "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
-              "mkfs_options": "-E nodiscard",
+              "mkfs_options": d.getVar('TEZI_ROOT_FSOPTS'),
               "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
               "uncompressed_size": get_uncompressed_size(d, d.getVar('TEZI_ROOT_NAME'))
             }
