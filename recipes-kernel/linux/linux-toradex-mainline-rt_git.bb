@@ -1,4 +1,4 @@
-LINUX_VERSION ?= "v6.1-rc7-rt5"
+LINUX_VERSION ?= "6.1.12-rt7"
 require recipes-kernel/linux/linux-toradex-mainline_git.bb
 
 SUMMARY = "Toradex mainline real-time Linux kernel"
@@ -7,11 +7,10 @@ SUMMARY = "Toradex mainline real-time Linux kernel"
 
 LINUX_REPO = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git"
 KBRANCH = "linux-6.1.y-rt"
-SRCREV_machine = "ab6918479c58dcaaebc5998301492a55e626b720"
+SRCREV_machine = "5802a509437aef7a9a0bfef11c58068cd214f6e4"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 SRC_URI:append = " \
     file://preempt-rt.scc \
     file://preempt-rt-less-latency.scc \
-    file://0001-Revert-ARM-dts-imx7-Fix-NAND-controller-size-cells.patch \
 "
