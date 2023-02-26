@@ -1,4 +1,4 @@
-From 07558dd2a672caca882d6a6ac03a1d7f061f6a1a Mon Sep 17 00:00:00 2001
+From 509dccde2a1cc4ac7d5099ca7aea9ec05c6f7e4f Mon Sep 17 00:00:00 2001
 From: Francesco Dolcini <francesco.dolcini@toradex.com>
 Date: Wed, 20 Apr 2022 11:13:00 +0200
 Subject: [PATCH] thermal: imx: Update critical temp threshold
@@ -18,10 +18,10 @@ Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/thermal/imx_thermal.c b/drivers/thermal/imx_thermal.c
-index fb0d5cab70af..0ff8cbedf560 100644
+index 16663373b682..75a631a23e61 100644
 --- a/drivers/thermal/imx_thermal.c
 +++ b/drivers/thermal/imx_thermal.c
-@@ -485,11 +485,11 @@ static void imx_init_temp_grade(struct platform_device *pdev, u32 ocotp_mem0)
+@@ -504,10 +504,10 @@ static void imx_init_temp_grade(struct platform_device *pdev, u32 ocotp_mem0)
  	}
  
  	/*
@@ -29,12 +29,11 @@ index fb0d5cab70af..0ff8cbedf560 100644
 +	 * Set the critical trip point at max
  	 * Set the passive trip point at 10 °C under max (changeable via sysfs)
  	 */
- 	trips[IMX_TRIP_PASSIVE].temperature = data->temp_max - (1000 * 10);
--	trips[IMX_TRIP_CRITICAL].temperature = data->temp_max - (1000 * 5);
-+	trips[IMX_TRIP_CRITICAL].temperature = data->temp_max;
+-	data->temp_critical = data->temp_max - (1000 * 5);
++	data->temp_critical = data->temp_max;
+ 	data->temp_passive = data->temp_max - (1000 * 10);
  }
  
- static int imx_init_from_tempmon_data(struct platform_device *pdev)
 -- 
-2.35.3
+2.25.1
 

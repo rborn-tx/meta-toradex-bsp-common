@@ -1,5 +1,6 @@
 LINUX_VERSION ?= "6.2-rc"
 require recipes-kernel/linux/linux-toradex-mainline_git.bb
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-git:"
 
 SUMMARY = "Toradex mainline real-time Linux kernel"
 # To build the RT kernel we use the RT kernel git repo rather than applying
