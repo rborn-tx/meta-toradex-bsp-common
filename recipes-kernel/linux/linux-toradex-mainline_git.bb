@@ -45,10 +45,10 @@ SRC_URI:append = " \
     file://0002-media-i2c-ov5640-Implement-get_mbus_config.patch \
 "
 
-LINUX_VERSION ?= "6.1.14"
+LINUX_VERSION ?= "6.1.22"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "7d54cb2c26dad1264ecca85992bfe8984df4b7b5"
+SRCREV_machine = "3b29299e5f604550faf3eff811d6cd60b4c6cae6"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
