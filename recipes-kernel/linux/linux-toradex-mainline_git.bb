@@ -29,6 +29,8 @@ SRC_URI:append = " \
     file://0001-thermal-imx-Update-critical-temp-threshold.patch \
     file://0001-Revert-drm-panel-simple-drop-use-of-data-mapping-pro.patch \
     file://0002-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
+    file://0001-media-v4l2-async-fix-binding-async-subdevs-with-mult.patch \
+    file://0002-media-i2c-ov5640-Implement-get_mbus_config.patch \
 "
 
 LINUX_VERSION ?= "6.3-rc"
