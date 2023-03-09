@@ -1,0 +1,107 @@
+From ba50876f7b4fd05b51b19a6774ff6748ba9b6902 Mon Sep 17 00:00:00 2001
+From: Philipp Zabel <p.zabel@pengutronix.de>
+Date: Wed, 10 Aug 2022 12:48:48 +0200
+Subject: [PATCH 1/2] media: v4l2-async: fix binding async subdevs with
+ multiple source ports
+
+Asynchronous subdevice probing on imx-media with imx6-mipi-csi2 is
+broken since commit 1f391df44607 ("media: v4l2-async: Use endpoints in
+__v4l2_async_nf_add_fwnode_remote()").
+
+This is a side effect of imx6-mipi-csi2 having a single subdevice with
+four separate source ports connected to different subdevices. Before,
+the imx-media-csi and video-mux devices registered async sub-devices
+via device fwnode that matched the imx6-mipi-csi2 device on their
+respective notifiers. This caused the first asd to be put on the
+notifier waiting list, and the other three to return -EEXIST and be
+ignored.
+
+With async subdev registration via endpoint fwnode, all four asds are
+distinct and three of them keep dangling on their notifiers after the
+first one is bound.
+
+This patch modifies __v4l2_async_nf_has_async_subdev() to consider
+asds matching different fwnode endpoints of the same sub-device equal
+if the latter is already bound and matches via device fwnode. Further,
+v4l2_async_register_subdev() is modified to remove dangling duplicate
+asds that were registered before the sub-device was available to check
+its fwnode.
+
+Fixes: 1f391df44607 ("media: v4l2-async: Use endpoints in __v4l2_async_nf_add_fwnode_remote()")
+Signed-off-by: Philipp Zabel <p.zabel@pengutronix.de>
+Upstream-Status: Submitted [https://lore.kernel.org/all/20220810104848.846783-1-p.zabel@pengutronix.de/]
+---
+ drivers/media/v4l2-core/v4l2-async.c | 43 ++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+
+diff --git a/drivers/media/v4l2-core/v4l2-async.c b/drivers/media/v4l2-core/v4l2-async.c
+index 2f1b718a9189..b24220ed7077 100644
+--- a/drivers/media/v4l2-core/v4l2-async.c
++++ b/drivers/media/v4l2-core/v4l2-async.c
+@@ -452,6 +452,22 @@ __v4l2_async_nf_has_async_subdev(struct v4l2_async_notifier *notifier,
+ 
+ 		if (asd_equal(asd, sd->asd))
+ 			return true;
++
++		/*
++		 * If the asd matches an endpoint fwnode, handle sub-devices
++		 * with device fwnode that were already matched by another asd
++		 * with a different endpoint fwnode on the same device.
++		 */
++		if (asd->match_type == V4L2_ASYNC_MATCH_FWNODE &&
++		    fwnode_graph_is_endpoint(asd->match.fwnode) &&
++		    sd->fwnode && !fwnode_graph_is_endpoint(sd->fwnode)) {
++			struct fwnode_handle *devnode;
++
++			devnode = fwnode_graph_get_port_parent(asd->match.fwnode);
++			fwnode_handle_put(devnode);
++			if (devnode == sd->fwnode)
++				return true;
++		}
+ 	}
+ 
+ 	return false;
+@@ -749,6 +765,24 @@ __v4l2_async_nf_add_i2c(struct v4l2_async_notifier *notifier, int adapter_id,
+ }
+ EXPORT_SYMBOL_GPL(__v4l2_async_nf_add_i2c);
+ 
++static void v4l2_async_remove_duplicate_matches(struct v4l2_subdev *sd)
++{
++	struct v4l2_async_notifier *notifier;
++
++	lockdep_assert_held(&list_lock);
++
++	list_for_each_entry(notifier, &notifier_list, list) {
++		struct v4l2_async_subdev *asd;
++
++		asd = v4l2_async_find_match(notifier, sd);
++		if (!asd)
++			continue;
++
++		/* Remove from the waiting list */
++		list_del(&asd->list);
++	}
++}
++
+ int v4l2_async_register_subdev(struct v4l2_subdev *sd)
+ {
+ 	struct v4l2_async_notifier *subdev_notifier;
+@@ -783,6 +817,15 @@ int v4l2_async_register_subdev(struct v4l2_subdev *sd)
+ 		if (ret)
+ 			goto err_unbind;
+ 
++		/*
++		 * At this point the asd is removed from the notifier wait list.
++		 * There might be other notifiers with asds matching different
++		 * fwnode endpoints of the same sd remaining. If the sd matches
++		 * by device fwnode, remove the dangling asds.
++		 */
++		if (sd->fwnode && !fwnode_graph_is_endpoint(sd->fwnode))
++			v4l2_async_remove_duplicate_matches(sd);
++
+ 		ret = v4l2_async_nf_try_complete(notifier);
+ 		if (ret)
+ 			goto err_unbind;
+-- 
+2.34.1
+
