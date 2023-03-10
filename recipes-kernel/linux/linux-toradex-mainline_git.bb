@@ -31,10 +31,10 @@ SRC_URI:append = " \
     file://0002-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
 "
 
-LINUX_VERSION ?= "6.2-rc"
+LINUX_VERSION ?= "6.3-rc"
 KBRANCH = "master"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "1b929c02afd37871d5afb9d498426f83432e71c2"
+SRCREV_machine = "fe15c26ee26efa11741a7b632e9f23b01aca4cc6"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
