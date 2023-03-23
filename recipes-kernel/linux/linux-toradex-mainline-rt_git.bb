@@ -7,8 +7,8 @@ SUMMARY = "Toradex mainline real-time Linux kernel"
 # the RT patch on top of a vanilla kernel.
 
 LINUX_REPO = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git"
-KBRANCH = "linux-6.3.y-rt"
-SRCREV_machine = "c0ca8b79d21d0c9a1ac7ed0ebebb5588804ba825"
+KBRANCH = "linux-6.4.y-rt"
+SRCREV_machine = "d37d728e9a66af49b62f3ce6c3b8cd790c221c4f"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 SRC_URI:append = " \
