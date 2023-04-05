@@ -7,7 +7,7 @@ ACTION=="add|change", KERNEL=="ttyS[0-9]*", KERNELS=="2810000.serial", SYMLINK+=
 #ACTION=="add|change", KERNEL=="ttyS[0-9]*", KERNELS=="2b300000.serial", SYMLINK+="verdin-uart2"
 ACTION=="add|change", KERNEL=="ttyS[0-9]*", KERNELS=="2800000.serial", SYMLINK+="verdin-uart3"
 ACTION=="add|change", KERNEL=="ttyS[0-9]*", KERNELS=="4a00000.serial", SYMLINK+="verdin-uart4"
-#ACTION=="add|change", KERNELS=="watchdog", SYMLINK+="verdin-watchdog"
+ACTION=="add|change", KERNELS=="watchdog", SYMLINK+="verdin-watchdog", SYMLINK+="verdin-watchdog-soc"
 ACTION=="add|change", SUBSYSTEM=="spidev", KERNELS=="20110000.*spi", SYMLINK+="verdin-spi-cs%n"
 KERNEL=="mmcblk[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="fa10000.mmc", SYMLINK+="emmc"
 KERNEL=="mmcblk[0-9]boot[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="fa10000.mmc", SYMLINK+="emmc-boot%n"
