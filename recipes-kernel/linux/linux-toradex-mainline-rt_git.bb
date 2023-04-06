@@ -1,4 +1,4 @@
-LINUX_VERSION ?= "6.1.12-rt7"
+LINUX_VERSION ?= "6.1.26-rt8"
 require recipes-kernel/linux/linux-toradex-mainline_git.bb
 
 SUMMARY = "Toradex mainline real-time Linux kernel"
@@ -7,7 +7,7 @@ SUMMARY = "Toradex mainline real-time Linux kernel"
 
 LINUX_REPO = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-stable-rt.git"
 KBRANCH = "v6.1-rt"
-SRCREV_machine = "5802a509437aef7a9a0bfef11c58068cd214f6e4"
+SRCREV_machine = "48e5445f07d6aadb97fd2d6cb34f378ff7f2cbe0"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 SRC_URI:append = " \
