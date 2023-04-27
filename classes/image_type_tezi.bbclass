@@ -139,24 +139,24 @@ def rootfs_tezi_emmc(d, use_bootfiles):
     emmcdevboot0 = d.getVar('EMMCDEVBOOT0')
     imagename = d.getVar('IMAGE_LINK_NAME')
     offset_bootrom = d.getVar('OFFSET_BOOTROM_PAYLOAD')
-    offset_tpl = d.getVar('OFFSET_TPL_PAYLOAD')
+    offset_fw = d.getVar('OFFSET_FW_PAYLOAD')
     offset_spl = d.getVar('OFFSET_SPL_PAYLOAD')
 
     bootpart_rawfiles = []
     filesystem_partitions = []
 
     offset_payload = offset_bootrom
-    if offset_tpl: 
-        # TPL_BINARY contain product_id <-> filename mapping
-        tplmapping = d.getVarFlags('TPL_BINARY')
-        for f, v in tplmapping.items():
+    if offset_fw:
+        # FIRMWARE_BINARY contain product_id <-> filename mapping
+        fwmapping = d.getVarFlags('FIRMWARE_BINARY')
+        for f, v in fwmapping.items():
             bootpart_rawfiles.append(
               {
                 "filename": v,
                 "dd_options": "seek=" + offset_payload,
                 "product_ids": f
               })
-        offset_payload = offset_tpl
+        offset_payload = offset_fw
     if offset_spl:
         bootpart_rawfiles.append(
               {
@@ -341,15 +341,15 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
         json.dump(data, outfile, indent=4)
     bb.note("Toradex Easy Installer metadata file {0} written.".format(json_file))
 
-def tpl_binaries(d):
-    tplmapping = d.getVarFlags('TPL_BINARY')
+def fw_binaries(d):
+    fwmapping = d.getVarFlags('FIRMWARE_BINARY')
 
-    if tplmapping is not None:
-        tpl_bins = []
-        for key, val in tplmapping.items():
-            if val not in tpl_bins:
-                tpl_bins.append(val)
-        return " " + " ".join(tpl_bins)
+    if fwmapping is not None:
+        fw_bins = []
+        for key, val in fwmapping.items():
+            if val not in fw_bins:
+                fw_bins.append(val)
+        return " " + " ".join(fw_bins)
     else:
         return ""
 
@@ -371,7 +371,7 @@ python rootfs_tezi_run_json() {
         uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
         uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
         # TODO: Multi image/raw NAND with SPL currently not supported
-        uboot_file += tpl_binaries(d);
+        uboot_file += fw_binaries(d);
         uboot_file += " " + d.getVar('SPL_BINARY') if d.getVar('OFFSET_SPL_PAYLOAD') else ""
         artifacts += " " + "%s/%s.%s" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME'), d.getVar('TEZI_BOOT_SUFFIX')) if use_bootfiles else ""
     else:
