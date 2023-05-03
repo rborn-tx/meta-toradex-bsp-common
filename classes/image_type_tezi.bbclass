@@ -47,8 +47,10 @@ UBOOT_ENV_TEZI_RAWNAND ?= "${UBOOT_ENV_TEZI}"
 DISTRO_FLAVOUR ??= ""
 SUMMARY:append = "${DISTRO_FLAVOUR}"
 
-TEZI_EULA_URL ?= "https://www.nxp.com/docs/en/disclaimer/LA_OPT_NXP_SW.html"
-export TEZI_EULA_URL
+TEZI_EULA_FILE ?= "LA_OPT_NXP_SW.html"
+TEZI_EULA_FILE:ti-soc ?= "TI-TFL.txt"
+TEZI_EULA_URL ?= "https://www.nxp.com/docs/en/disclaimer/${TEZI_EULA_FILE}"
+TEZI_EULA_URL:ti-soc ?= ""
 
 # Append tar command to store uncompressed image size to ${T}.
 # If a custom rootfs type is used make sure this file is created
@@ -308,8 +310,7 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
     if os.path.exists(os.path.join(deploydir, "toradexlinux.png")):
         data["icon"] = "toradexlinux.png"
     if d.getVar('TEZI_SHOW_EULA_LICENSE')  == "1":
-        url = d.getVar('TEZI_EULA_URL')
-        data["license"] = os.path.basename(url)
+        data["license"] = d.getVar('TEZI_EULA_FILE')
 
     product_ids = d.getVar('TORADEX_PRODUCT_IDS')
     if product_ids is None:
@@ -388,8 +389,9 @@ IMAGE_CMD:teziimg () {
 	# Copy image json file to ${WORKDIR}/image-json
 	cp ${IMGDEPLOYDIR}/image*.json ${WORKDIR}/image-json/image.json
 
-	curl -k --retry 5 -O ${TEZI_EULA_URL} || true
-	EULA_FILE=$(echo "${TEZI_EULA_URL##*/}")
+	if [ -n "$TEZI_EULA_URL" ]; then
+		curl -k --retry 5 -O ${TEZI_EULA_URL} || true
+	fi
 
 	# The first transform strips all folders from the files to tar, the
 	# second transform "moves" them in a subfolder ${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.
@@ -397,7 +399,7 @@ IMAGE_CMD:teziimg () {
 		--transform='s/.*\///' \
 		--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
 		-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
-		toradexlinux.png marketing.tar prepare.sh wrapup.sh ${EULA_FILE} \
+		toradexlinux.png marketing.tar prepare.sh wrapup.sh ${TEZI_EULA_FILE} \
 		${WORKDIR}/image-json/image.json ${TEZI_ARTIFACTS}
 }
 do_image_teziimg[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
