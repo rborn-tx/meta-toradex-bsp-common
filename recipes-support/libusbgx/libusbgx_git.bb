@@ -11,11 +11,12 @@ DEPENDS = "libconfig"
 EXTRA_OECONF = "--includedir=${includedir}/usbgx"
 
 PV = "0.2.0+git${SRCPV}"
-SRCREV = "36e71e1e1ea9fb18d4765d0376329dcde90c8c91"
+SRCREV = "721e3a1cbd7e2b6361bb439d3959e7403e4f0092"
 SRCBRANCH = "master"
 SRC_URI = " \
     git://github.com/libusbgx/libusbgx.git;branch=${SRCBRANCH};protocol=https \
     file://0001-libusbgx-Add-interface-name-for-NCM-Feature-Descript.patch \
+    file://0001-fix-stack-buffer-overflow-in-usbg_f_foo_attr_val-pro.patch \
     file://usbg.service \
     file://g1.schema.in \
 "
