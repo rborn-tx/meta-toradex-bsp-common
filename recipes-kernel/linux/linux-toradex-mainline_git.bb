@@ -43,6 +43,8 @@ SRC_URI:append = " \
     file://0002-arm64-dts-imx8mp-verdin-Add-yavia-carrier-board.patch \
     file://0001-media-v4l2-async-fix-binding-async-subdevs-with-mult.patch \
     file://0002-media-i2c-ov5640-Implement-get_mbus_config.patch \
+    file://0001-Revert-usb-gadget-udc-core-Prevent-redundant-calls-t.patch \
+    file://0002-Revert-usb-gadget-udc-core-Invoke-usb_gadget_connect.patch \
 "
 
 LINUX_VERSION ?= "6.1.27"
