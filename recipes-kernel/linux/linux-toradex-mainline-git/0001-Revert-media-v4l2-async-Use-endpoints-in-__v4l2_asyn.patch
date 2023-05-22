@@ -1,0 +1,40 @@
+From 3557195151f8a5de785dc75c26aea30288473c5b Mon Sep 17 00:00:00 2001
+From: Aishwarya Kothari <aishwaryakothari75@gmail.com>
+Date: Mon, 22 May 2023 11:17:34 +0200
+Subject: [PATCH] Revert "media: v4l2-async: Use endpoints in
+ __v4l2_async_nf_add_fwnode_remote()"
+
+linux-toradex-mainline: fix hdmi-csi bridge with imx6
+
+Revert f446077d62514ee29f75970dff3d55a432.
+
+This reverted commit breaks the async subdevice probing that is needed
+by TC358743 HDMI to MIPI-CSI2 bridge on Apalis iMX6. See [1] for details.
+
+The V4L2 async framework for the iMX6 seem to be fixed by [2]
+patch series, that it is not yet merged.
+While waiting for this patch series to be merged we revert this single commit.
+
+[1] https://lore.kernel.org/all/8360125.31r3eYUQgx@steina-w/
+[2] https://lore.kernel.org/all/20230525091615.2324824-1-sakari.ailus@linux.intel.com/
+
+---
+ drivers/media/v4l2-core/v4l2-async.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/v4l2-core/v4l2-async.c b/drivers/media/v4l2-core/v4l2-async.c
+index 008a2a3e312e..0c88d2594671 100644
+--- a/drivers/media/v4l2-core/v4l2-async.c
++++ b/drivers/media/v4l2-core/v4l2-async.c
+@@ -713,7 +713,7 @@ __v4l2_async_nf_add_fwnode_remote(struct v4l2_async_notifier *notif,
+ 	struct v4l2_async_subdev *asd;
+ 	struct fwnode_handle *remote;
+ 
+-	remote = fwnode_graph_get_remote_endpoint(endpoint);
++	remote = fwnode_graph_get_remote_port_parent(endpoint);
+ 	if (!remote)
+ 		return ERR_PTR(-ENOTCONN);
+ 
+-- 
+2.34.1
+
