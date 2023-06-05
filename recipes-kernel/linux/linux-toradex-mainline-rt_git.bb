@@ -1,4 +1,4 @@
-LINUX_VERSION ?= "6.3-rc"
+LINUX_VERSION ?= "6.5-rc"
 require recipes-kernel/linux/linux-toradex-mainline_git.bb
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-git:"
 
@@ -7,8 +7,8 @@ SUMMARY = "Toradex mainline real-time Linux kernel"
 # the RT patch on top of a vanilla kernel.
 
 LINUX_REPO = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git"
-KBRANCH = "linux-6.4.y-rt"
-SRCREV_machine = "d37d728e9a66af49b62f3ce6c3b8cd790c221c4f"
+KBRANCH = "linux-6.5.y-rt"
+SRCREV_machine = "16ae0de52ef9f7e5c2cd7e8443f5195c176353ea"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 SRC_URI:append = " \
