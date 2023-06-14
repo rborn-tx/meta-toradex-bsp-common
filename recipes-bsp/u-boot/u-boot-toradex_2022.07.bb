@@ -26,6 +26,7 @@ TDX_PATCHES = " \
     file://0001-ARM-imx8mp-verdin-imx8mp-Add-memory-size-detection.patch \
     file://0001-apalis-colibri_imx6-imx6ull-_imx7-update-env-memory-.patch \
     file://0001-configs-colibri-imx7-Fix-bad-block-table-in-flash-co.patch \
+    file://0001-colibri_imx6-fix-RALAT-and-WALAT-values.patch \
 "
 # patches which are not (yet) in the latest master
 TDX_PATCHES:use-head-next = " \
