@@ -146,11 +146,15 @@ def rootfs_tezi_emmc(d, use_bootfiles):
     filesystem_partitions = []
 
     offset_payload = offset_bootrom
-    if offset_tpl:
-        bootpart_rawfiles.append(
+    if offset_tpl: 
+        # TPL_BINARY contain product_id <-> filename mapping
+        tplmapping = d.getVarFlags('TPL_BINARY')
+        for f, v in tplmapping.items():
+            bootpart_rawfiles.append(
               {
-                "filename": d.getVar('TPL_BINARY'),
-                "dd_options": "seek=" + offset_payload
+                "filename": v,
+                "dd_options": "seek=" + offset_payload,
+                "product_ids": f
               })
         offset_payload = offset_tpl
     if offset_spl:
@@ -337,6 +341,18 @@ def rootfs_tezi_json(d, flash_type, flash_data, json_file, uenv_file):
         json.dump(data, outfile, indent=4)
     bb.note("Toradex Easy Installer metadata file {0} written.".format(json_file))
 
+def tpl_binaries(d):
+    tplmapping = d.getVarFlags('TPL_BINARY')
+
+    if tplmapping is not None:
+        tpl_bins = []
+        for key, val in tplmapping.items():
+            if val not in tpl_bins:
+                tpl_bins.append(val)
+        return " " + " ".join(tpl_bins)
+    else:
+        return ""
+
 python rootfs_tezi_run_json() {
     artifacts = "%s/%s.%s" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME'), d.getVar('TEZI_ROOT_SUFFIX'))
     flash_type = d.getVar('TORADEX_FLASH_TYPE')
@@ -355,7 +371,7 @@ python rootfs_tezi_run_json() {
         uenv_file = d.getVar('UBOOT_ENV_TEZI_EMMC')
         uboot_file = d.getVar('UBOOT_BINARY_TEZI_EMMC')
         # TODO: Multi image/raw NAND with SPL currently not supported
-        uboot_file += " " + d.getVar('TPL_BINARY') if d.getVar('OFFSET_TPL_PAYLOAD') else ""
+        uboot_file += tpl_binaries(d);
         uboot_file += " " + d.getVar('SPL_BINARY') if d.getVar('OFFSET_SPL_PAYLOAD') else ""
         artifacts += " " + "%s/%s.%s" % (d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME'), d.getVar('TEZI_BOOT_SUFFIX')) if use_bootfiles else ""
     else:
