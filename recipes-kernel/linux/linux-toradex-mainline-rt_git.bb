@@ -7,7 +7,7 @@ SUMMARY = "Toradex mainline real-time Linux kernel"
 
 LINUX_REPO = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-stable-rt.git"
 KBRANCH = "v6.1-rt"
-SRCREV_machine = "3f9ca5f166e5796bd21176f356a479e505ce7760"
+SRCREV_machine = "7c574e2eb052aa39ba796334bf95c0baa9479411"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 SRC_URI:append = " \
