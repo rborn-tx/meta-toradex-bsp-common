@@ -39,6 +39,8 @@ inherit devicetree
 S = "${WORKDIR}/git/overlays"
 DT_FILES_PATH = "${WORKDIR}/machine-overlays"
 DT_INCLUDE:append = " ${S}"
+KERNEL_DTB_PREFIX ??= ""
+KERNEL_INCLUDE:append = " ${STAGING_KERNEL_DIR}/arch/${ARCH}/boot/dts/${KERNEL_DTB_PREFIX}"
 
 # The machine specific recipes start with MACHINE_PREFIX}[_-]
 MACHINE_PREFIX = "${MACHINE}"
