@@ -5,9 +5,10 @@
 # Since it also generates the image.json description file it is rather
 # interwind with the boot flow which is U-Boot target specific.
 
+KERNEL_DEVICETREE_BASENAME = "${@make_dtb_boot_files(d)}"
 WKS_FILE_DEPENDS:append = " tezi-metadata virtual/dtb"
 DEPENDS += "${WKS_FILE_DEPENDS}"
-IMAGE_BOOT_FILES_REMOVE = "${@make_dtb_boot_files(d) if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else ''}"
+IMAGE_BOOT_FILES_REMOVE = "${KERNEL_DEVICETREE_BASENAME} if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else ''}"
 IMAGE_BOOT_FILES:append = " overlays.txt ${@'' if d.getVar('KERNEL_IMAGETYPE') == 'fitImage' else 'overlays/*;overlays/'}"
 IMAGE_BOOT_FILES:remove = "${IMAGE_BOOT_FILES_REMOVE}"
 
@@ -364,7 +365,7 @@ python rootfs_tezi_run_json() {
         flash_data = rootfs_tezi_rawnand(d)
         uenv_file = d.getVar('UBOOT_ENV_TEZI_RAWNAND')
         uboot_file = d.getVar('UBOOT_BINARY_TEZI_RAWNAND')
-        artifacts += " " + d.getVar('KERNEL_IMAGETYPE') + " " + d.getVar('KERNEL_DEVICETREE')
+        artifacts += " " + d.getVar('KERNEL_IMAGETYPE') + " " + d.getVar('KERNEL_DEVICETREE_BASENAME')
     elif flash_type == "emmc":
         use_bootfiles = oe.types.boolean(d.getVar('TEZI_USE_BOOTFILES'))
         flash_data = rootfs_tezi_emmc(d, use_bootfiles)
