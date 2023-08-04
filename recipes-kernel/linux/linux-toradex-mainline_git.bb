@@ -46,10 +46,10 @@ SRC_URI:append = " \
     file://0001-Revert-media-v4l2-async-Use-endpoints-in-__v4l2_asyn.patch \
 "
 
-LINUX_VERSION ?= "6.1.37"
+LINUX_VERSION ?= "6.1.50"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "d2a6dc4eaf6d50ba32a9b39b4c6ec713a92072ab"
+SRCREV_machine = "a2943d2d9a00ae7c5c1fde2b2e7e9cdb47e7db05"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
