@@ -31,6 +31,7 @@ TDX_PATCHES = " \
 # patches which are not (yet) in the latest master
 TDX_PATCHES:use-head-next = " \
 "
+SRC_URI = "git://source.denx.de/u-boot/u-boot.git;protocol=https;branch=master"
 SRC_URI:append = " ${TDX_PATCHES}"
 SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \
     file://0001-colibri_imx7-boot-linux-kernel-in-secure-mode.patch \
