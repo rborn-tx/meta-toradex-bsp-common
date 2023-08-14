@@ -5,7 +5,7 @@ Requires=sys-kernel-config.mount
 After=sys-kernel-config.mount
 
 [Service]
-Type=simple
+Type=oneshot
 ExecStart=/usr/bin/gadget-import g1 /etc/usbg/g1.schema
 ExecStartPost=/bin/sh -c '/bin/echo $((0x4000+$(expr $(tr -d "\0" < /proc/device-tree/toradex,product-id) + 0))) > \
                                     /sys/kernel/config/usb_gadget/g1/idProduct'
