@@ -47,20 +47,12 @@ KCONFIG_MODE="--alldefconfig"
 # Load USB functions configurable through configfs (CONFIG_USB_CONFIGFS)
 KERNEL_MODULE_AUTOLOAD += "${@bb.utils.contains('COMBINED_FEATURES', 'usbgadget', ' libcomposite', '',d)}"
 
-inherit kernel-yocto kernel pkgconfig toradex-kernel-localversion
+inherit kernel-yocto kernel pkgconfig toradex-kernel-deploy-config toradex-kernel-localversion
 
 # Additional file deployed by recent mainline kernels
 FILES:${KERNEL_PACKAGE_NAME}-base += "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.builtin.modinfo"
-
-KERNEL_CONFIG_NAME ?= "${KERNEL_PACKAGE_NAME}-config-${KERNEL_ARTIFACT_NAME}"
-KERNEL_CONFIG_LINK_NAME ?= "${KERNEL_PACKAGE_NAME}-config"
 
 export DTC_FLAGS = "-@"
 
 # kconfiglib.KconfigError: init/Kconfig:70: error: couldn't parse 'default $(shell,$(srctree)/scripts/rust-version.sh $(RUSTC))': macro expanded to blank string
 do_kernel_configcheck[noexec] = "1"
-
-do_deploy:append() {
-    cp -a ${B}/.config ${DEPLOYDIR}/${KERNEL_CONFIG_NAME}
-    ln -sf ${KERNEL_CONFIG_NAME} ${DEPLOYDIR}/${KERNEL_CONFIG_LINK_NAME}
-}
