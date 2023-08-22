@@ -4,8 +4,8 @@
 #
 # The following options are supported:
 #
-#  SCMVERSION        Puts the Git hash in kernel local version
-#  LOCALVERSION      Value used in LOCALVERSION
+#  SCMVERSION           Puts the Git hash in kernel local version
+#  KERNEL_LOCALVERSION  Value used in LOCALVERSION by the oe kernel classes
 #
 # Copyright 2014, 2015 (C) O.S. Systems Software LTDA.
 # Copyright 2019 (C) Toradex AG
@@ -14,11 +14,15 @@ inherit toradex-kernel-config
 
 TDX_VERSION ??= "0"
 SCMVERSION ??= "y"
-LOCALVERSION ?= "-${TDX_VERSION}"
+# mute the meta-freescale/classes/fsl-kernel-localversion settings, otherwise
+# with latest master we get -${TDX_VERSION} twice in the resulting version.
+LINUX_VERSION_EXTENSION = ""
+do_kernel_localversion() {
+	:
+}
 
 kernel_do_configure:append() {
-	kernel_configure_variable LOCALVERSION "\"${LOCALVERSION}\""
-
+	kernel_configure_variable LOCALVERSION "\"-${TDX_VERSION}\""
 	if [ "${SCMVERSION}" = "y" ]; then
 		# Add GIT revision to the local version
 		# SRCREV_machine is used in kernel recipes using kernel-yocto.bbclass,
