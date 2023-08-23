@@ -1,17 +1,8 @@
-require recipes-bsp/u-boot/u-boot-common.inc
-require recipes-bsp/u-boot/u-boot.inc
-BINMAN_HANDLING = ""
-BINMAN_HANDLING:ti-soc = "recipes-bsp/u-boot/binman-ti.inc"
-require ${BINMAN_HANDLING}
-
-LIC_FILES_CHKSUM = "file://Licenses/README;md5=2ca5f2c35c8cc335f0a19756634782f1"
-DEPENDS += "bc-native dtc-native"
+require u-boot-toradex-common.inc
 
 # hash of release v2022.07"
-PV = "2022.07"
 SRCREV = "e092e3250270a1016c877da7bdd9384f14b1321e"
-SRCREV:use-head-next = "${AUTOREV}"
-# patches which are not (yet) in the used stable version
+# patches which are not in the used stable version
 TDX_PATCHES = " \
     file://0001-toradex-tdx-cfg-block-use-only-snprintf.patch \
     file://0002-toradex-tdx-cfg-block-use-defines-for-string-length.patch \
@@ -31,60 +22,3 @@ TDX_PATCHES = " \
     file://0001-configs-colibri-imx7-Fix-bad-block-table-in-flash-co.patch \
     file://0001-colibri_imx6-fix-RALAT-and-WALAT-values.patch \
 "
-# patches which are not (yet) in the latest master
-TDX_PATCHES:use-head-next = " \
-"
-SRC_URI = "git://source.denx.de/u-boot/u-boot.git;protocol=https;branch=master"
-SRC_URI:append = " ${TDX_PATCHES}"
-
-inherit toradex-u-boot-localversion
-
-UBOOT_INITIAL_ENV = "u-boot-initial-env"
-
-PADDING_DIR = "${B}"
-nand_padding () {
-    # pad the end of U-Boot with 0x00 up to the the end of the CSF area
-    #PAD_END=$(echo -n "0x"; od -X  -j 0x24 -N 4 u-boot.imx | sed -e '/................/!d' -e 's/........\(.*\)/\1/')
-    #PAD_END=$(( $PAD_END - 0x400 ))
-    #objcopy -I binary -O binary --pad-to $PAD_END u-boot.imx u-boot.imx.zero-padded
-    # assume that the above never need more than 10k of padding and skip the
-    # shell magic to get a correct size.
-    dd bs=10k count=1 if=/dev/zero | cat ${PADDING_DIR}/u-boot.imx - > ${PADDING_DIR}/u-boot.imx.zero-padded
-
-    # U-Boot is flashed 1k into a NAND block, create a binary which prepends
-    # U-boot with 1k of zeros to ease flashing
-    dd bs=1024 count=1 if=/dev/zero | cat - ${PADDING_DIR}/u-boot.imx.zero-padded > ${PADDING_DIR}/u-boot-nand.imx
-}
-
-# build imx-boot from within U-Boot
-inherit ${@oe.utils.ifelse(d.getVar('UBOOT_PROVIDES_BOOT_CONTAINER') == '1', 'imx-boot-container', '')}
-
-do_compile:append:colibri-imx6ull () {
-    nand_padding
-}
-
-do_compile:append:colibri-imx7 () {
-    nand_padding
-}
-
-BOOT_TOOLS = "imx-boot-tools"
-do_deploy:append:mx8m-generic-bsp() {
-    # Deploy u-boot-nodtb.bin and fsl-imx8m*-XX.dtb for mkimage to generate boot binary
-    if [ -n "${UBOOT_CONFIG}" ]
-    then
-        for config in ${UBOOT_MACHINE}; do
-            i=$(expr $i + 1);
-            for type in ${UBOOT_CONFIG}; do
-                j=$(expr $j + 1);
-                if [ $j -eq $i ]
-                then
-                    install -d ${DEPLOYDIR}/${BOOT_TOOLS}
-                    install -m 0777 ${B}/${config}/arch/arm/dts/${UBOOT_DTB_NAME}  ${DEPLOYDIR}/${BOOT_TOOLS}
-                    install -m 0777 ${B}/${config}/u-boot-nodtb.bin  ${DEPLOYDIR}/${BOOT_TOOLS}/u-boot-nodtb.bin-${MACHINE}-${type}
-                fi
-            done
-            unset  j
-        done
-        unset  i
-    fi
-}
