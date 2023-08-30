@@ -56,28 +56,6 @@ nand_padding () {
     dd bs=1024 count=1 if=/dev/zero | cat - ${PADDING_DIR}/u-boot.imx.zero-padded > ${PADDING_DIR}/u-boot-nand.imx
 }
 
-deploy_uboot_with_spl () {
-    #Deploy u-boot-with-spl.imx
-    if [ -n "${UBOOT_CONFIG}" ]
-    then
-        for config in ${UBOOT_MACHINE}; do
-            i=$(expr $i + 1);
-            for type in ${UBOOT_CONFIG}; do
-                j=$(expr $j + 1);
-                if [ $j -eq $i ]
-                then
-                    install -D -m 644 ${B}/${config}/u-boot-with-spl.imx ${DEPLOYDIR}/u-boot-with-spl.imx-${MACHINE}-${type}
-                    ln -sf u-boot-with-spl.imx-${MACHINE}-${type} ${DEPLOYDIR}/u-boot-with-spl.imx
-                fi
-            done
-            unset  j
-        done
-        unset  i
-    else
-        install -D -m 644 ${B}/${config}/u-boot-with-spl.imx ${DEPLOYDIR}/u-boot-with-spl.imx
-    fi
-}
-
 # build imx-boot from within U-Boot
 inherit ${@oe.utils.ifelse(d.getVar('UBOOT_PROVIDES_BOOT_CONTAINER') == '1', 'imx-boot-container', '')}
 
@@ -87,14 +65,6 @@ do_compile:append:colibri-imx6ull () {
 
 do_compile:append:colibri-imx7 () {
     nand_padding
-}
-
-do_deploy:append:colibri-imx6 () {
-    deploy_uboot_with_spl
-}
-
-do_deploy:append:apalis-imx6 () {
-    deploy_uboot_with_spl
 }
 
 BOOT_TOOLS = "imx-boot-tools"
