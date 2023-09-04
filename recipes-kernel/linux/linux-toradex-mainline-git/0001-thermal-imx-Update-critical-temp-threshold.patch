@@ -1,7 +1,7 @@
-From 07558dd2a672caca882d6a6ac03a1d7f061f6a1a Mon Sep 17 00:00:00 2001
+From 212abec626e1c82616a1cf6e492e467cf79aef23 Mon Sep 17 00:00:00 2001
 From: Francesco Dolcini <francesco.dolcini@toradex.com>
 Date: Wed, 20 Apr 2022 11:13:00 +0200
-Subject: [PATCH] thermal: imx: Update critical temp threshold
+Subject: [PATCH 1/4] thermal: imx: Update critical temp threshold
 
 Increase the critical temperature threshold to the datasheet defined
 value according to the temperature grade of the SoC, increasing the
@@ -18,10 +18,10 @@ Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/thermal/imx_thermal.c b/drivers/thermal/imx_thermal.c
-index fb0d5cab70af..0ff8cbedf560 100644
+index 826358cbe810..4fcbf15b2768 100644
 --- a/drivers/thermal/imx_thermal.c
 +++ b/drivers/thermal/imx_thermal.c
-@@ -485,11 +485,11 @@ static void imx_init_temp_grade(struct platform_device *pdev, u32 ocotp_mem0)
+@@ -458,11 +458,11 @@ static void imx_init_temp_grade(struct platform_device *pdev, u32 ocotp_mem0)
  	}
  
  	/*
