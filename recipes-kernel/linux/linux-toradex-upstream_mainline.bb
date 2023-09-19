@@ -1,4 +1,9 @@
-require linux-toradex-mainline-common.inc
+# This builds latest head of linux master
+# Do not use this recipe for production, it is not reproducible
+# and you don't know what git hash is built from just looking
+# at the metadata
+
+require linux-toradex-upstream.inc
 
 LINUX_REPO = "git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git"
 TDX_PATCHES = " \
@@ -7,8 +12,8 @@ TDX_PATCHES = " \
     file://0003-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
     file://0004-media-i2c-ov5640-Implement-get_mbus_config.patch \
 "
-
-LINUX_VERSION ?= "6.6-rc"
+# set PV manually, that way PREFERRED_VERSION can be set to a constant value
+PV = "mainline"
+LINUX_VERSION = "6.6-rc"
 KBRANCH = "master"
-SRCREV_machine = "2dde18cd1d8fac735875f2e4987f11817cc0bc2c"
-SRCREV_machine:use-head-next = "${AUTOREV}"
+SRCREV_machine = "${AUTOREV}"

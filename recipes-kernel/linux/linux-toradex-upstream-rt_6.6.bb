@@ -1,6 +1,6 @@
-require linux-toradex-mainline-common.inc
+require linux-toradex-upstream.inc
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/linux-toradex-mainline-rt-git:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/linux-toradex-upstream-rt:"
 
 SUMMARY = "Toradex mainline real-time Linux kernel"
 # To build the RT kernel we use the RT kernel git repo rather than applying
@@ -18,7 +18,8 @@ SRC_URI:append = " \
     file://preempt-rt-less-latency.scc \
 "
 
-LINUX_VERSION ?= "6.5-rc"
-KBRANCH = "linux-6.5.y-rt"
-SRCREV_machine = "16ae0de52ef9f7e5c2cd7e8443f5195c176353ea"
-SRCREV_machine:use-head-next = "${AUTOREV}"
+# set PV manually, that way PREFERRED_VERSION can be set to a constant value
+PV = "6.6"
+LINUX_VERSION = "6.6-rt"
+KBRANCH = "linux-6.6.y-rt"
+SRCREV_machine = "${AUTOREV}"
