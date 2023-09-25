@@ -1,7 +1,7 @@
 require recipes-bsp/u-boot/u-boot-common.inc
 require recipes-bsp/u-boot/u-boot.inc
 SOC_HANDLING = ""
-SOC_HANDLING:imx = "recipes-bsp/u-boot/u-boot-toradex-imx.inc"
+SOC_HANDLING:imx-generic-bsp = "recipes-bsp/u-boot/u-boot-toradex-imx.inc"
 SOC_HANDLING:ti-soc = "recipes-bsp/u-boot/u-boot-toradex-ti.inc"
 require ${SOC_HANDLING}
 
