@@ -21,4 +21,5 @@ TDX_PATCHES = " \
     file://0001-apalis-colibri_imx6-imx6ull-_imx7-update-env-memory-.patch \
     file://0001-configs-colibri-imx7-Fix-bad-block-table-in-flash-co.patch \
     file://0001-colibri_imx6-fix-RALAT-and-WALAT-values.patch \
+    file://0001-toradex-colibri_imx7-Enable-nand-emmc-detection-and-.patch \
 "
