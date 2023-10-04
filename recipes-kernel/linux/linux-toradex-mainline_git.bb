@@ -46,7 +46,7 @@ SRC_URI:append = " \
     file://0001-Revert-media-v4l2-async-Use-endpoints-in-__v4l2_asyn.patch \
 "
 
-LINUX_VERSION ?= "6.1.50"
+LINUX_VERSION ?= "6.1.55"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
 SRCREV_machine = "d23900f974e0fb995b36ef47283a5aa74ca25f51"
