@@ -1,4 +1,4 @@
-LINUX_VERSION ?= "6.1.46-rt13"
+LINUX_VERSION ?= "6.1.54-rt15"
 require recipes-kernel/linux/linux-toradex-mainline_git.bb
 
 SUMMARY = "Toradex mainline real-time Linux kernel"
