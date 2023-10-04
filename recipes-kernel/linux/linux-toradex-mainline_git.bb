@@ -49,7 +49,7 @@ SRC_URI:append = " \
 LINUX_VERSION ?= "6.1.50"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "a2943d2d9a00ae7c5c1fde2b2e7e9cdb47e7db05"
+SRCREV_machine = "d23900f974e0fb995b36ef47283a5aa74ca25f51"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
