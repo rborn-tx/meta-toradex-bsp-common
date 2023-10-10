@@ -1,11 +1,34 @@
 # SYSFW/TIFS Firmware
-DEPENDS:append:k3 = " python3-jsonschema-native python3-pyelftools-native python3-pyyaml-native optee-os ti-sci-fw ti-dm-fw trusted-firmware-a"
-DEPENDS:append:k3r5 = " python3-jsonschema-native python3-pyelftools-native python3-pyyaml-native ti-sci-fw ti-dm-fw"
-BL31 = "${STAGING_DIR_HOST}/firmware/bl31.bin"
-TEE = "${STAGING_DIR_HOST}${nonarch_base_libdir}/firmware/bl32.bin"
+DEPENDS:append:k3 = " python3-jsonschema-native python3-pyelftools-native python3-pyyaml-native"
+DEPENDS:append:k3r5 = " python3-jsonschema-native python3-pyelftools-native python3-pyyaml-native ti-sci-fw"
+
+DM_FIRMWARE = "ipc_echo_testb_mcu1_0_release_strip.xer5f"
+
+PLAT_SFX = ""
+PLAT_SFX:j721e = "j721e"
+PLAT_SFX:j7200 = "j7200"
+PLAT_SFX:j721s2 = "j721s2"
+PLAT_SFX:j784s4 = "j784s4"
+PLAT_SFX:am65xx = "am65xx"
+PLAT_SFX:am64xx = "am64xx"
+PLAT_SFX:am62xx = "am62xx"
+PLAT_SFX:am62axx = "am62axx"
+
+PACKAGECONFIG[atf] = "BL31=${STAGING_DIR_HOST}/firmware/bl31.bin,,trusted-firmware-a"
+PACKAGECONFIG[optee] = "TEE=${STAGING_DIR_HOST}${nonarch_base_libdir}/firmware/bl32.bin,,optee-os"
+PACKAGECONFIG[dm] = "DM=${STAGING_DIR_HOST}${nonarch_base_libdir}/firmware/ti-dm/${PLAT_SFX}/${DM_FIRMWARE},,ti-dm-fw"
+
+PACKAGECONFIG:append:aarch64 = " atf optee"
+PACKAGECONFIG:append:j721e = " dm"
+PACKAGECONFIG:append:j7200 = " dm"
+PACKAGECONFIG:append:j721s2 = " dm"
+PACKAGECONFIG:append:j784s4 = " dm"
+PACKAGECONFIG:append:am62xx = " dm"
+PACKAGECONFIG:append:am62axx = " dm"
+
 BINMAN_INDIRS = "${STAGING_DIR_HOST}${nonarch_base_libdir}/firmware"
-EXTRA_OEMAKE:append:k3 = " BL31=${BL31} TEE=${TEE} BINMAN_INDIRS=${BINMAN_INDIRS}"
-EXTRA_OEMAKE:append:k3r5 = " BINMAN_INDIRS=${BINMAN_INDIRS}"
+
+EXTRA_OEMAKE:append = " ${PACKAGECONFIG_CONFARGS} BINMAN_INDIRS=${BINMAN_INDIRS}"
 
 do_deploy:append:k3r5 () {
     if [ -n "${UBOOT_CONFIG}" ]
