@@ -44,6 +44,10 @@ SRC_URI:append = " \
     file://0001-media-v4l2-async-fix-binding-async-subdevs-with-mult.patch \
     file://0002-media-i2c-ov5640-Implement-get_mbus_config.patch \
     file://0001-Revert-media-v4l2-async-Use-endpoints-in-__v4l2_asyn.patch \
+    file://0001-power-reset-gpio-poweroff-use-a-struct-to-store-the-.patch \
+    file://0002-power-reset-gpio-poweroff-use-sys-off-handler-API.patch \
+    file://0003-dt-bindings-power-reset-gpio-poweroff-Add-priority-p.patch \
+    file://0004-power-reset-gpio-poweroff-make-sys-handler-priority-.patch \
 "
 
 LINUX_VERSION ?= "6.1.55"

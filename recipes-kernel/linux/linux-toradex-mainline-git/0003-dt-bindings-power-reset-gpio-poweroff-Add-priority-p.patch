@@ -1,0 +1,43 @@
+From de109153fbdc722a63a880101bc0f2065ac029b2 Mon Sep 17 00:00:00 2001
+From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Date: Wed, 20 Sep 2023 18:14:49 +0200
+Subject: [PATCH 3/4] dt-bindings: power: reset: gpio-poweroff: Add priority
+ property
+
+Add the priority property to the gpio-poweroff bindings description.
+
+Upstream-Status: Submitted [https://lore.kernel.org/all/20231006130428.11259-1-francesco@dolcini.it/]
+
+Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+---
+ .../devicetree/bindings/power/reset/gpio-poweroff.yaml     | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/power/reset/gpio-poweroff.yaml b/Documentation/devicetree/bindings/power/reset/gpio-poweroff.yaml
+index 45d66c7751156..0d1d8d28ccdbb 100644
+--- a/Documentation/devicetree/bindings/power/reset/gpio-poweroff.yaml
++++ b/Documentation/devicetree/bindings/power/reset/gpio-poweroff.yaml
+@@ -18,6 +18,9 @@ description: >
+   Finally the operating system assumes the power off failed if
+   the system is still running after waiting some time (timeout-ms).
+ 
++allOf:
++  - $ref: restart-handler.yaml#
++
+ properties:
+   compatible:
+     const: gpio-poweroff
+@@ -40,6 +43,10 @@ properties:
+     default: 100
+     description: Delay to wait after driving gpio inactive
+ 
++  priority:
++    default: 0
++    description: Priority of the power off handler
++
+   timeout-ms:
+     default: 3000
+     description: Time to wait before assuming the power off sequence failed.
+-- 
+2.39.2
+
