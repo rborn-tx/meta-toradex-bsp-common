@@ -14,6 +14,7 @@ DEPENDS += " \
     python3-pyyaml-native \
     python3-yamllint-native \
 "
+PROVIDES += "u-boot"
 
 SRC_URI = " \
     git://source.denx.de/u-boot/u-boot.git;protocol=https;branch=master \
