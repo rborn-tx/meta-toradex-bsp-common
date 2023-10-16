@@ -1,0 +1,61 @@
+From 444331b1b1c8a94e5cdcfaddb447f8e718793ec4 Mon Sep 17 00:00:00 2001
+From: Luca Ceresoli <luca.ceresoli@bootlin.com>
+Date: Fri, 10 Mar 2023 11:07:52 +0100
+Subject: [PATCH] arm: imx: add u-boot-nand.imx to boot from NAND without SPL
+
+U-Boot can be booted from NAND without SPL by prepending the DCD header to
+the actual U-Boot binary. However this requires prepending 1024 bytes to
+u-boot.imx (DCD + u-boot.bin).
+
+There is already a similar target to build spl/u-boot-nand-spl.imx, add the
+same option for no-SPL boot.
+
+Tested on i.MX6ULL.
+
+The resulting layout of u-boot-nand.imx is:
+
+ - Offset 0x0000 (0 KiB): padding
+ - Offset 0x0400 (1 KiB): DCD header
+ - Offset 0x1000 (4 KiB): u-boot.bin
+
+Upstream-Status: Backport [95942f99a7057359c07bf383214d57154e2466fe]
+Signed-off-by: Luca Ceresoli <luca.ceresoli@bootlin.com>
+---
+ Makefile                   | 3 +++
+ arch/arm/mach-imx/Makefile | 6 ++++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 98867fbe06..402adbe26c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1562,6 +1562,9 @@ endif
+ u-boot.uim: u-boot.bin FORCE
+ 	$(Q)$(MAKE) $(build)=arch/arm/mach-imx $@
+ 
++u-boot-nand.imx: u-boot.imx FORCE
++	$(Q)$(MAKE) $(build)=arch/arm/mach-imx $@
++
+ u-boot-with-spl.imx u-boot-with-nand-spl.imx: SPL $(if $(CONFIG_OF_SEPARATE),u-boot.img,u-boot.uim) FORCE
+ 	$(Q)$(MAKE) $(build)=arch/arm/mach-imx $@
+ 
+diff --git a/arch/arm/mach-imx/Makefile b/arch/arm/mach-imx/Makefile
+index aa0b6447f1..e9b484fa9b 100644
+--- a/arch/arm/mach-imx/Makefile
++++ b/arch/arm/mach-imx/Makefile
+@@ -132,6 +132,12 @@ u-boot.imx: MKIMAGEOUTPUT = u-boot.imx.log
+ u-boot.imx: u-boot.bin u-boot.cfgout $(PLUGIN).bin FORCE
+ 	$(call if_changed,mkimage)
+ 
++quiet_cmd_u-boot-nand_imx = GEN     $@
++cmd_u-boot-nand_imx = (dd bs=1024 count=1 if=/dev/zero 2>/dev/null) | cat - $< > $@
++
++u-boot-nand.imx: u-boot.imx FORCE
++	$(call if_changed,u-boot-nand_imx)
++
+ ifeq ($(CONFIG_MULTI_DTB_FIT),y)
+ MKIMAGEFLAGS_u-boot-dtb.imx = -n $(filter-out $(PLUGIN).bin $< $(PHONY),$^) \
+ 	-T $(IMAGE_TYPE) -e $(CONFIG_SYS_TEXT_BASE)
+-- 
+2.42.0
+

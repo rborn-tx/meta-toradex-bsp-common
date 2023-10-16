@@ -1,0 +1,43 @@
+From 7dede4033bd0391d240914b3e54ec49a984d39b2 Mon Sep 17 00:00:00 2001
+From: Hiago De Franco <hiago.franco@toradex.com>
+Date: Tue, 3 Oct 2023 18:26:54 -0300
+Subject: [PATCH] arm: mach-imx: Makefile: Extend u-boot-nand.imx padding
+
+Extend the padding process of u-boot-nand.imx target by adding 10k bytes
+of zeros to the end of the binary using the 'dd' command.
+
+The existing padding method did not generate a functional binary,
+as discussed in more detail in this thread [1]. Instead, we adopt the
+end-padding calculation method documented in 'board/doc/colibri_imx7.rst'
+as a reference, which is relevant for iMX7 with NAND storage.
+
+Adding 10k bytes of zeros provides an approximate value that makes the
+proper padding for these NAND devices.
+
+[1] https://lore.kernel.org/all/CAC4tdFUqffQzRQFv5AGe_xtbFy1agr2SEpn_FzEdexhwjdryyw@mail.gmail.com/
+
+Upstream-Status: Backport [7dede4033bd0391d240914b3e54ec49a984d39b2]
+Signed-off-by: Hiago De Franco <hiago.franco@toradex.com>
+Reviewed-by: Fabio Estevam <festevam@gmail.com>
+---
+ arch/arm/mach-imx/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-imx/Makefile b/arch/arm/mach-imx/Makefile
+index aebfa6517b..6904cf3880 100644
+--- a/arch/arm/mach-imx/Makefile
++++ b/arch/arm/mach-imx/Makefile
+@@ -142,7 +142,9 @@ u-boot.imx: u-boot.bin u-boot.cfgout $(PLUGIN).bin FORCE
+ 	$(call if_changed,mkimage)
+ 
+ quiet_cmd_u-boot-nand_imx = GEN     $@
+-cmd_u-boot-nand_imx = (dd bs=1024 count=1 if=/dev/zero 2>/dev/null) | cat - $< > $@
++cmd_u-boot-nand_imx = (dd bs=1024 count=1 if=/dev/zero 2>/dev/null) | cat - $< > $@.zero-padded ; \
++		      (dd bs=10k count=1 if=/dev/zero 2>/dev/null) | cat $@.zero-padded - > $@ ; \
++		      rm -f $@.zero-padded
+ 
+ u-boot-nand.imx: u-boot.imx FORCE
+ 	$(call if_changed,u-boot-nand_imx)
+-- 
+2.42.0
+
