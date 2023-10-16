@@ -14,7 +14,7 @@ This enhancement improves variant detection during system initialization
 through USB recovery mode, where U-Boot is loaded directly to RAM. This
 allows variant detection for an accurate device tree selection.
 
-Submitted [https://lore.kernel.org/u-boot/20231002115749.15160-1-hiagofranco@gmail.com/]
+Upstream-Status: Submitted [https://lore.kernel.org/u-boot/20231002115749.15160-1-hiagofranco@gmail.com/]
 Signed-off-by: Hiago De Franco <hiago.franco@toradex.com>
 
 ---
