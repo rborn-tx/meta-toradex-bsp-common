@@ -1,0 +1,53 @@
+From 27242a1feb7946c08b932f2562bc513313ec7f65 Mon Sep 17 00:00:00 2001
+From: Hiago De Franco <hiago.franco@toradex.com>
+Date: Thu, 21 Sep 2023 10:08:32 -0300
+Subject: [PATCH] arm: dts: Makefile: Prevent build errors from other imx7 dts
+
+This commit addresses a build error in the arch/arm/dts/Makefile.
+
+The error occurred because of the following device tree files:
+- imx7d-pico-pi.dtb
+- imx7d-pico-hobbit.dtb
+
+This happend after enabling the DEVICE_TREE_INCLUDES configuration in
+order to check for the "recovery_tezi" environment variable.
+
+Error: arch/arm/dts/.imx7d-pico-pi.dtb.pre.tmp:93.3-11 syntax error
+FATAL ERROR: Unable to parse input tree
+Error: arch/arm/dts/.imx7d-pico-hobbit.dtb.pre.tmp:105.3-11 syntax error
+FATAL ERROR: Unable to parse input tree
+make[2]: *** [scripts/Makefile.lib:335: arch/arm/dts/imx7d-pico-hobbit.dtb] Error 1
+make[1]: *** [dts/Makefile:44: arch-dtbs] Error 2
+make: *** [Makefile:1164: dts/dt.dtb] Error 2
+
+Since we don't need these files for our binary target, remove them to
+prevent this failure.
+
+Upstream-Status: Inappropriate [Other]
+
+This problem has been resolved in U-Boot v2022.10. Although there is no
+specific commit addressing this issue, this patch removes the problematic
+files causing errors to facilitate the resolution process. This patch can
+be removed once we move to a newer U-Boot.
+
+Signed-off-by: Hiago De Franco <hiago.franco@toradex.com>
+---
+ arch/arm/dts/Makefile | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index a7e0d9f6c0..3eed3dc84f 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -907,8 +907,6 @@ dtb-$(CONFIG_MX7) += imx7d-sdb.dtb \
+ 	imx7-colibri-rawnand.dtb \
+ 	imx7s-warp.dtb \
+ 	imx7d-meerkat96.dtb \
+-	imx7d-pico-pi.dtb \
+-	imx7d-pico-hobbit.dtb \
+ 	imx7d-smegw01.dtb
+ 
+ dtb-$(CONFIG_ARCH_MX7ULP) += imx7ulp-com.dtb \
+-- 
+2.40.1
+

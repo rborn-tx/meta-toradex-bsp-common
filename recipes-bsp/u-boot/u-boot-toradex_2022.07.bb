@@ -24,4 +24,5 @@ TDX_PATCHES = " \
     file://0001-toradex-colibri_imx7-Enable-nand-emmc-detection-and-.patch \
     file://0001-arm-imx-add-u-boot-nand.imx-to-boot-from-NAND-withou.patch \
     file://0001-arm-mach-imx-Makefile-Extend-u-boot-nand.imx-padding.patch \
+    file://0001-arm-dts-Makefile-Prevent-build-errors-from-other-imx.patch \
 "
