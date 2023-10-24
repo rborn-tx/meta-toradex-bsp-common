@@ -48,6 +48,7 @@ SRC_URI:append = " \
     file://0002-power-reset-gpio-poweroff-use-sys-off-handler-API.patch \
     file://0003-dt-bindings-power-reset-gpio-poweroff-Add-priority-p.patch \
     file://0004-power-reset-gpio-poweroff-make-sys-handler-priority-.patch \
+    file://0001-ARM-dts-imx6q-apalis-add-can-power-up-delay-on-ixora.patch \
 "
 
 LINUX_VERSION ?= "6.1.55"
