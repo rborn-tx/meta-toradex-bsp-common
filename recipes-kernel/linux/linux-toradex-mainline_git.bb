@@ -51,10 +51,10 @@ SRC_URI:append = " \
     file://0001-ARM-dts-imx6q-apalis-add-can-power-up-delay-on-ixora.patch \
 "
 
-LINUX_VERSION ?= "6.1.55"
+LINUX_VERSION ?= "6.1.60"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "d23900f974e0fb995b36ef47283a5aa74ca25f51"
+SRCREV_machine = "32c9cdbe383c153af23cfa1df0a352b97ab3df7a"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
