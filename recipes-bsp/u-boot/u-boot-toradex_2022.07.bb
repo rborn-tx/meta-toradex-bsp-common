@@ -25,4 +25,6 @@ TDX_PATCHES = " \
     file://0001-arm-imx-add-u-boot-nand.imx-to-boot-from-NAND-withou.patch \
     file://0001-arm-mach-imx-Makefile-Extend-u-boot-nand.imx-padding.patch \
     file://0001-arm-dts-Makefile-Prevent-build-errors-from-other-imx.patch \
+    file://0001-apalis-colibri-imx6-imx6ull-imx7-defconfig-Enable-fa.patch \
+    file://0002-board-apalis-colibri-imx6-imx6ull-imx7-Add-fastboot-.patch \
 "
