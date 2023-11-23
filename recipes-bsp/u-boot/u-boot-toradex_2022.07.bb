@@ -27,4 +27,5 @@ TDX_PATCHES = " \
     file://0001-arm-dts-Makefile-Prevent-build-errors-from-other-imx.patch \
     file://0001-apalis-colibri-imx6-imx6ull-imx7-defconfig-Enable-fa.patch \
     file://0002-board-apalis-colibri-imx6-imx6ull-imx7-Add-fastboot-.patch \
+    file://0001-colibri-imx7-Call-fdt_increase_size.patch \
 "
