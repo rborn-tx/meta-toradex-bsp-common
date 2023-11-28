@@ -13,8 +13,8 @@
 #
 #                                      The devicetree overlays to be deployed
 #                                      to ${DEPLOY_DIR_IMAGE}/overlays, if not
-#                                      set, all common and machine related
-#                                      overlays would be deployed.
+#                                      set, all machine related overlays would
+#                                      be deployed.
 #
 # TEZI_EXTERNAL_KERNEL_DEVICETREE_BOOT = "a-overlay.dtbo"
 #
@@ -48,8 +48,7 @@ MACHINE_PREFIX:colibri-imx7-emmc = "colibri-imx7"
 do_collect_overlays () {
     if [ -z "${TEZI_EXTERNAL_KERNEL_DEVICETREE}" ] ; then
         machine_dts=`cd ${S} && ls ${MACHINE_PREFIX}[_-]*.dts 2>/dev/null || true`
-        common_dts=`cd ${S} && ls *.dts 2>/dev/null | grep -v -e 'imx[6-8]' | xargs || true`
-        all_dts="$machine_dts $common_dts"
+        all_dts="$machine_dts"
     else
         for dtbo in ${TEZI_EXTERNAL_KERNEL_DEVICETREE}; do
             dtbo_ext=${dtbo##*.}
