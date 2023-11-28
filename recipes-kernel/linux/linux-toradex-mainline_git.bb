@@ -49,13 +49,12 @@ SRC_URI:append = " \
     file://0003-dt-bindings-power-reset-gpio-poweroff-Add-priority-p.patch \
     file://0004-power-reset-gpio-poweroff-make-sys-handler-priority-.patch \
     file://0001-ARM-dts-imx6q-apalis-add-can-power-up-delay-on-ixora.patch \
-    file://0001-mmc-Add-quirk-MMC_QUIRK_BROKEN_CACHE_FLUSH-for-Micro.patch \
 "
 
-LINUX_VERSION ?= "6.1.60"
+LINUX_VERSION ?= "6.1.64"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "32c9cdbe383c153af23cfa1df0a352b97ab3df7a"
+SRCREV_machine = "6ac30d748bb080752d4078d482534b68d62f685f"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
