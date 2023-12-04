@@ -49,6 +49,8 @@ SRC_URI:append = " \
     file://0003-dt-bindings-power-reset-gpio-poweroff-Add-priority-p.patch \
     file://0004-power-reset-gpio-poweroff-make-sys-handler-priority-.patch \
     file://0001-ARM-dts-imx6q-apalis-add-can-power-up-delay-on-ixora.patch \
+    file://0003-arm64-dts-freescale-verdin-imx8mp-add-support-to-mal.patch \
+    file://0003-arm64-dts-freescale-verdin-imx8mm-add-support-to-mal.patch \
 "
 
 LINUX_VERSION ?= "6.1.64"
