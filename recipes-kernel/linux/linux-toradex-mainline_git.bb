@@ -53,10 +53,10 @@ SRC_URI:append = " \
     file://0003-arm64-dts-freescale-verdin-imx8mm-add-support-to-mal.patch \
 "
 
-LINUX_VERSION ?= "6.1.64"
+LINUX_VERSION ?= "6.1.65"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "6ac30d748bb080752d4078d482534b68d62f685f"
+SRCREV_machine = "c6114c845984144944f1abc07c61de219367a4da"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
