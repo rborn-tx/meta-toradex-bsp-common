@@ -55,10 +55,10 @@ SRC_URI:append = " \
     file://0001-usb-gadget-f_ncm-Apply-workaround-for-packet-cloggin.patch \
 "
 
-LINUX_VERSION ?= "6.1.65"
+LINUX_VERSION ?= "6.1.71"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "c6114c845984144944f1abc07c61de219367a4da"
+SRCREV_machine = "38fb82ecd144fa22c5e41cb6e56f1fa8c98d6f61"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
