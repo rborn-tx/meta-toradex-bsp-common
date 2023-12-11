@@ -1,0 +1,75 @@
+From 6a5b684c60ae10ec465b926643eb236afc671f54 Mon Sep 17 00:00:00 2001
+From: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+Date: Mon, 11 Dec 2023 14:01:26 -0300
+Subject: [PATCH v1] board: colibri_imx7: fix emmc detection
+
+Later versions of Colibri iMX7D V1.1B modules use a "new" SoC fusing. The
+difference lies in whether we enable the boot ROM to use the eMMC reset
+signal. Depending on the SoC fuse, the boot ROM configures this pin as a
+GPIO output to drive the reset signal. Our eMMC vs NAND detection
+currently only sets that signal to a GPIO without explicitly setting any
+direction. Previously, by default, it was set as an input. As the boot ROM
+now configures it as an output, we receive a value of zero instead of one,
+indicating the absence of the pull-up on eMMC modules.
+
+To fix this, set the SION bit, allowing the reading back of the value
+even if it is configured as an output by the boot ROM. It's important to
+note that with the new SoC fusing, we now read back what the boot ROM
+drives rather than the real value caused by the pull-up resistor. However,
+if it were ever driven low, the eMMC would permanently be reset.
+
+In addition, remove hard-coded variant in the eMMC build case as since the
+commit 0c39564d0281 ("toradex: colibri_imx7: Enable nand/emmc detection
+and set boot variant") will anyways always get overridden by the detection
+routing in board code.
+
+Upstream-Status: Submitted [https://lore.kernel.org/u-boot/20231212112815.7880-1-hiagofranco@gmail.com/]
+
+Fixes: 0c39564d ("toradex: colibri_imx7: Enable nand/emmc detection and set boot variant")
+Signed-off-by: Marcel Ziswiler <marcel.ziswiler@toradex.com>
+Signed-off-by: Hiago De Franco <hiago.franco@toradex.com>
+---
+ board/toradex/colibri_imx7/colibri_imx7.c | 6 +++---
+ include/configs/colibri_imx7.h            | 1 -
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/board/toradex/colibri_imx7/colibri_imx7.c b/board/toradex/colibri_imx7/colibri_imx7.c
+index f0356af008..3e7c5d64c3 100644
+--- a/board/toradex/colibri_imx7/colibri_imx7.c
++++ b/board/toradex/colibri_imx7/colibri_imx7.c
+@@ -66,7 +66,7 @@ int dram_init(void)
+ }
+ 
+ static iomux_v3_cfg_t const flash_detection_pads[] = {
+-	MX7D_PAD_SD3_RESET_B__GPIO6_IO11 | MUX_PAD_CTRL(FLASH_DETECTION_CTRL),
++	MX7D_PAD_SD3_RESET_B__GPIO6_IO11 | MUX_PAD_CTRL(FLASH_DETECTION_CTRL) | MUX_MODE_SION,
+ };
+ 
+ static iomux_v3_cfg_t const uart1_pads[] = {
+@@ -193,9 +193,9 @@ int board_init(void)
+ 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
+ 
+ 	/*
+-	 * Enable GPIO on NAND_WE_B/eMMC_RST with 100k pull-down. eMMC_RST
++	 * Enable GPIO SION on NAND_WE_B/eMMC_RST with 100k pull-down. eMMC_RST
+ 	 * is pulled high with 4.7k for eMMC devices. This allows to reliably
+-	 * detect eMMC/NAND flash
++	 * detect eMMC vs NAND flash.
+ 	 */
+ 	imx_iomux_v3_setup_multiple_pads(flash_detection_pads, ARRAY_SIZE(flash_detection_pads));
+ 	gpio_request(FLASH_DET_GPIO, "flash-detection-gpio");
+diff --git a/include/configs/colibri_imx7.h b/include/configs/colibri_imx7.h
+index 03f8ed1478..7a9f4afe7d 100644
+--- a/include/configs/colibri_imx7.h
++++ b/include/configs/colibri_imx7.h
+@@ -101,7 +101,6 @@
+ 	UBI_BOOTCMD
+ #elif defined(CONFIG_TARGET_COLIBRI_IMX7_EMMC)
+ #define MODULE_EXTRA_ENV_SETTINGS \
+-	"variant=-emmc\0" \
+ 	EMMC_ANDROID_BOOTCMD
+ #endif
+ 
+-- 
+2.43.0
+
