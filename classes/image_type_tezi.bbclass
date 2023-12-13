@@ -30,6 +30,7 @@ TEZI_ROOT_FSOPTS ?= "-E nodiscard"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_NAME ??= "rootfs"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
+TEZI_ROOT_FILELIST ??= ""
 TEZI_USE_BOOTFILES ??= "true"
 TEZI_AUTO_INSTALL ??= "false"
 TEZI_BOOT_SUFFIX ??= "${@'bootfs.tar.xz' if oe.types.boolean('${TEZI_USE_BOOTFILES}') else ''}"
@@ -75,6 +76,59 @@ def get_bootfs_part_size(d):
     from math import log
     part_size = 3 * 2 ** (1 + int(log(get_uncompressed_size(d, 'bootfs'), 2)))
     return max(16, part_size)
+
+def get_filelist_var(d, varname):
+    filelist = d.getVar(varname)
+    if not filelist:
+        return None
+    import re
+    return re.split(r"\s+", filelist.strip())
+
+def get_tezi_filelist_artifacts(d):
+    filelist = get_filelist_var(d, 'TEZI_ROOT_FILELIST')
+    if not filelist:
+        return None
+    artifacts = []
+    for entry in filelist:
+        artifacts.append(entry.split(":")[0])
+    return artifacts
+
+# Determine the storage space required for the given "filelist".
+def get_filelist_extra_size(d, filelist):
+    import shlex
+    import subprocess
+
+    extra_size = 0
+    for entry in filelist:
+        unpack = False
+        flds = entry.split(":")
+        fpath = os.path.join(d.getVar('IMGDEPLOYDIR'), flds[0])
+        # Any non-empty string is considered as true except the strings "0" and
+        # "false"; this is to be compatible with the QVariant used by Tezi.
+        if len(flds) >= 3 and (flds[2] and flds[2].lower() not in ["0", "false"]):
+            unpack = True
+        if unpack and fpath.endswith(".zip"):
+            # Deal with .zip files only:
+            cmd = ("unzip -p %s | wc -c" % shlex.quote(fpath))
+            bb.debug(1, "Running command [%s]" % cmd)
+            outp = subprocess.check_output(cmd, shell=True)
+            size = int(outp)
+            bb.debug(1, "Unpacked size of '%s': %d (bytes)" % (fpath, size))
+        elif unpack:
+            # Deal with .tar.(gz|xz|bz2|lzo|zstd):
+            cmd = ("tar -xf %s -O | wc -c" % shlex.quote(fpath))
+            bb.debug(1, "Running command [%s]" % cmd)
+            outp = subprocess.check_output(cmd, shell=True)
+            size = int(outp)
+            bb.debug(1, "Unpacked size of '%s': %d (bytes)" % (fpath, size))
+        else:
+            stat = os.stat(fpath)
+            size = stat.st_size
+            bb.debug(1, "Size of '%s': %d (bytes)" % (fpath, size))
+        extra_size += size
+
+    # Returned size is in MB.
+    return float(extra_size) / 1024 / 1024
 
 # Whitespace separated list of files declared by 'deploy_var' variable
 # from 'source_dir' (DEPLOY_DIR_IMAGE by default) to place in 'deploy_dir'.
@@ -184,18 +238,24 @@ def rootfs_tezi_emmc(d, use_bootfiles):
                 }
               })
 
-    filesystem_partitions.append(
-          {
-            "partition_size_nominal": 512,
-            "want_maximised": True,
-            "content": {
-              "label": d.getVar('TEZI_ROOT_LABEL'),
-              "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
-              "mkfs_options": d.getVar('TEZI_ROOT_FSOPTS'),
-              "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
-              "uncompressed_size": get_uncompressed_size(d, d.getVar('TEZI_ROOT_NAME'))
-            }
-          })
+    rootfs = {
+               "partition_size_nominal": 512,
+               "want_maximised": True,
+               "content": {
+                 "label": d.getVar('TEZI_ROOT_LABEL'),
+                 "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
+                 "mkfs_options": d.getVar('TEZI_ROOT_FSOPTS'),
+                 "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
+                 "uncompressed_size": get_uncompressed_size(d, d.getVar('TEZI_ROOT_NAME'))
+               }
+             }
+
+    rootfs_filelist = get_filelist_var(d, 'TEZI_ROOT_FILELIST')
+    if rootfs_filelist:
+        rootfs["content"]["filelist"] = rootfs_filelist
+        rootfs["content"]["uncompressed_size"] += get_filelist_extra_size(d, rootfs_filelist)
+
+    filesystem_partitions.append(rootfs)
 
     return [
         OrderedDict({
@@ -250,6 +310,11 @@ def rootfs_tezi_rawnand(d):
                  "uncompressed_size": get_uncompressed_size(d, d.getVar('TEZI_ROOT_NAME'))
                }
              }
+
+    rootfs_filelist = get_filelist_var(d, 'TEZI_ROOT_FILELIST')
+    if rootfs_filelist:
+        rootfs["content"]["filelist"] = rootfs_filelist
+        rootfs["content"]["uncompressed_size"] += get_filelist_extra_size(d, rootfs_filelist)
 
     kernel = {
                "name": "kernel",
@@ -378,6 +443,10 @@ python rootfs_tezi_run_json() {
         bb.fatal("Toradex flash type unknown")
 
     artifacts += " " + uenv_file + " " + uboot_file
+    artifacts_fl = get_tezi_filelist_artifacts(d)
+    if artifacts_fl:
+        for artifact in artifacts_fl:
+            artifacts += " %s/%s" % (d.getVar('IMGDEPLOYDIR'), artifact)
     d.setVar("TEZI_ARTIFACTS", artifacts)
 
     rootfs_tezi_json(d, flash_type, flash_data, "image-%s.json" % d.getVar('IMAGE_BASENAME'), uenv_file)
