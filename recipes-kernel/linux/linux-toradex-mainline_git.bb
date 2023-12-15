@@ -51,6 +51,7 @@ SRC_URI:append = " \
     file://0001-ARM-dts-imx6q-apalis-add-can-power-up-delay-on-ixora.patch \
     file://0003-arm64-dts-freescale-verdin-imx8mp-add-support-to-mal.patch \
     file://0003-arm64-dts-freescale-verdin-imx8mm-add-support-to-mal.patch \
+    file://0001-wifi-mwifiex-configure-BSSID-consistently-when-start.patch \
 "
 
 LINUX_VERSION ?= "6.1.65"
