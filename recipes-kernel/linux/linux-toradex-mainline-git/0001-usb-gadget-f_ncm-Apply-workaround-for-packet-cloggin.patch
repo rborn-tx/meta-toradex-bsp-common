@@ -1,0 +1,68 @@
+From 2147c8ddfaa746cdb8857db070f907fa9abfcb60 Mon Sep 17 00:00:00 2001
+From: Hiago De Franco <hiago.franco@toradex.com>
+Date: Tue, 19 Dec 2023 11:52:07 -0300
+Subject: [PATCH] usb: gadget: f_ncm: Apply workaround for packet clogging
+
+The existing size of 32 is causing significant slowness and freezing when
+utilizing the NCM protocol with a VNC client. This issue likely arises
+because the VNC protocol relies on sending numerous small packets, which
+accumulate until the 16KB limit is reached, leading to transmission
+delays.
+
+By decreasing TX_MAX_NUM_DPE to 4, we ensure that the NCM driver transmits
+packets at a reduced interval, thereby resolving the VNC performance
+issues. To comprehend how these packets are sent, refer to the code
+snippet below from f_ncm.c:
+
+```
+		/* If the new skb is too big for the current NCM NTB then
+		 * set the current stored skb to be sent now and clear it
+		 * ready for new data.
+		 * NOTE: Assume maximum align for speed of calculation.
+		 */
+		if (ncm->skb_tx_data
+		    && (ncm->ndp_dgram_count >= TX_MAX_NUM_DPE
+		    || (ncm->skb_tx_data->len +
+		    div + rem + skb->len +
+		    ncm->skb_tx_ndp->len + ndp_align + (2 * dgram_idx_len))
+		    > max_size)) {
+			skb2 = package_for_tx(ncm);
+			if (!skb2)
+				goto err;
+		}
+```
+
+This issue is presently under investigation on the Linux kernel mailing
+list, and you can find the entire discussion at [1].
+
+[1] https://lore.kernel.org/all/20231204183751.64202-1-hiagofranco@gmail.com/
+
+Upstream-Status: Inappropriate [other]
+
+There is no proper patch for now, so instead we're using this patch that
+makes VNC work again as a temporarily solution until the mainline code
+gets fixed.
+
+Related-to: TEI-1078
+Signed-off-by: Hiago De Franco <hiago.franco@toradex.com>
+Signed-off-by: Joao Paulo Goncalves <joao.goncalves@toradex.com>
+---
+ drivers/usb/gadget/function/f_ncm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/usb/gadget/function/f_ncm.c b/drivers/usb/gadget/function/f_ncm.c
+index e0c183234283..5e972d1c1a0c 100644
+--- a/drivers/usb/gadget/function/f_ncm.c
++++ b/drivers/usb/gadget/function/f_ncm.c
+@@ -113,7 +113,7 @@ static inline unsigned ncm_bitrate(struct usb_gadget *g)
+  * Smaller packets are not likely to be trying to maximize the
+  * throughput and will be mstly sending smaller infrequent frames.
+  */
+-#define TX_MAX_NUM_DPE		32
++#define TX_MAX_NUM_DPE		4
+ 
+ /* Delay for the transmit to wait before sending an unfilled NTB frame. */
+ #define TX_TIMEOUT_NSECS	300000
+-- 
+2.34.1
+
