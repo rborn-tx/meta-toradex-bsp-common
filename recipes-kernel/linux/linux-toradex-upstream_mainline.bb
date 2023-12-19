@@ -11,9 +11,10 @@ TDX_PATCHES = " \
     file://0002-Revert-drm-panel-simple-drop-use-of-data-mapping-pro.patch \
     file://0003-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
     file://0004-media-i2c-ov5640-Implement-get_mbus_config.patch \
+    file://0001-usb-gadget-f_ncm-Apply-workaround-for-packet-cloggin.patch \
 "
 # set PV manually, that way PREFERRED_VERSION can be set to a constant value
 PV = "mainline"
-LINUX_VERSION = "6.6-rc"
+LINUX_VERSION = "6.8-rc"
 KBRANCH = "master"
 SRCREV_machine = "${AUTOREV}"
