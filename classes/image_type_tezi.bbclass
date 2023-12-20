@@ -478,14 +478,20 @@ IMAGE_CMD:teziimg () {
 		curl -k --retry 5 -O ${TEZI_EULA_URL} || true
 	fi
 
+	local outfile stdoutfile
+	outfile=${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar
+	stdoutfile=${TEZI_IMAGE_NAME}-Tezi.tar
+
 	# The first transform strips all folders from the files to tar, the
 	# second transform "moves" them in a subfolder ${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.
 	${IMAGE_CMD_TAR} \
 		--transform='s/.*\///' \
 		--transform 's,^,${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}/,' \
-		-chf ${IMGDEPLOYDIR}/${TEZI_IMAGE_NAME}-Tezi_${TEZI_VERSION}.tar \
+		-chf "${IMGDEPLOYDIR}/${outfile}" \
 		toradexlinux.png marketing.tar prepare.sh wrapup.sh ${TEZI_EULA_FILE} \
 		${WORKDIR}/image-json/image.json ${TEZI_ARTIFACTS}
+
+	ln -sf "${outfile}" "${IMGDEPLOYDIR}/${stdoutfile}"
 }
 do_image_teziimg[dirs] += "${WORKDIR}/image-json ${DEPLOY_DIR_IMAGE}"
 do_image_teziimg[cleandirs] += "${WORKDIR}/image-json"
