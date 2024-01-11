@@ -8,6 +8,8 @@ require u-boot-toradex-common.inc
 SRCREV = "${AUTOREV}"
 # patches which are not (yet) in the latest master
 TDX_PATCHES = " \
+    file://use_hash_old_parser.cfg \
 "
+
 
 DEFAULT_PREFERENCE = "-1"
