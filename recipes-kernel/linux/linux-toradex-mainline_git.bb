@@ -53,6 +53,8 @@ SRC_URI:append = " \
     file://0003-arm64-dts-freescale-verdin-imx8mm-add-support-to-mal.patch \
     file://0001-wifi-mwifiex-configure-BSSID-consistently-when-start.patch \
     file://0001-usb-gadget-f_ncm-Apply-workaround-for-packet-cloggin.patch \
+    file://0001-dt-bindings-arm-fsl-Add-toradex-apalis_imx6q-eval-v1.patch \
+    file://0002-arm-dts-nxp-imx-Add-support-for-Apalis-Evaluation-Bo.patch \
 "
 
 LINUX_VERSION ?= "6.1.71"
