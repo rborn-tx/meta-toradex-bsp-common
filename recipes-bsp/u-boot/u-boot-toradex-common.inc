@@ -6,7 +6,14 @@ SOC_HANDLING:ti-soc = "recipes-bsp/u-boot/u-boot-toradex-ti.inc"
 require ${SOC_HANDLING}
 
 LIC_FILES_CHKSUM = "file://Licenses/README;md5=2ca5f2c35c8cc335f0a19756634782f1"
-DEPENDS += "bc-native dtc-native"
+DEPENDS += " \
+    bc-native \
+    dtc-native \
+    python3-jsonschema-native \
+    python3-pyelftools-native \
+    python3-pyyaml-native \
+    python3-yamllint-native \
+"
 
 SRC_URI = " \
     git://source.denx.de/u-boot/u-boot.git;protocol=https;branch=master \
