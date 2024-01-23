@@ -34,6 +34,7 @@ TDX_PATCHES = " \
     file://0002-board-apalis-colibri-imx6-imx6ull-imx7-Add-fastboot-.patch \
     file://0001-colibri-imx7-Call-fdt_increase_size.patch \
     file://0001-board-colibri_imx7-fix-emmc-detection.patch \
+    file://0014-toradex-tdx-cfg-block-Add-new-apalis-and-colibri-pid.patch \
 "
 SRC_URI:append = " ${TDX_PATCHES}"
 SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \

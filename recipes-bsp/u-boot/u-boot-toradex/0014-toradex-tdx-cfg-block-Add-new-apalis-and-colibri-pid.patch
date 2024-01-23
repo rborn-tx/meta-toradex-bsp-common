@@ -1,0 +1,57 @@
+From 61079f2de20296a9f670b149510204933b4185d8 Mon Sep 17 00:00:00 2001
+From: Joao Paulo Goncalves <joao.goncalves@toradex.com>
+Date: Thu, 18 Jan 2024 16:00:54 -0300
+Subject: [PATCH] toradex: tdx-cfg-block: Add new apalis and colibri pid
+
+Add new apalis imx6 and colibri imx6/imx7 products IDs.
+
+Upstream-Status: Submitted [https://lore.kernel.org/u-boot/20240122200930.673447-1-jpaulo.silvagoncalves@gmail.com/]
+
+Signed-off-by: Joao Paulo Goncalves <joao.goncalves@toradex.com>
+---
+ board/toradex/common/tdx-cfg-block.c | 9 +++++++++
+ board/toradex/common/tdx-cfg-block.h | 9 +++++++++
+ 2 files changed, 18 insertions(+)
+
+diff --git a/board/toradex/common/tdx-cfg-block.c b/board/toradex/common/tdx-cfg-block.c
+index 7cf2dfae974..52e1ca2b717 100644
+--- a/board/toradex/common/tdx-cfg-block.c
++++ b/board/toradex/common/tdx-cfg-block.c
+@@ -137,6 +137,15 @@ const struct toradex_som toradex_modules[] = {
+ 	[66] = { "Verdin iMX8M Plus Quad 8GB WB",        TARGET_IS_ENABLED(VERDIN_IMX8MP)   },
+ 	[67] = { "Apalis iMX8QM 8GB WB IT",              TARGET_IS_ENABLED(APALIS_IMX8)     },
+ 	[68] = { "Verdin iMX8M Mini Quad 2GB WB IT",     TARGET_IS_ENABLED(VERDIN_IMX8MM)   },
++	[77] = { "Colibri iMX6S 256MB",                  TARGET_IS_ENABLED(COLIBRI_IMX6)    },
++	[78] = { "Colibri iMX6S 256MB IT",               TARGET_IS_ENABLED(COLIBRI_IMX6)    },
++	[79] = { "Colibri iMX6DL 512MB",                 TARGET_IS_ENABLED(COLIBRI_IMX6)    },
++	[80] = { "Colibri iMX6DL 512MB IT",              TARGET_IS_ENABLED(COLIBRI_IMX6)    },
++	[81] = { "Colibri iMX7D 512MB",                  TARGET_IS_ENABLED(COLIBRI_IMX7)    },
++	[82] = { "Apalis iMX6D 512MB",                   TARGET_IS_ENABLED(APALIS_IMX6)     },
++	[83] = { "Apalis iMX6Q 1GB",                     TARGET_IS_ENABLED(APALIS_IMX6)     },
++	[84] = { "Apalis iMX6D 1GB IT",                  TARGET_IS_ENABLED(APALIS_IMX6)     },
++	[85] = { "Apalis iMX6Q 2GB IT",                  TARGET_IS_ENABLED(APALIS_IMX6)     },
+ };
+ 
+ const char * const toradex_carrier_boards[] = {
+diff --git a/board/toradex/common/tdx-cfg-block.h b/board/toradex/common/tdx-cfg-block.h
+index 32e4c6f6879..415a343258c 100644
+--- a/board/toradex/common/tdx-cfg-block.h
++++ b/board/toradex/common/tdx-cfg-block.h
+@@ -94,6 +94,15 @@ enum {
+ 	VERDIN_IMX8MPQ_8GB_WIFI_BT,
+ 	APALIS_IMX8QM_8GB_WIFI_BT_IT,
+ 	VERDIN_IMX8MMQ_WIFI_BT_IT_NO_CAN,
++	COLIBRI_IMX6S_NOWINCE = 77,
++	COLIBRI_IMX6S_IT_NOWINCE,
++	COLIBRI_IMX6DL_NOWINCE,
++	COLIBRI_IMX6DL_IT_NOWINCE, /* 80 */
++	COLIBRI_IMX7D_NOWINCE,
++	APALIS_IMX6D_NOWINCE,
++	APALIS_IMX6Q_NOWINCE,
++	APALIS_IMX6D_IT_NOWINCE,
++	APALIS_IMX6Q_IT_NOWINCE, /* 85 */
+ };
+ 
+ enum {
+-- 
+2.34.1
