@@ -9,9 +9,9 @@ SRCREV_imx-firmware = "7be5a936ce8677962dd7b41c6c9f41dd14350bec"
 SRCREV_FORMAT = "default_imx-firmware"
 
 do_install:append () {
-    # Install IMX Firmware EULA license
+    # Install IMX Firmware EULA/LICENSE license
     install -d ${D}${nonarch_base_libdir}/firmware
-    install -m 0644 imx-firmware/EULA.txt ${D}${nonarch_base_libdir}/firmware/LICENSE.imx
+    install -m 0644 imx-firmware/LICENSE.txt ${D}${nonarch_base_libdir}/firmware/LICENSE.imx
 
     # Install common IMX firmware files
     install -d ${D}${nonarch_base_libdir}/firmware/nxp
@@ -35,9 +35,9 @@ LICENSE += " \
     & firmware-imx \
 "
 LIC_FILES_CHKSUM += " \
-    file://imx-firmware/EULA.txt;md5=673fa34349fa40f59e0713cb0ac22b1f \
+    file://imx-firmware/LICENSE.txt;md5=2827219e81f28aba7c6a569f7c437fa7 \
 "
-NO_GENERIC_LICENSE[firmware-imx] = "imx-firmware/EULA.txt"
+NO_GENERIC_LICENSE[firmware-imx] = "imx-firmware/LICENSE.txt"
 
 PACKAGES =+ " \
     ${PN}-imx-common \
