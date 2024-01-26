@@ -51,16 +51,15 @@ SRC_URI:append = " \
     file://0001-ARM-dts-imx6q-apalis-add-can-power-up-delay-on-ixora.patch \
     file://0003-arm64-dts-freescale-verdin-imx8mp-add-support-to-mal.patch \
     file://0003-arm64-dts-freescale-verdin-imx8mm-add-support-to-mal.patch \
-    file://0001-wifi-mwifiex-configure-BSSID-consistently-when-start.patch \
     file://0001-usb-gadget-f_ncm-Apply-workaround-for-packet-cloggin.patch \
     file://0001-dt-bindings-arm-fsl-Add-toradex-apalis_imx6q-eval-v1.patch \
     file://0002-arm-dts-nxp-imx-Add-support-for-Apalis-Evaluation-Bo.patch \
 "
 
-LINUX_VERSION ?= "6.1.71"
+LINUX_VERSION ?= "6.1.75"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "38fb82ecd144fa22c5e41cb6e56f1fa8c98d6f61"
+SRCREV_machine = "883d1a9562083922c6d293e9adad8cca4626adf3"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
