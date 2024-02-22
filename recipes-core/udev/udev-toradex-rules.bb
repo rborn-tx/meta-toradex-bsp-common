@@ -10,10 +10,29 @@ SRC_URI = "\
     file://toradex-mount-bootpart.sh \
 "
 
+SRC_URI:append:verdin-am62 = " \
+    file://10-toradex-can0-ifname.link \
+    file://10-toradex-can1-ifname.link \
+"
+SRC_URI:append:verdin-imx8mm = " \
+    file://10-toradex-can0-ifname.link \
+"
+SRC_URI:append:verdin-imx8mp = " \
+    file://10-toradex-can0-ifname.link \
+    file://10-toradex-can1-ifname.link \
+"
+
 do_install () {
     install -d ${D}${sysconfdir}/udev/rules.d
     install -d ${D}${sysconfdir}/udev/scripts
     install -d ${D}${sysconfdir}/systemd/network
+    # 10-toradex-can*-ifname.link files are only available for the Verdin family
+    if [ -f ${WORKDIR}/10-toradex-can0-ifname.link ]; then
+        install -m 0644 ${WORKDIR}/10-toradex-can0-ifname.link ${D}${sysconfdir}/systemd/network/
+    fi
+    if [ -f ${WORKDIR}/10-toradex-can1-ifname.link ]; then
+        install -m 0644 ${WORKDIR}/10-toradex-can1-ifname.link ${D}${sysconfdir}/systemd/network/
+    fi
     install -m 0644 ${WORKDIR}/10-toradex-wifi-ifnames.link ${D}${sysconfdir}/systemd/network/
     install -m 0644 ${WORKDIR}/99-toradex.rules ${D}${sysconfdir}/udev/rules.d/
     install -m 0644 ${WORKDIR}/bootpart-automount.rules ${D}${sysconfdir}/udev/rules.d/
