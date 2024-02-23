@@ -48,7 +48,6 @@ SRC_URI:append = " \
     file://0002-power-reset-gpio-poweroff-use-sys-off-handler-API.patch \
     file://0003-dt-bindings-power-reset-gpio-poweroff-Add-priority-p.patch \
     file://0004-power-reset-gpio-poweroff-make-sys-handler-priority-.patch \
-    file://0001-ARM-dts-imx6q-apalis-add-can-power-up-delay-on-ixora.patch \
     file://0003-arm64-dts-freescale-verdin-imx8mp-add-support-to-mal.patch \
     file://0003-arm64-dts-freescale-verdin-imx8mm-add-support-to-mal.patch \
     file://0001-usb-gadget-f_ncm-Apply-workaround-for-packet-cloggin.patch \
@@ -56,10 +55,10 @@ SRC_URI:append = " \
     file://0002-arm-dts-nxp-imx-Add-support-for-Apalis-Evaluation-Bo.patch \
 "
 
-LINUX_VERSION ?= "6.1.76"
+LINUX_VERSION ?= "6.1.79"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "e5c3b988b827c76f52d0f62343e863b9133a0cd2"
+SRCREV_machine = "81e1dc2f70014b9523dd02ca763788e4f81e5bac"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
