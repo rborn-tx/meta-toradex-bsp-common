@@ -1,0 +1,38 @@
+From 0fd10dbe5a88a882340d604bf55affeb7dbe03b7 Mon Sep 17 00:00:00 2001
+From: Hiago De Franco <hiago.franco@toradex.com>
+Date: Mon, 20 Nov 2023 21:58:17 +0100
+Subject: [PATCH 2/3] ARM: dts: imx6qdl-colibri: Add usdhc aliases
+
+Add mmc aliases to ensure a consistent mmc device naming across the
+Toradex SoM family, with this commit mmc0 is the on-module eMMC
+boot device and the not available mmc interfaces are removed.
+
+Upstream-Status: Backport [265f56542a936fa2edac21ee2cd45f0d331707a6]
+
+Signed-off-by: Hiago De Franco <hiago.franco@toradex.com>
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+---
+ arch/arm/boot/dts/nxp/imx/imx6qdl-colibri.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm/boot/dts/nxp/imx/imx6qdl-colibri.dtsi b/arch/arm/boot/dts/nxp/imx/imx6qdl-colibri.dtsi
+index 11d9c7a2dacb1..55c90f6393ad5 100644
+--- a/arch/arm/boot/dts/nxp/imx/imx6qdl-colibri.dtsi
++++ b/arch/arm/boot/dts/nxp/imx/imx6qdl-colibri.dtsi
+@@ -12,6 +12,13 @@ / {
+ 	model = "Toradex Colibri iMX6DL/S Module";
+ 	compatible = "toradex,colibri_imx6dl", "fsl,imx6dl";
+
++	aliases {
++		mmc0 = &usdhc3; /* eMMC */
++		mmc1 = &usdhc1; /* MMC/SD Slot */
++		/delete-property/ mmc2;
++		/delete-property/ mmc3;
++	};
++
+ 	backlight: backlight {
+ 		compatible = "pwm-backlight";
+ 		brightness-levels = <0 45 63 88 119 158 203 255>;
+--
+2.34.1

@@ -1,0 +1,40 @@
+From 212abec626e1c82616a1cf6e492e467cf79aef23 Mon Sep 17 00:00:00 2001
+From: Francesco Dolcini <francesco.dolcini@toradex.com>
+Date: Wed, 20 Apr 2022 11:13:00 +0200
+Subject: [PATCH 1/4] thermal: imx: Update critical temp threshold
+
+Increase the critical temperature threshold to the datasheet defined
+value according to the temperature grade of the SoC, increasing the
+actual critical temperature value of 5 degrees.
+
+Without this change the emergency shutdown will trigger earlier then
+required affecting applications that are expected to be working on this
+close to the limit, but yet valid, temperature range.
+
+Upstream-Status: Denied [https://lore.kernel.org/all/20220420091300.179753-1-francesco.dolcini@toradex.com/]
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+---
+ drivers/thermal/imx_thermal.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/thermal/imx_thermal.c b/drivers/thermal/imx_thermal.c
+index 826358cbe810..4fcbf15b2768 100644
+--- a/drivers/thermal/imx_thermal.c
++++ b/drivers/thermal/imx_thermal.c
+@@ -458,11 +458,11 @@ static void imx_init_temp_grade(struct platform_device *pdev, u32 ocotp_mem0)
+ 	}
+ 
+ 	/*
+-	 * Set the critical trip point at 5 °C under max
++	 * Set the critical trip point at max
+ 	 * Set the passive trip point at 10 °C under max (changeable via sysfs)
+ 	 */
+ 	trips[IMX_TRIP_PASSIVE].temperature = data->temp_max - (1000 * 10);
+-	trips[IMX_TRIP_CRITICAL].temperature = data->temp_max - (1000 * 5);
++	trips[IMX_TRIP_CRITICAL].temperature = data->temp_max;
+ }
+ 
+ static int imx_init_from_tempmon_data(struct platform_device *pdev)
+-- 
+2.35.3
+

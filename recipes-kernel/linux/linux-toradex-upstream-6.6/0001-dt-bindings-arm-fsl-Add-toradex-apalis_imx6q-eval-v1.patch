@@ -1,0 +1,52 @@
+From 07aff3753a49d9c70cd98571a7bf58e61f8d9fed Mon Sep 17 00:00:00 2001
+From: Hiago De Franco <hiago.franco@toradex.com>
+Date: Wed, 24 Jan 2024 11:13:19 -0300
+Subject: [PATCH 1/2] dt-bindings: arm: fsl: Add toradex,apalis_imx6q-eval-v1.2
+ board
+
+Add the toradex,apalis_imx6q-eval-v1.2 compatible string for version 1.2
+of the Apalis Evaluation Board.
+
+Version v1.2 includes the following changes compared to v1.1:
+
+- 8-bit MMC connector replaced with a 4-bit uSD connector.
+- Audio codec NAU88C22 added.
+- M24C02 EEPROM i2c added.
+- MIPI-CSI-2 connector directly to the board added.
+- PCIe switch PEX8605 removed and PCIe now is routed directly to Mini
+  PCIe connector.
+- Power measurement IC INA219 added.
+- Replaced DVI with HDMI connector.
+- Single-channel USB to UART converter replaced with four-channel USB
+  to UART/JTAG.
+- Temperature sensor TMP75 added.
+
+Please note that version v1.0 (which reached EOL) is compatible with
+v1.1, therefore toradex,apalis_imx6q-eval compatible string should be
+used for both v1.0 and v1.1.
+
+Upstream-Status: Submitted [https://lore.kernel.org/lkml/20240122123526.43400-1-hiagofranco@gmail.com/]
+
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: Hiago De Franco <hiago.franco@toradex.com>
+Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+---
+ Documentation/devicetree/bindings/arm/fsl.yaml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/devicetree/bindings/arm/fsl.yaml b/Documentation/devicetree/bindings/arm/fsl.yaml
+index 9450b2c8a678f..9a3262ca169e2 100644
+--- a/Documentation/devicetree/bindings/arm/fsl.yaml
++++ b/Documentation/devicetree/bindings/arm/fsl.yaml
+@@ -381,7 +381,8 @@ properties:
+               - toradex,apalis_imx6q-ixora      # Apalis iMX6Q/D Module on Ixora Carrier Board
+               - toradex,apalis_imx6q-ixora-v1.1 # Apalis iMX6Q/D Module on Ixora V1.1 Carrier Board
+               - toradex,apalis_imx6q-ixora-v1.2 # Apalis iMX6Q/D Module on Ixora V1.2 Carrier Board
+-              - toradex,apalis_imx6q-eval       # Apalis iMX6Q/D Module on Apalis Evaluation Board
++              - toradex,apalis_imx6q-eval       # Apalis iMX6Q/D Module on Apalis Evaluation Board v1.0/v1.1
++              - toradex,apalis_imx6q-eval-v1.2  # Apalis iMX6Q/D Module on Apalis Evaluation Board v1.2
+           - const: toradex,apalis_imx6q
+           - const: fsl,imx6q
+
+--
+2.34.1

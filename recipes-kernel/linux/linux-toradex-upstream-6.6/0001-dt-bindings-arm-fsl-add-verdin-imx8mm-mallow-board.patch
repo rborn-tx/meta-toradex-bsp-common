@@ -1,0 +1,44 @@
+From b12afbf0aba29a6a5b70c356146e2dc8b530998c Mon Sep 17 00:00:00 2001
+From: Joao Paulo Goncalves <joao.goncalves@toradex.com>
+Date: Fri, 1 Dec 2023 16:07:32 +0100
+Subject: [PATCH 1/2] dt-bindings: arm: fsl: add verdin imx8mm mallow board
+
+Add Mallow carrier board for wifi and nonwifi variants of Toradex Verdin
+IMX8MM SoM. Mallow is a low-cost carrier board in the Verdin family with
+a small form factor and build for volume production making it ideal for
+industrial and embedded applications.
+
+https://www.toradex.com/products/carrier-board/mallow-carrier-board
+
+Upstream-Status: Backport [ffce67b61108aaab6061f122b5cffe6c4e59fee2]
+
+Signed-off-by: Joao Paulo Goncalves <joao.goncalves@toradex.com>
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+---
+ Documentation/devicetree/bindings/arm/fsl.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/arm/fsl.yaml b/Documentation/devicetree/bindings/arm/fsl.yaml
+index 9450b2c8a678f..beca54b61999b 100644
+--- a/Documentation/devicetree/bindings/arm/fsl.yaml
++++ b/Documentation/devicetree/bindings/arm/fsl.yaml
+@@ -958,6 +958,7 @@ properties:
+               - menlo,mx8menlo                       # Verdin iMX8M Mini Module on i.MX8MM Menlo board
+               - toradex,verdin-imx8mm-nonwifi-dahlia # Verdin iMX8M Mini Module on Dahlia
+               - toradex,verdin-imx8mm-nonwifi-dev    # Verdin iMX8M Mini Module on Verdin Development Board
++              - toradex,verdin-imx8mm-nonwifi-mallow # Verdin iMX8M Mini Module on Mallow
+               - toradex,verdin-imx8mm-nonwifi-yavia  # Verdin iMX8M Mini Module on Yavia
+           - const: toradex,verdin-imx8mm-nonwifi     # Verdin iMX8M Mini Module without Wi-Fi / BT
+           - const: toradex,verdin-imx8mm             # Verdin iMX8M Mini Module
+@@ -968,6 +969,7 @@ properties:
+           - enum:
+               - toradex,verdin-imx8mm-wifi-dahlia # Verdin iMX8M Mini Wi-Fi / BT Module on Dahlia
+               - toradex,verdin-imx8mm-wifi-dev    # Verdin iMX8M Mini Wi-Fi / BT M. on Verdin Development B.
++              - toradex,verdin-imx8mm-wifi-mallow # Verdin iMX8M Mini Wi-Fi / BT Module on Mallow
+               - toradex,verdin-imx8mm-wifi-yavia  # Verdin iMX8M Mini Wi-Fi / BT Module on Yavia
+           - const: toradex,verdin-imx8mm-wifi     # Verdin iMX8M Mini Wi-Fi / BT Module
+           - const: toradex,verdin-imx8mm          # Verdin iMX8M Mini Module
+--
+2.34.1

@@ -1,0 +1,54 @@
+From 0af4e07ee7510a04d0ba3fba26a0675068c43780 Mon Sep 17 00:00:00 2001
+From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Date: Fri, 6 Oct 2023 10:04:28 -0300
+Subject: [PATCH 4/4] power: reset: gpio-poweroff: make sys handler priority
+ configurable
+
+Add a priority property equal to gpio-restart to allow increasing the
+priority of the gpio-poweroff handler.
+
+Upstream-Status: Backport [d03d2a8cdefe86f04cfb53934a708620e7dfbfcb]
+
+Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+Link: https://lore.kernel.org/r/20231006130428.11259-5-francesco@dolcini.it
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/power/reset/gpio-poweroff.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/power/reset/gpio-poweroff.c b/drivers/power/reset/gpio-poweroff.c
+index 0deb293eb2d66..52cfeee2cb284 100644
+--- a/drivers/power/reset/gpio-poweroff.c
++++ b/drivers/power/reset/gpio-poweroff.c
+@@ -54,6 +54,7 @@ static int gpio_poweroff_probe(struct platform_device *pdev)
+ 	struct gpio_poweroff *gpio_poweroff;
+ 	bool input = false;
+ 	enum gpiod_flags flags;
++	int priority = SYS_OFF_PRIO_DEFAULT;
+ 	int ret;
+
+ 	gpio_poweroff = devm_kzalloc(&pdev->dev, sizeof(*gpio_poweroff), GFP_KERNEL);
+@@ -75,14 +76,18 @@ static int gpio_poweroff_probe(struct platform_device *pdev)
+ 	device_property_read_u32(&pdev->dev, "inactive-delay-ms",
+ 				 &gpio_poweroff->inactive_delay_ms);
+ 	device_property_read_u32(&pdev->dev, "timeout-ms", &gpio_poweroff->timeout_ms);
++	device_property_read_u32(&pdev->dev, "priority", &priority);
++	if (priority > 255) {
++		dev_err(&pdev->dev, "Invalid priority property: %u\n", priority);
++		return -EINVAL;
++	}
+
+ 	gpio_poweroff->reset_gpio = devm_gpiod_get(&pdev->dev, NULL, flags);
+ 	if (IS_ERR(gpio_poweroff->reset_gpio))
+ 		return PTR_ERR(gpio_poweroff->reset_gpio);
+
+ 	ret = devm_register_sys_off_handler(&pdev->dev, SYS_OFF_MODE_POWER_OFF,
+-					    SYS_OFF_PRIO_DEFAULT, gpio_poweroff_do_poweroff,
+-					    gpio_poweroff);
++					    priority, gpio_poweroff_do_poweroff, gpio_poweroff);
+ 	if (ret)
+ 		return dev_err_probe(&pdev->dev, ret, "Cannot register poweroff handler\n");
+
+--
+2.34.1

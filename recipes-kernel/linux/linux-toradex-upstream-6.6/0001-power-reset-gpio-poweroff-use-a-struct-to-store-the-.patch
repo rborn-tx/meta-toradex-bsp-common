@@ -1,0 +1,110 @@
+From 248de784e6db9afc2eb9b01a123ce27324d16457 Mon Sep 17 00:00:00 2001
+From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Date: Fri, 6 Oct 2023 10:04:25 -0300
+Subject: [PATCH 1/4] power: reset: gpio-poweroff: use a struct to store the
+ module variables
+
+Use a struct to store the module variables. This is required to later
+move to notifier_blocks where we can have several instances.
+
+Upstream-Status: Backport [13b4c6964665cadb9b06c085029710c43a0c662]
+
+Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+Link: https://lore.kernel.org/r/20231006130428.11259-2-francesco@dolcini.it
+Signed-off-by: Sebastian Reichel <sebastian.reichel@collabora.com>
+---
+ drivers/power/reset/gpio-poweroff.c | 48 +++++++++++++++++++----------
+ 1 file changed, 31 insertions(+), 17 deletions(-)
+
+diff --git a/drivers/power/reset/gpio-poweroff.c b/drivers/power/reset/gpio-poweroff.c
+index b28f24da1b3cd..dea550e422f3c 100644
+--- a/drivers/power/reset/gpio-poweroff.c
++++ b/drivers/power/reset/gpio-poweroff.c
+@@ -17,32 +17,37 @@
+ #include <linux/module.h>
+
+ #define DEFAULT_TIMEOUT_MS 3000
++
++struct gpio_poweroff {
++	struct gpio_desc *reset_gpio;
++	u32 timeout_ms;
++	u32 active_delay_ms;
++	u32 inactive_delay_ms;
++};
++
+ /*
+  * Hold configuration here, cannot be more than one instance of the driver
+  * since pm_power_off itself is global.
+  */
+-static struct gpio_desc *reset_gpio;
+-static u32 timeout = DEFAULT_TIMEOUT_MS;
+-static u32 active_delay = 100;
+-static u32 inactive_delay = 100;
++static struct gpio_poweroff *gpio_poweroff;
+
+ static void gpio_poweroff_do_poweroff(void)
+ {
+-	BUG_ON(!reset_gpio);
++	BUG_ON(!gpio_poweroff);
+
+ 	/* drive it active, also inactive->active edge */
+-	gpiod_direction_output(reset_gpio, 1);
+-	mdelay(active_delay);
++	gpiod_direction_output(gpio_poweroff->reset_gpio, 1);
++	mdelay(gpio_poweroff->active_delay_ms);
+
+ 	/* drive inactive, also active->inactive edge */
+-	gpiod_set_value_cansleep(reset_gpio, 0);
+-	mdelay(inactive_delay);
++	gpiod_set_value_cansleep(gpio_poweroff->reset_gpio, 0);
++	mdelay(gpio_poweroff->inactive_delay_ms);
+
+ 	/* drive it active, also inactive->active edge */
+-	gpiod_set_value_cansleep(reset_gpio, 1);
++	gpiod_set_value_cansleep(gpio_poweroff->reset_gpio, 1);
+
+ 	/* give it some time */
+-	mdelay(timeout);
++	mdelay(gpio_poweroff->timeout_ms);
+
+ 	WARN_ON(1);
+ }
+@@ -60,20 +65,29 @@ static int gpio_poweroff_probe(struct platform_device *pdev)
+ 		return -EBUSY;
+ 	}
+
++	gpio_poweroff = devm_kzalloc(&pdev->dev, sizeof(*gpio_poweroff), GFP_KERNEL);
++	if (!gpio_poweroff)
++		return -ENOMEM;
++
+ 	input = device_property_read_bool(&pdev->dev, "input");
+ 	if (input)
+ 		flags = GPIOD_IN;
+ 	else
+ 		flags = GPIOD_OUT_LOW;
+
+-	device_property_read_u32(&pdev->dev, "active-delay-ms", &active_delay);
++
++	gpio_poweroff->active_delay_ms = 100;
++	gpio_poweroff->inactive_delay_ms = 100;
++	gpio_poweroff->timeout_ms = DEFAULT_TIMEOUT_MS;
++
++	device_property_read_u32(&pdev->dev, "active-delay-ms", &gpio_poweroff->active_delay_ms);
+ 	device_property_read_u32(&pdev->dev, "inactive-delay-ms",
+-				 &inactive_delay);
+-	device_property_read_u32(&pdev->dev, "timeout-ms", &timeout);
++				 &gpio_poweroff->inactive_delay_ms);
++	device_property_read_u32(&pdev->dev, "timeout-ms", &gpio_poweroff->timeout_ms);
+
+-	reset_gpio = devm_gpiod_get(&pdev->dev, NULL, flags);
+-	if (IS_ERR(reset_gpio))
+-		return PTR_ERR(reset_gpio);
++	gpio_poweroff->reset_gpio = devm_gpiod_get(&pdev->dev, NULL, flags);
++	if (IS_ERR(gpio_poweroff->reset_gpio))
++		return PTR_ERR(gpio_poweroff->reset_gpio);
+
+ 	pm_power_off = &gpio_poweroff_do_poweroff;
+ 	return 0;
+--
+2.34.1

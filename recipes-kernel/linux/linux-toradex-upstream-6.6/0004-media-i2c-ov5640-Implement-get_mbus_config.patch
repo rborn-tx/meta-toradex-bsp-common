@@ -1,0 +1,54 @@
+From 3317d3298cd06213d457ad7090ec0fd56eefc5d2 Mon Sep 17 00:00:00 2001
+From: Aishwarya Kothari <aishwarya.kothari@toradex.com>
+Date: Wed, 25 Jan 2023 13:09:15 +0100
+Subject: [PATCH 4/4] media: i2c: ov5640: Implement get_mbus_config
+
+Implement the introduced get_mbus_config operation to report the
+config of the MIPI CSI-2, BT.656 and Parallel interface.
+
+Signed-off-by: Aishwarya Kothari <aishwarya.kothari@toradex.com>
+Upstream-Status: Submitted [https://lore.kernel.org/all/20230306063649.7387-1-marcel@ziswiler.com/]
+---
+ drivers/media/i2c/ov5640.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/drivers/media/i2c/ov5640.c b/drivers/media/i2c/ov5640.c
+index 5fe85aa2d2ec..8cb966fb1b79 100644
+--- a/drivers/media/i2c/ov5640.c
++++ b/drivers/media/i2c/ov5640.c
+@@ -3755,6 +3755,24 @@ static int ov5640_init_cfg(struct v4l2_subdev *sd,
+ 	return 0;
+ }
+ 
++static int ov5640_get_mbus_config(struct v4l2_subdev *sd,
++				   unsigned int pad,
++				   struct v4l2_mbus_config *cfg)
++{
++	struct ov5640_dev *sensor = to_ov5640_dev(sd);
++
++	cfg->type = sensor->ep.bus_type;
++	if (ov5640_is_csi2(sensor)) {
++		cfg->bus.mipi_csi2.num_data_lanes =
++			sensor->ep.bus.mipi_csi2.num_data_lanes;
++		cfg->bus.mipi_csi2.flags = sensor->ep.bus.mipi_csi2.flags;
++	} else {
++		cfg->bus.parallel.flags = sensor->ep.bus.parallel.flags;
++	}
++
++	return 0;
++}
++
+ static const struct v4l2_subdev_core_ops ov5640_core_ops = {
+ 	.log_status = v4l2_ctrl_subdev_log_status,
+ 	.subscribe_event = v4l2_ctrl_subdev_subscribe_event,
+@@ -3775,6 +3793,7 @@ static const struct v4l2_subdev_pad_ops ov5640_pad_ops = {
+ 	.get_selection = ov5640_get_selection,
+ 	.enum_frame_size = ov5640_enum_frame_size,
+ 	.enum_frame_interval = ov5640_enum_frame_interval,
++	.get_mbus_config = ov5640_get_mbus_config,
+ };
+ 
+ static const struct v4l2_subdev_ops ov5640_subdev_ops = {
+-- 
+2.35.3
+

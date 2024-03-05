@@ -1,0 +1,35 @@
+From dfddfac32dd5854b2b05e66abbedbddf6814485f Mon Sep 17 00:00:00 2001
+From: Hiago De Franco <hiago.franco@toradex.com>
+Date: Mon, 20 Nov 2023 21:58:18 +0100
+Subject: [PATCH 3/3] ARM: dts: imx7d-colibri-emmc: Add usdhc aliases
+
+Add mmc aliases to ensure a consistent mmc device naming across the
+Toradex SoM family, with this commit mmc0 is the on-module eMMC
+boot device and the not available mmc interfaces are removed.
+
+Upstream-Status: Backport [d53314dd068e782ba0fa808405026f37dbedeb1e]
+
+Signed-off-by: Hiago De Franco <hiago.franco@toradex.com>
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
+Signed-off-by: Shawn Guo <shawnguo@kernel.org>
+---
+ arch/arm/boot/dts/nxp/imx/imx7d-colibri-emmc.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/nxp/imx/imx7d-colibri-emmc.dtsi b/arch/arm/boot/dts/nxp/imx/imx7d-colibri-emmc.dtsi
+index 3740e34ef99f1..9670f45eab3ba 100644
+--- a/arch/arm/boot/dts/nxp/imx/imx7d-colibri-emmc.dtsi
++++ b/arch/arm/boot/dts/nxp/imx/imx7d-colibri-emmc.dtsi
+@@ -11,6 +11,10 @@ aliases {
+ 		/* Required to properly pass MAC addresses from bootloader. */
+ 		ethernet0 = &fec1;
+ 		ethernet1 = &fec2;
++		mmc0 = &usdhc3; /* eMMC */
++		mmc1 = &usdhc1; /* MMC/SD slot */
++		/delete-property/ mmc2;
++		/delete-property/ mmc3;
+ 	};
+
+ 	memory@80000000 {
+--
+2.34.1
