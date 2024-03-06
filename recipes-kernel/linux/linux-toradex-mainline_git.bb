@@ -57,10 +57,10 @@ SRC_URI:append = " \
     file://0002-mmc-core-block.c-avoid-negative-index-with-array-acc.patch \
 "
 
-LINUX_VERSION ?= "6.1.80"
+LINUX_VERSION ?= "6.1.83"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "a3eb3a74aa8c94e6c8130b55f3b031f29162868c"
+SRCREV_machine = "e5cd595e23c1a075359a337c0e5c3a4f2dc28dd1"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
