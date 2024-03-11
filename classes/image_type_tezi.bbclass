@@ -31,6 +31,8 @@ TEZI_ROOT_FSOPTS ?= "-E nodiscard"
 TEZI_ROOT_LABEL ??= "RFS"
 TEZI_ROOT_NAME ??= "rootfs"
 TEZI_ROOT_SUFFIX ??= "tar.xz"
+TEZI_ROOT_PART_TYPE ??= "83"
+TEZI_ROOT_PART_SIZE ??= "512"
 TEZI_ROOT_FILELIST ??= ""
 TEZI_USE_BOOTFILES ??= "true"
 TEZI_AUTO_INSTALL ??= "false"
@@ -239,17 +241,33 @@ def rootfs_tezi_emmc(d, use_bootfiles):
                 }
               })
 
-    rootfs = {
-               "partition_size_nominal": 512,
-               "want_maximised": True,
-               "content": {
-                 "label": d.getVar('TEZI_ROOT_LABEL'),
-                 "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
-                 "mkfs_options": d.getVar('TEZI_ROOT_FSOPTS'),
-                 "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
-                 "uncompressed_size": get_uncompressed_size(d, d.getVar('TEZI_ROOT_NAME'))
-               }
-             }
+    if d.getVar('TEZI_ROOT_FSTYPE') == "raw":
+        rootfs = {
+                   "partition_size_nominal": d.getVar('TEZI_ROOT_PART_SIZE'),
+                   "partition_type": d.getVar('TEZI_ROOT_PART_TYPE'),
+                   "want_maximised": True,
+                   "content": {
+                     "filesystem_type": "raw",
+                     "rawfiles": [
+                       {
+                         "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX')
+                       }
+                     ],
+                     "uncompressed_size": get_uncompressed_size(d, d.getVar('TEZI_ROOT_NAME'))
+                   }
+                 }
+    else:
+        rootfs = {
+                   "partition_size_nominal": d.getVar('TEZI_ROOT_PART_SIZE'),
+                   "want_maximised": True,
+                   "content": {
+                     "label": d.getVar('TEZI_ROOT_LABEL'),
+                     "filesystem_type": d.getVar('TEZI_ROOT_FSTYPE'),
+                     "mkfs_options": d.getVar('TEZI_ROOT_FSOPTS'),
+                     "filename": imagename + "." + d.getVar('TEZI_ROOT_SUFFIX'),
+                     "uncompressed_size": get_uncompressed_size(d, d.getVar('TEZI_ROOT_NAME'))
+                   }
+                 }
 
     rootfs_filelist = get_filelist_var(d, 'TEZI_ROOT_FILELIST')
     if rootfs_filelist:
