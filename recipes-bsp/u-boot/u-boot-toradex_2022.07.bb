@@ -37,9 +37,6 @@ TDX_PATCHES = " \
     file://0014-toradex-tdx-cfg-block-Add-new-apalis-and-colibri-pid.patch \
 "
 SRC_URI:append = " ${TDX_PATCHES}"
-SRC_URI:append:use-nxp-bsp:colibri-imx7 = " \
-    file://0001-colibri_imx7-boot-linux-kernel-in-secure-mode.patch \
-"
 
 inherit toradex-u-boot-localversion
 
