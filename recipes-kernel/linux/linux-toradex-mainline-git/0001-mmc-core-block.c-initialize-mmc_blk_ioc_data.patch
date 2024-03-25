@@ -1,0 +1,46 @@
+From 8665d5c2210040a05d26abc1ec2c81fb1cea4630 Mon Sep 17 00:00:00 2001
+From: Mikko Rapeli <mikko.rapeli@linaro.org>
+Date: Wed, 13 Mar 2024 15:37:43 +0200
+Subject: [PATCH 1/2] mmc core block.c: initialize mmc_blk_ioc_data
+
+Commit "mmc: core: Use mrq.sbc in close-ended ffu" adds flags uint to
+struct mmc_blk_ioc_data but it does not get initialized for RPMB ioctls
+which now fail.
+
+Fix this by always initializing the struct and flags to zero.
+
+Fixes access to RPMB storage.
+
+Upstream-Status: Submitted [https://lore.kernel.org/all/20240313133744.2405325-1-mikko.rapeli@linaro.org/]
+
+Fixes: 4d0c8d0aef63 ("mmc: core: Use mrq.sbc in close-ended ffu")
+Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218587
+Link: https://lore.kernel.org/all/20231129092535.3278-1-avri.altman@wdc.com/
+Cc: Avri Altman <avri.altman@wdc.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Adrian Hunter <adrian.hunter@intel.com>
+Cc: linux-mmc@vger.kernel.org
+Cc: stable@vger.kernel.org
+Signed-off-by: Mikko Rapeli <mikko.rapeli@linaro.org>
+Acked-by: Adrian Hunter <adrian.hunter@intel.com>
+Reviewed-by: Avri Altman <avri.altman@wdc.com>
+---
+ drivers/mmc/core/block.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index ea60efaecb0d..5487c71ae0df 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -415,7 +415,7 @@ static struct mmc_blk_ioc_data *mmc_blk_ioctl_copy_from_user(
+ 	struct mmc_blk_ioc_data *idata;
+ 	int err;
+ 
+-	idata = kmalloc(sizeof(*idata), GFP_KERNEL);
++	idata = kzalloc(sizeof(*idata), GFP_KERNEL);
+ 	if (!idata) {
+ 		err = -ENOMEM;
+ 		goto out;
+-- 
+2.39.2
+

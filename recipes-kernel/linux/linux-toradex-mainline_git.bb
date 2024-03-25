@@ -53,6 +53,8 @@ SRC_URI:append = " \
     file://0001-usb-gadget-f_ncm-Apply-workaround-for-packet-cloggin.patch \
     file://0001-dt-bindings-arm-fsl-Add-toradex-apalis_imx6q-eval-v1.patch \
     file://0002-arm-dts-nxp-imx-Add-support-for-Apalis-Evaluation-Bo.patch \
+    file://0001-mmc-core-block.c-initialize-mmc_blk_ioc_data.patch \
+    file://0002-mmc-core-block.c-avoid-negative-index-with-array-acc.patch \
 "
 
 LINUX_VERSION ?= "6.1.80"
