@@ -1,0 +1,30 @@
+From 5f84fe1258750e40c9943e6d6e70008e318da58c Mon Sep 17 00:00:00 2001
+From: Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
+Date: Wed, 20 Mar 2024 18:12:02 +0100
+Subject: [PATCH 2/3] configs: colibri-imx7: set non-secure boot mode as
+ default
+
+Linux kernel is supposed to run in non-secure world,
+fix the defconfig accordingly.
+
+Upstream-Status: Submitted [https://lore.kernel.org/all/20240328101724.127371-1-ghidoliemanuele@gmail.com/]
+Signed-off-by: Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
+---
+ configs/colibri_imx7_emmc_defconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configs/colibri_imx7_emmc_defconfig b/configs/colibri_imx7_emmc_defconfig
+index 0e09127255c1..5839d21d60f6 100644
+--- a/configs/colibri_imx7_emmc_defconfig
++++ b/configs/colibri_imx7_emmc_defconfig
+@@ -7,7 +7,6 @@ CONFIG_DM_GPIO=y
+ CONFIG_DEFAULT_DEVICE_TREE="imx7-colibri-emmc"
+ CONFIG_TARGET_COLIBRI_IMX7=y
+ CONFIG_TARGET_COLIBRI_IMX7_EMMC=y
+-CONFIG_ARMV7_BOOT_SEC_DEFAULT=y
+ CONFIG_IMX_RDC=y
+ CONFIG_IMX_BOOTAUX=y
+ CONFIG_IMX_HAB=y
+-- 
+2.34.1
+

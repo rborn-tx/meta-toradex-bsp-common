@@ -35,6 +35,9 @@ TDX_PATCHES = " \
     file://0001-colibri-imx7-Call-fdt_increase_size.patch \
     file://0001-board-colibri_imx7-fix-emmc-detection.patch \
     file://0014-toradex-tdx-cfg-block-Add-new-apalis-and-colibri-pid.patch \
+    file://0001-crypto-fsl-allow-accessing-Job-Ring-from-non-TrustZo.patch \
+    file://0002-configs-colibri-imx7-set-non-secure-boot-mode-as-def.patch \
+    file://0003-configs-colibri-imx7-allow-accessing-job-rings-from-.patch \
 "
 SRC_URI:append = " ${TDX_PATCHES}"
 

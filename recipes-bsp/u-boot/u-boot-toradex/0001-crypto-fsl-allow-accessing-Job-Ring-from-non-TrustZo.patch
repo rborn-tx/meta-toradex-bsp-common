@@ -1,0 +1,89 @@
+From 26c1c3009747cbcda9f90881174b389a7d296a2d Mon Sep 17 00:00:00 2001
+From: Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
+Date: Wed, 20 Mar 2024 10:08:49 +0100
+Subject: [PATCH 1/3] crypto/fsl: allow accessing Job Ring from non-TrustZone
+
+Add a new kconfig option to allow non-secure world access
+to the CAAM Job Ring.
+This is needed, for example, when running linux without
+OP-TEE services, as it's done on Colibri iMX7.
+
+Upstream-Status: Submitted [https://lore.kernel.org/all/20240328101724.127371-1-ghidoliemanuele@gmail.com/]
+Fixes: 51f1357f3428 ("Revert "drivers/crypto/fsl: assign job-rings to non-TrustZone"")
+Signed-off-by: Emanuele Ghidoli <emanuele.ghidoli@toradex.com>
+---
+ drivers/crypto/fsl/Kconfig |  6 ++++++
+ drivers/crypto/fsl/jr.c    | 19 +++++++++++++++++++
+ drivers/crypto/fsl/jr.h    |  2 ++
+ 3 files changed, 27 insertions(+)
+
+diff --git a/drivers/crypto/fsl/Kconfig b/drivers/crypto/fsl/Kconfig
+index e03fcdd9c7e4..be65abd3f52b 100644
+--- a/drivers/crypto/fsl/Kconfig
++++ b/drivers/crypto/fsl/Kconfig
+@@ -57,6 +57,12 @@ config SYS_FSL_SEC_LE
+ 
+ if FSL_CAAM
+ 
++config FSL_CAAM_JR_NTZ_ACCESS
++	bool "Give CAAM Job Ring access to non-secure world"
++	help
++	  It is needed when OP-TEE is not used and Freescale CAAM Job Ring linux
++	  driver is used.
++
+ config FSL_CAAM_RNG
+ 	bool "Enable Random Number Generator support"
+ 	depends on DM_RNG
+diff --git a/drivers/crypto/fsl/jr.c b/drivers/crypto/fsl/jr.c
+index acd29924f7e7..09e7b01dab92 100644
+--- a/drivers/crypto/fsl/jr.c
++++ b/drivers/crypto/fsl/jr.c
+@@ -673,6 +673,21 @@ static int rng_init(uint8_t sec_idx, ccsr_sec_t *sec)
+ 	return ret;
+ }
+ 
++#if CONFIG_IS_ENABLED(FSL_CAAM_JR_NTZ_ACCESS)
++static void jr_setown_non_trusted(ccsr_sec_t *sec)
++{
++	u32 jrown_ns;
++	int i;
++
++	/* Set ownership of job rings to non-TrustZone mode */
++	for (i = 0; i < ARRAY_SIZE(sec->jrliodnr); i++) {
++		jrown_ns = sec_in32(&sec->jrliodnr[i].ms);
++		jrown_ns |= JROWN_NS | JRMID_NS;
++		sec_out32(&sec->jrliodnr[i].ms, jrown_ns);
++	}
++}
++#endif
++
+ int sec_init_idx(uint8_t sec_idx)
+ {
+ 	int ret = 0;
+@@ -761,6 +776,10 @@ int sec_init_idx(uint8_t sec_idx)
+ #if CONFIG_IS_ENABLED(OF_CONTROL)
+ init:
+ #endif
++#if CONFIG_IS_ENABLED(FSL_CAAM_JR_NTZ_ACCESS)
++	jr_setown_non_trusted(sec);
++#endif
++
+ 	ret = jr_init(sec_idx, caam);
+ 	if (ret < 0) {
+ 		printf("SEC%u:  initialization failed\n", sec_idx);
+diff --git a/drivers/crypto/fsl/jr.h b/drivers/crypto/fsl/jr.h
+index 3eb7be79da41..f46001065403 100644
+--- a/drivers/crypto/fsl/jr.h
++++ b/drivers/crypto/fsl/jr.h
+@@ -37,6 +37,8 @@
+ #define JRNSLIODN_MASK		0x0fff0000
+ #define JRSLIODN_SHIFT		0
+ #define JRSLIODN_MASK		0x00000fff
++#define JROWN_NS		0x00000008
++#define JRMID_NS		0x00000001
+ 
+ #define JRDID_MS_PRIM_DID	BIT(0)
+ #define JRDID_MS_PRIM_TZ	BIT(4)
+-- 
+2.34.1
+
