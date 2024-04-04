@@ -53,14 +53,12 @@ SRC_URI:append = " \
     file://0001-usb-gadget-f_ncm-Apply-workaround-for-packet-cloggin.patch \
     file://0001-dt-bindings-arm-fsl-Add-toradex-apalis_imx6q-eval-v1.patch \
     file://0002-arm-dts-nxp-imx-Add-support-for-Apalis-Evaluation-Bo.patch \
-    file://0001-mmc-core-block.c-initialize-mmc_blk_ioc_data.patch \
-    file://0002-mmc-core-block.c-avoid-negative-index-with-array-acc.patch \
 "
 
-LINUX_VERSION ?= "6.1.83"
+LINUX_VERSION ?= "6.1.84"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "e5cd595e23c1a075359a337c0e5c3a4f2dc28dd1"
+SRCREV_machine = "347385861c50adc8d4801d4b899eded38a2f04cd"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
