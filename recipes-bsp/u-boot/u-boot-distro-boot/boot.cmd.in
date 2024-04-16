@@ -67,11 +67,8 @@ if test "${root_devtype}" = ""; then
     fi
 fi
 
-if test -n ${setup}; then
-    run setup
-else
-    env set setupargs console=tty1 console=${console},${baudrate} consoleblank=0
-fi
+env set appendargs @@APPEND@@
+env set setupargs console=tty1 console=${console},${baudrate}
 
 if test ${kernel_image} = "fitImage"; then
     env set kernel_addr_load ${ramdisk_addr_r}
@@ -121,7 +118,7 @@ else
     fi
 fi
 
-env set bootcmd_args 'run rootfsargs_set && env set bootargs ${defargs} ${rootfsargs} ${setupargs} ${vidargs} ${tdxargs}'
+env set bootcmd_args 'run rootfsargs_set && env set bootargs ${rootfsargs} ${setupargs} ${appendargs} ${tdxargs}'
 if test ${skip_fdt_overlays} != 1; then
     env set bootcmd_overlays 'run load_overlays_file && run fdt_resize && run apply_overlays'
 else
