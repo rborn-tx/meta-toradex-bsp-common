@@ -13,7 +13,7 @@ fi
 hostname=@@MACHINE@@"-"${serial}
 
 if [ -f /usr/bin/hostnamectl ]; then
-    /usr/bin/hostnamectl set-hostname ${hostname}
+    /usr/bin/hostnamectl set-hostname @@HOSTNAMECTL_OPT@@ ${hostname}
 else
     hostname ${hostname}
 fi
