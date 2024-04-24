@@ -55,10 +55,10 @@ SRC_URI:append = " \
     file://0002-arm-dts-nxp-imx-Add-support-for-Apalis-Evaluation-Bo.patch \
 "
 
-LINUX_VERSION ?= "6.1.84"
+LINUX_VERSION ?= "6.1.89"
 KBRANCH = "linux-6.1.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "347385861c50adc8d4801d4b899eded38a2f04cd"
+SRCREV_machine = "dcbc050cb0d304c3427d6583384eebcaf0e3caee"
 SRCREV_machine:use-head-next = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
