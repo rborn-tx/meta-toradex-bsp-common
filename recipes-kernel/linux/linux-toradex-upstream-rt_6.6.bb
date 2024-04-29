@@ -1,8 +1,6 @@
 LINUX_VERSION ?= "6.6.20-rt25"
 require recipes-kernel/linux/linux-toradex-upstream_6.6.bb
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/linux-toradex-upstream-6.6:"
-
 SUMMARY = "Toradex mainline real-time Linux kernel"
 # To build the RT kernel we use the RT kernel git repo rather than applying
 # the RT patch on top of a vanilla kernel.

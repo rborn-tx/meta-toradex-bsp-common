@@ -1,6 +1,6 @@
 require linux-toradex-upstream.inc
 
-FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-${PV}:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/linux-toradex-upstream-6.6:"
 
 LINUX_REPO = "git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git"
 
