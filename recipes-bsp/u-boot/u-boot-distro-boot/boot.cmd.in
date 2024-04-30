@@ -67,8 +67,14 @@ if test "${root_devtype}" = ""; then
     fi
 fi
 
+# Set console baudrate only when required
+setexpr _res sub "," "_" ${console}
+if test ! $? -eq 0; then
+	env set console "${console},${baudrate}"
+fi
+
 env set appendargs @@APPEND@@
-env set setupargs console=tty1 console=${console},${baudrate}
+env set setupargs console=tty1 console=${console}
 
 if test ${kernel_image} = "fitImage"; then
     env set kernel_addr_load ${ramdisk_addr_r}
