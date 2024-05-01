@@ -3,7 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://weston.sh"
 
 PACKAGECONFIG:append:upstream:tdx = " no-idle-timeout"
-PACKAGECONFIG:append:am62x = " no-idle-timeout"
+PACKAGECONFIG:append:k3 = " no-idle-timeout"
 PACKAGECONFIG:append:upstream:colibri-imx6ull = " use-pixman"
 PACKAGECONFIG:append:upstream:colibri-imx6ull-emmc = " use-pixman"
 PACKAGECONFIG:append:upstream:colibri-imx7 = " use-pixman"
