@@ -1,0 +1,120 @@
+From 85eba60ab304cfc9d7053298a6aa7dc4234f2cad Mon Sep 17 00:00:00 2001
+From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Date: Fri, 26 Jan 2024 13:33:05 +0100
+Subject: [PATCH v1 1/4] arm64: dts: freescale: imx8mp-verdin: replace
+ sleep-moci hog with regulator
+
+The Verdin family has a signal called sleep-moci which can be used to
+turn off peripherals on the carrier board when the SoM goes into
+suspend. So far we have hogged this signal, which means the peripherals
+are always on and it is not possible to add peripherals that depend on
+the sleep-moci to be on. With this change, we replace the hog with a
+regulator so that peripherals can add their own regulators that use the
+same gpio. Carrier boards that allow peripherals to be powered off in
+suspend can disable this regulator and implement their own regulator to
+control the sleep-moci.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-devicetree/20240405160720.5977-1-eichest@gmail.com/]
+Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+---
+ .../dts/freescale/imx8mp-verdin-dahlia.dtsi   |  5 ++++
+ .../boot/dts/freescale/imx8mp-verdin-dev.dtsi |  5 ++++
+ .../dts/freescale/imx8mp-verdin-yavia.dtsi    |  5 ++++
+ .../boot/dts/freescale/imx8mp-verdin.dtsi     | 26 ++++++++++++-------
+ 4 files changed, 31 insertions(+), 10 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-verdin-dahlia.dtsi b/arch/arm64/boot/dts/freescale/imx8mp-verdin-dahlia.dtsi
+index 7e9e4b13b5c5..e68e0e6f21e9 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-verdin-dahlia.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx8mp-verdin-dahlia.dtsi
+@@ -70,6 +70,11 @@ &flexspi {
+ 	status = "okay";
+ };
+ 
++&gpio4 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_ctrl_sleep_moci>;
++};
++
+ /* Current measurement into module VCC */
+ &hwmon {
+ 	status = "okay";
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-verdin-dev.dtsi b/arch/arm64/boot/dts/freescale/imx8mp-verdin-dev.dtsi
+index a509b2b7fa85..1a2520d4d6cf 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-verdin-dev.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx8mp-verdin-dev.dtsi
+@@ -93,6 +93,11 @@ &flexspi {
+ 	status = "okay";
+ };
+ 
++&gpio4 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_ctrl_sleep_moci>;
++};
++
+ &gpio_expander_21 {
+ 	status = "okay";
+ 	vcc-supply = <&reg_1p8v>;
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-verdin-yavia.dtsi b/arch/arm64/boot/dts/freescale/imx8mp-verdin-yavia.dtsi
+index db1722f0d80e..27160024d5b5 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-verdin-yavia.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx8mp-verdin-yavia.dtsi
+@@ -100,6 +100,11 @@ &flexcan1 {
+ 	status = "okay";
+ };
+ 
++&gpio4 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_ctrl_sleep_moci>;
++};
++
+ &hwmon_temp {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/freescale/imx8mp-verdin.dtsi b/arch/arm64/boot/dts/freescale/imx8mp-verdin.dtsi
+index faa17cbbe2fd..e523762947aa 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mp-verdin.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx8mp-verdin.dtsi
+@@ -116,6 +116,22 @@ reg_module_eth1phy: regulator-module-eth1phy {
+ 		vin-supply = <&reg_vdd_3v3>;
+ 	};
+ 
++	/*
++	 * By default we enable CTRL_SLEEP_MOCI#, this is required to have
++	 * peripherals on the carrier board powered.
++	 * If more granularity or power saving is required this can be disabled
++	 * in the carrier board device tree files.
++	 */
++	reg_force_sleep_moci: regulator-force-sleep-moci {
++		compatible = "regulator-fixed";
++		enable-active-high;
++		/* Verdin CTRL_SLEEP_MOCI# (SODIMM 256) */
++		gpio = <&gpio4 29 GPIO_ACTIVE_HIGH>;
++		regulator-always-on;
++		regulator-boot-on;
++		regulator-name = "CTRL_SLEEP_MOCI#";
++	};
++
+ 	reg_usb1_vbus: regulator-usb1-vbus {
+ 		compatible = "regulator-fixed";
+ 		enable-active-high;
+@@ -439,16 +455,6 @@ &gpio4 {
+ 			  "SODIMM_256",
+ 			  "SODIMM_48",
+ 			  "SODIMM_44";
+-
+-	ctrl-sleep-moci-hog {
+-		gpio-hog;
+-		/* Verdin CTRL_SLEEP_MOCI# (SODIMM 256) */
+-		gpios = <29 GPIO_ACTIVE_HIGH>;
+-		line-name = "CTRL_SLEEP_MOCI#";
+-		output-high;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&pinctrl_ctrl_sleep_moci>;
+-	};
+ };
+ 
+ /* On-module I2C */
+-- 
+2.40.1
+

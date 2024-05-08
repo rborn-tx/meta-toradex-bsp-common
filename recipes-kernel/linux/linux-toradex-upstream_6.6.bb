@@ -21,6 +21,14 @@ TDX_PATCHES = " \
     file://0003-dt-bindings-power-reset-gpio-poweroff-Add-priority-p.patch \
     file://0004-media-i2c-ov5640-Implement-get_mbus_config.patch \
     file://0004-power-reset-gpio-poweroff-make-sys-handler-priority-.patch \
+    file://0001-drm-bridge-lt8912b-Add-suspend-resume-support.patch \
+    file://0002-drm-bridge-lt8912b-Add-power-supplies.patch \
+    file://0001-arm64-dts-freescale-imx8mp-verdin-replace-sleep-m.patch \
+    file://0002-arm64-dts-freescale-imx8mp-verdin-dahlia-support-.patch \
+    file://0003-arm64-dts-freescale-imx8mm-verdin-replace-sleep-m.patch \
+    file://0004-arm64-dts-freescale-imx8mm-verdin-dahlia-support-.patch \
+    file://0001-arm64-dts-ti-k3-am62-verdin-replace-sleep-moci-ho.patch \
+    file://0002-arm64-dts-ti-k3-am62-verdin-dahlia-support-sleep-.patch \
 "
 PV = "6.6"
 LINUX_VERSION ?= "6.6.20"

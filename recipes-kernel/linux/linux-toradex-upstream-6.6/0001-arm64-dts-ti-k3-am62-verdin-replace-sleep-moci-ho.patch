@@ -1,0 +1,67 @@
+From 4f65d10d84e26e48818e8c16b604fcdcd6b9f2a3 Mon Sep 17 00:00:00 2001
+From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Date: Fri, 26 Jan 2024 13:55:00 +0100
+Subject: [PATCH v1 1/2] arm64: dts: ti: k3-am62-verdin: replace sleep-moci hog
+ with regulator
+
+The Verdin family has a signal called sleep-moci which can be used to
+turn off peripherals on the carrier board when the SoM goes into
+suspend. So far we have hogged this signal, which means the peripherals
+are always on and it is not possible to add peripherals that depend on
+the sleep-moci to be on. With this change, we replace the hog with a
+regulator so that peripherals can add their own regulators that use the
+same gpio. Carrier boards that allow peripherals to be powered off in
+suspend can disable this regulator and implement their own regulator to
+control the sleep-moci.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-devicetree/20240301084901.16656-1-eichest@gmail.com/]
+Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+---
+ arch/arm64/boot/dts/ti/k3-am62-verdin.dtsi | 24 ++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/ti/k3-am62-verdin.dtsi b/arch/arm64/boot/dts/ti/k3-am62-verdin.dtsi
+index 6a06724b6d16..ba3b3e18a46d 100644
+--- a/arch/arm64/boot/dts/ti/k3-am62-verdin.dtsi
++++ b/arch/arm64/boot/dts/ti/k3-am62-verdin.dtsi
+@@ -122,6 +122,22 @@ reg_1v8_eth: regulator-1v8-eth {
+ 		vin-supply = <&reg_1v8>;
+ 	};
+ 
++	/*
++	 * By default we enable CTRL_SLEEP_MOCI#, this is required to have
++	 * peripherals on the carrier board powered.
++	 * If more granularity or power saving is required this can be disabled
++	 * in the carrier board device tree files.
++	 */
++	reg_force_sleep_moci: regulator-force-sleep-moci {
++		compatible = "regulator-fixed";
++		enable-active-high;
++		/* Verdin CTRL_SLEEP_MOCI# (SODIMM 256) */
++		gpio = <&main_gpio0 31 GPIO_ACTIVE_HIGH>;
++		regulator-always-on;
++		regulator-boot-on;
++		regulator-name = "CTRL_SLEEP_MOCI#";
++	};
++
+ 	/* Verdin SD_1 Power Supply */
+ 	reg_sdhc1_vmmc: regulator-sdhci1 {
+ 		compatible = "regulator-fixed";
+@@ -951,14 +967,6 @@ &main_gpio0 {
+ 		"",
+ 		"",
+ 		"";
+-
+-	verdin_ctrl_sleep_moci: ctrl-sleep-moci-hog {
+-		gpio-hog;
+-		/* Verdin CTRL_SLEEP_MOCI# (SODIMM 256) */
+-		gpios = <31 GPIO_ACTIVE_HIGH>;
+-		line-name = "CTRL_SLEEP_MOCI#";
+-		output-high;
+-	};
+ };
+ 
+ &main_gpio1 {
+-- 
+2.40.1
+

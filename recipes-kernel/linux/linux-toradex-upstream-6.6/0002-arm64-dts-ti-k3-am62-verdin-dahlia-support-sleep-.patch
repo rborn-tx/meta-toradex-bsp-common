@@ -1,0 +1,70 @@
+From ae6bfe80045f0b01b352dc03ff99c9afdcaff98b Mon Sep 17 00:00:00 2001
+From: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+Date: Fri, 26 Jan 2024 13:58:53 +0100
+Subject: [PATCH v1 2/2] arm64: dts: ti: k3-am62-verdin-dahlia: support
+ sleep-moci
+
+Previously, we had the sleep-moci pin set to always on. However, the
+Dahlia carrier board supports disabling the sleep-moci when the system
+is suspended to power down peripherals that support it. This reduces
+overall power consumption. This commit adds support for this feature by
+disabling the reg_force_sleep_moci regulator and adding a new regulator
+for the USB hub that can be turned off when the system is suspended.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-devicetree/20240301084901.16656-1-eichest@gmail.com/]
+Signed-off-by: Stefan Eichenberger <stefan.eichenberger@toradex.com>
+---
+ .../boot/dts/ti/k3-am62-verdin-dahlia.dtsi    | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/ti/k3-am62-verdin-dahlia.dtsi b/arch/arm64/boot/dts/ti/k3-am62-verdin-dahlia.dtsi
+index bf6d27e70bc4..bb066e726527 100644
+--- a/arch/arm64/boot/dts/ti/k3-am62-verdin-dahlia.dtsi
++++ b/arch/arm64/boot/dts/ti/k3-am62-verdin-dahlia.dtsi
+@@ -43,6 +43,15 @@ simple-audio-card,cpu {
+ 			sound-dai = <&mcasp0>;
+ 		};
+ 	};
++
++	reg_usb_hub: regulator-usb-hub {
++		compatible = "regulator-fixed";
++		enable-active-high;
++		/* Verdin CTRL_SLEEP_MOCI# (SODIMM 256) */
++		gpio = <&main_gpio0 31 GPIO_ACTIVE_HIGH>;
++		regulator-boot-on;
++		regulator-name = "HUB_PWR_EN";
++	};
+ };
+ 
+ /* Verdin ETHs */
+@@ -183,6 +192,11 @@ &ospi0 {
+ 	status = "okay";
+ };
+ 
++/* Do not force CTRL_SLEEP_MOCI# always enabled */
++&reg_force_sleep_moci {
++	status = "disabled";
++};
++
+ /* Verdin SD_1 */
+ &sdhci1 {
+ 	ti,driver-strength-ohm = <33>;
+@@ -204,7 +218,15 @@ &usbss1 {
+ };
+ 
+ &usb1 {
++	#address-cells = <1>;
++	#size-cells = <0>;
+ 	status = "okay";
++
++	usb-hub@1 {
++		compatible = "usb424,2744";
++		reg = <1>;
++		vdd-supply = <&reg_usb_hub>;
++	};
+ };
+ 
+ /* Verdin CTRL_WAKE1_MICO# */
+-- 
+2.40.1
+
