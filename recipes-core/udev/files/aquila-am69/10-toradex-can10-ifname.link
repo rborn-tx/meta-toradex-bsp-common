@@ -1,0 +1,6 @@
+[Match]
+Property=ID_PATH=platform-27a1000.can
+
+[Link]
+AlternativeNamesPolicy=
+AlternativeName=aquila-can1
