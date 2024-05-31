@@ -1,12 +1,16 @@
 IMX_FIRMWARE_SRC ?= "git://github.com/NXP/imx-firmware.git;protocol=https"
 SRCBRANCH_imx-firmware = "lf-6.6.3_1.0.0"
 SRC_URI += " \
-    ${IMX_FIRMWARE_SRC};branch=${SRCBRANCH_imx-firmware};destsuffix=${S}/imx-firmware;name=imx-firmware \
+    ${IMX_FIRMWARE_SRC};branch=${SRCBRANCH_imx-firmware};destsuffix=${WORKDIR}/imx-firmware;name=imx-firmware \
 "
 
 SRCREV_imx-firmware = "2afa15e77f0b58eade42b4f59c9215339efcca66"
 
 SRCREV_FORMAT = "default_imx-firmware"
+
+do_compile:prepend () {
+    mv ${WORKDIR}/imx-firmware ${S}
+}
 
 do_install:append () {
     # Install IMX Firmware EULA/LICENSE license
@@ -35,7 +39,7 @@ LICENSE += " \
     & firmware-imx \
 "
 LIC_FILES_CHKSUM += " \
-    file://imx-firmware/LICENSE.txt;md5=44a8052c384584ba09077e85a3d1654f \
+    file://${WORKDIR}/imx-firmware/LICENSE.txt;md5=44a8052c384584ba09077e85a3d1654f \
 "
 NO_GENERIC_LICENSE[firmware-imx] = "imx-firmware/LICENSE.txt"
 
