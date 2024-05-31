@@ -13,6 +13,8 @@ SRC_URI = " \
     file://${TEZI_EULA_FILE} \
 "
 
+S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
+
 # We want to always check the latest EULA file in image_type_tezi.bbclass
 # So we put ${TEZI_EULA_FILE} to sstate allow overlap files, this
 # ensures it could be deployed to ${DEPLOY_DIR_IMAGE} as a backup even
@@ -22,11 +24,11 @@ SSTATE_ALLOW_OVERLAP_FILES:prepend = "${DEPLOY_DIR_IMAGE}/${TEZI_EULA_FILE} "
 inherit deploy nopackages
 
 do_deploy () {
-    install -m 644 ${WORKDIR}/prepare.sh ${DEPLOYDIR}
-    install -m 644 ${WORKDIR}/wrapup.sh ${DEPLOYDIR}
-    install -m 644 ${WORKDIR}/toradexlinux.png ${DEPLOYDIR}
-    install -m 644 ${WORKDIR}/marketing.tar ${DEPLOYDIR}
-    install -m 644 ${WORKDIR}/${TEZI_EULA_FILE} ${DEPLOYDIR}
+    install -m 644 ${S}/prepare.sh ${DEPLOYDIR}
+    install -m 644 ${S}/wrapup.sh ${DEPLOYDIR}
+    install -m 644 ${S}/toradexlinux.png ${DEPLOYDIR}
+    install -m 644 ${S}/marketing.tar ${DEPLOYDIR}
+    install -m 644 ${S}/${TEZI_EULA_FILE} ${DEPLOYDIR}
 }
 
 addtask deploy before do_build after do_install

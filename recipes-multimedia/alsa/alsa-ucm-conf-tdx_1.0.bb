@@ -11,17 +11,19 @@ SRC_URI = "\
         file://verdin-wm8904.conf \
 "
 
+S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
+
 do_install () {
         wm8904_dir="${D}${datadir}/alsa/ucm2/Toradex/wm8904"
         nau8822_dir="${D}${datadir}/alsa/ucm2/Toradex/nau8822"
 
         install -d $wm8904_dir
-        install -m 0644 ${WORKDIR}/verdin-wm8904-HiFi.conf $wm8904_dir
-        install -m 0644 ${WORKDIR}/verdin-wm8904.conf $wm8904_dir
+        install -m 0644 ${S}/verdin-wm8904-HiFi.conf $wm8904_dir
+        install -m 0644 ${S}/verdin-wm8904.conf $wm8904_dir
 
         install -d $nau8822_dir
-        install -m 0644 ${WORKDIR}/verdin-nau8822-HiFi.conf $nau8822_dir
-        install -m 0644 ${WORKDIR}/verdin-nau8822.conf $nau8822_dir
+        install -m 0644 ${S}/verdin-nau8822-HiFi.conf $nau8822_dir
+        install -m 0644 ${S}/verdin-nau8822.conf $nau8822_dir
 
         install -d "${D}${datadir}/alsa/ucm2/conf.d/simple-card"
         ln -fsr ${wm8904_dir}/verdin-wm8904.conf \
