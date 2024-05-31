@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 SRC_URI = "file://btnxpuart.conf"
 
+S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
+
 do_install () {
 	install -d ${D}/etc/modprobe.d/
-	install -m 0755 ${WORKDIR}/btnxpuart.conf ${D}/etc/modprobe.d/btnxpuart.conf
+	install -m 0755 ${S}/btnxpuart.conf ${D}/etc/modprobe.d/btnxpuart.conf
 }
