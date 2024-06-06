@@ -16,3 +16,5 @@ PV = "6.6"
 KBRANCH = "v6.6-rt"
 SRCREV_machine = "a27814b8cd8f89ad68e29d3d6f8f3b61c65aebf5"
 SRCREV_machine:use-head-next = "${AUTOREV}"
+
+LINUX_KERNEL_TYPE = "preempt-rt"

@@ -21,9 +21,15 @@ PV = "${LINUX_VERSION}+git${SRCPV}"
 
 SRC_URI = " \
     ${LINUX_REPO};protocol=https;branch=${KBRANCH};name=machine \
-    file://defconfig \
+    ${KCONFIG_REPO};protocol=https;type=kmeta;name=meta-toradex-bsp;branch=main;destsuffix=${KMETA} \
     ${TDX_PATCHES} \
 "
+
+KCONFIG_REPO = "git://git.toradex.com/linux-toradex-kconfig.git"
+KMETA = "kernel-meta-toradex-bsp"
+
+SRCREV_meta-toradex-bsp = "39d025249b221204c2dbd337d5287dd231e8f410"
+SRCREV_meta-toradex-bsp:use-head-next = "${AUTOREV}"
 
 KERNEL_VERSION_SANITY_SKIP = "1"
 
