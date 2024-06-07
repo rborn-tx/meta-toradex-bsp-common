@@ -1,4 +1,0 @@
-define KFEATURE_DESCRIPTION "Disable configs that could lead to preempt-rt latency"
-define KFEATURE_COMPATIBILITY board
-
-kconf non-hardware preempt-rt-less-latency.cfg

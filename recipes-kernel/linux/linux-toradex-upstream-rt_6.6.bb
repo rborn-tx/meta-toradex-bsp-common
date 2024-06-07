@@ -6,10 +6,6 @@ SUMMARY = "Toradex mainline real-time Linux kernel"
 # the RT patch on top of a vanilla kernel.
 
 LINUX_REPO = "git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-stable-rt.git"
-SRC_URI:append = " \
-    file://preempt-rt.scc \
-    file://preempt-rt-less-latency.scc \
-"
 
 # set PV manually, that way PREFERRED_VERSION can be set to a constant value
 PV = "6.6"
