@@ -33,6 +33,13 @@ TEZI_ROOT_SUFFIX ??= "tar.xz"
 TEZI_ROOT_PART_TYPE ??= "83"
 TEZI_ROOT_PART_SIZE ??= "512"
 TEZI_ROOT_FILELIST ??= ""
+TEZI_DATA_ENABLED ??= "0"
+TEZI_DATA_PART_SIZE ??= "512"
+TEZI_DATA_PART_TYPE ??= "83"
+TEZI_DATA_LABEL ??= "DATA"
+TEZI_DATA_FSTYPE ??= "ext4"
+TEZI_DATA_FSOPTS ?= "-E nodiscard"
+TEZI_DATA_FILES ?= ""
 TEZI_USE_BOOTFILES ??= "true"
 TEZI_AUTO_INSTALL ??= "false"
 TEZI_BOOT_SUFFIX ??= "${@'bootfs.tar.xz' if oe.types.boolean('${TEZI_USE_BOOTFILES}') else ''}"
@@ -274,6 +281,20 @@ def rootfs_tezi_emmc(d, use_bootfiles):
         rootfs["content"]["uncompressed_size"] += get_filelist_extra_size(d, rootfs_filelist)
 
     filesystem_partitions.append(rootfs)
+
+    if d.getVar('TEZI_DATA_ENABLED') == "1":
+        data = {
+                   "partition_size_nominal": d.getVar('TEZI_DATA_PART_SIZE'),
+                   "partition_type": d.getVar('TEZI_DATA_PART_TYPE'),
+                   "want_maximised": True,
+                   "content": {
+                     "label": d.getVar('TEZI_DATA_LABEL'),
+                     "filesystem_type": d.getVar('TEZI_DATA_FSTYPE'),
+                     "mkfs_options": d.getVar('TEZI_DATA_FSOPTS'),
+                     "filename": d.getVar('TEZI_DATA_FILES')
+                   }
+               }
+        filesystem_partitions.append(data)
 
     return [
         OrderedDict({
