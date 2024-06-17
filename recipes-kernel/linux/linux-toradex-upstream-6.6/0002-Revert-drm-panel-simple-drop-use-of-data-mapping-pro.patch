@@ -15,7 +15,7 @@ In addition to the revert have mapping pointing to the empty string to
 prevent a kernel panic if data-mapping can not be read from the dt and
 then an uninitialized pointer is used in strcmp.
 
-Upstream-Status: denied [Alternative solution being discused]
+Upstream-Status: Denied [Alternative solution being discused]
 https://lore.kernel.org/all/20220628181838.2031-1-max.oss.09@gmail.com/
 Signed-off-by: Max Krummenacher <max.krummenacher@toradex.com>
 ---
