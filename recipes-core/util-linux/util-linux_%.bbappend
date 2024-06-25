@@ -11,7 +11,7 @@ do_install:append() {
         install -d ${D}${systemd_unitdir}/system
         install -m 0644 ${WORKDIR}/fstrim.service ${D}${systemd_unitdir}/system/
         install -m 0644 ${WORKDIR}/fstrim.timer ${D}${systemd_unitdir}/system/
-        sed -i -e 's,@SBINDIR@,${sbindir},g' \
+        sed -i -e 's,@SBINDIR@,${base_sbindir},g' \
                 -e 's,@SYSCONFDIR@,${sysconfdir},g' \
                 ${D}${systemd_unitdir}/system/*.service
 }
