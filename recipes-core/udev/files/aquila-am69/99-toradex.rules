@@ -8,7 +8,7 @@ ACTION=="add|change", KERNEL=="i2c-[0-9]*", KERNELS=="42120000.i2c", SYMLINK+="a
 ACTION=="add|change", KERNEL=="ttyS[0-9]*", KERNELS=="2810000.serial", SYMLINK+="aquila-uart1"
 ACTION=="add|change", KERNEL=="ttyS[0-9]*", KERNELS=="42300000.serial", SYMLINK+="aquila-uart2"
 ACTION=="add|change", KERNEL=="ttyS[0-9]*", KERNELS=="2880000.serial", SYMLINK+="aquila-uart3"
-ACTION=="add|change", KERNEL=="ttyS[0-9]*", KERNELS=="2800000.serial", SYMLINK+="aquila-uart4"
+ACTION=="add|change", KERNEL=="ttyS[0-9]*", KERNELS=="40a00000.serial", SYMLINK+="aquila-uart4"
 ACTION=="add|change", KERNELS=="watchdog", SYMLINK+="aquila-watchdog", SYMLINK+="aquila-watchdog-soc"
 ACTION=="add|change", SUBSYSTEM=="spidev", KERNELS=="2120000.*spi", SYMLINK+="aquila-spi1-cs%n"
 ACTION=="add|change", SUBSYSTEM=="spidev", KERNELS=="2100000.*spi", SYMLINK+="aquila-spi2-cs%n"
