@@ -1,6 +1,6 @@
 [Match]
-Property=ID_PATH=platform-40568000.can
+Property=ID_PATH=platform-40528000.can
 
 [Link]
 AlternativeNamesPolicy=
-AlternativeName=aquila-can4
+AlternativeName=aquila-can2
