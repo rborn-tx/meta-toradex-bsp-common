@@ -22,6 +22,7 @@ do_install:append:tdx() {
         sed -i "s/SocketGroup=wayland/SocketGroup=root/" ${D}${systemd_system_unitdir}/weston.socket
 
         # Wait for device to be ready
+        sed -i "/^EnvironmentFile=.etc.default.weston/a ExecStartPre=-\/usr\/bin\/sh -c \"ls \/dev\/dri\/by-path\/*gpu* &> \/dev\/null && \/usr\/bin\/udevadm wait --timeout=30 \/dev\/dri\/card1\"" ${D}${systemd_system_unitdir}/weston.service
         sed -i "/^EnvironmentFile=.etc.default.weston/a ExecStartPre=-\/usr\/bin\/udevadm wait --timeout=30 \/dev\/dri\/card0" ${D}${systemd_system_unitdir}/weston.service
     fi
 }
