@@ -25,7 +25,7 @@ do_install:append:tdx() {
 
         # We see on Verdin AM62 and Verdin iMX8MM that often weston fails as
         # the drm device is not yet ready. Work around this by giving the
-        # drm device 3 more seconds to be up and running.
-	sed -i "/^EnvironmentFile=.etc.default.weston/a ExecStartPre=-\/usr\/bin\/sleep 3" ${D}${systemd_system_unitdir}/weston.service
+        # drm device 5 more seconds to be up and running.
+        sed -i "/^EnvironmentFile=.etc.default.weston/a ExecStartPre=-\/usr\/bin\/sleep 5" ${D}${systemd_system_unitdir}/weston.service
     fi
 }
