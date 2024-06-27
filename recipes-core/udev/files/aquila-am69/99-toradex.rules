@@ -15,7 +15,6 @@ ACTION=="add|change", SUBSYSTEM=="spidev", KERNELS=="2100000.*spi", SYMLINK+="aq
 KERNEL=="mmcblk[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="4f80000.mmc", SYMLINK+="emmc"
 KERNEL=="mmcblk[0-9]boot[0-9]", ENV{DEVTYPE}=="disk", KERNELS=="4f80000.mmc", SYMLINK+="emmc-boot%n"
 KERNEL=="mmcblk[0-9]p[0-9]", ENV{DEVTYPE}=="partition", KERNELS=="4f80000.mmc", SYMLINK+="emmc-part%n"
-#TODO ADC
-#SUBSYSTEM=="iio", KERNELS=="iio:device0", RUN+="/etc/udev/scripts/toradex-adc.sh"
+SUBSYSTEM=="iio", KERNELS=="iio:device0", RUN+="/etc/udev/scripts/toradex-adc.sh"
 ACTION=="add|change", KERNEL=="mmcblk[0-9]", KERNELS=="4fb0000.mmc", SYMLINK+="aquila-sd"
 ACTION=="add|change", KERNEL=="mmcblk[0-9]p[0-9]*", KERNELS=="4fb0000.mmc", SYMLINK+="aquila-sd-part%n"
