@@ -23,9 +23,7 @@ do_install:append:tdx() {
         sed -i "s/SocketUser=weston/SocketUser=root/" ${D}${systemd_system_unitdir}/weston.socket
         sed -i "s/SocketGroup=wayland/SocketGroup=root/" ${D}${systemd_system_unitdir}/weston.socket
 
-        # We see on Verdin AM62 and Verdin iMX8MM that often weston fails as
-        # the drm device is not yet ready. Work around this by giving the
-        # drm device 5 more seconds to be up and running.
-        sed -i "/^EnvironmentFile=.etc.default.weston/a ExecStartPre=-\/usr\/bin\/sleep 5" ${D}${systemd_system_unitdir}/weston.service
+        # Wait for device to be ready
+        sed -i "/^EnvironmentFile=.etc.default.weston/a ExecStartPre=-\/usr\/bin\/udevadm wait --timeout=30 \/dev\/dri\/card0" ${D}${systemd_system_unitdir}/weston.service
     fi
 }
