@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://Licenses/README;md5=2ca5f2c35c8cc335f0a19756634782f1"
 DEPENDS += " \
     bc-native \
     dtc-native \
+    gnutls-native \
     python3-jsonschema-native \
     python3-pyelftools-native \
     python3-pyyaml-native \
