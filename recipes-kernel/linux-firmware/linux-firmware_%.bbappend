@@ -8,8 +8,10 @@ SRCREV_imx-firmware = "2afa15e77f0b58eade42b4f59c9215339efcca66"
 
 SRCREV_FORMAT = "default_imx-firmware"
 
-do_compile:prepend () {
-    mv ${WORKDIR}/imx-firmware ${S}
+do_patch:append() {
+    src = oe.path.join(d.getVar("WORKDIR"), "/imx-firmware")
+    dest = oe.path.join(d.getVar("S"), "/imx-firmware")
+    oe.path.copyhardlinktree(src, dest)
 }
 
 do_install:append () {
@@ -39,7 +41,7 @@ LICENSE += " \
     & firmware-imx \
 "
 LIC_FILES_CHKSUM += " \
-    file://${WORKDIR}/imx-firmware/LICENSE.txt;md5=44a8052c384584ba09077e85a3d1654f \
+    file://imx-firmware/LICENSE.txt;md5=44a8052c384584ba09077e85a3d1654f \
 "
 NO_GENERIC_LICENSE[firmware-imx] = "imx-firmware/LICENSE.txt"
 
