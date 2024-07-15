@@ -37,6 +37,8 @@ PV = "${SRCBRANCH}+git${SRCPV}"
 inherit devicetree
 
 S = "${WORKDIR}/git/overlays"
+UNPACKDIR = "${WORKDIR}/sources"
+
 DT_FILES_PATH = "${WORKDIR}/machine-overlays"
 DT_INCLUDE:append = " ${S}"
 KERNEL_DTB_PREFIX ??= ""
