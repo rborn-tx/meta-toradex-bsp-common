@@ -15,9 +15,7 @@ RCONFLICTS:${PN} = "mwifiexap"
 
 SRC_URI = "file://mwifiex.conf"
 
-S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
-
 do_install () {
 	install -d ${D}/etc/modprobe.d/
-	install -m 0755 ${S}/mwifiex.conf ${D}/etc/modprobe.d/mwifiex.conf
+	install -m 0755 ${WORKDIR}/mwifiex.conf ${D}/etc/modprobe.d/mwifiex.conf
 }

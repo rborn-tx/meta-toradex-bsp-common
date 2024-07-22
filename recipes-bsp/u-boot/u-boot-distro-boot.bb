@@ -9,8 +9,6 @@ SRC_URI = " \
     file://boot.cmd.in \
 "
 
-S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
-
 APPEND ?= ""
 
 KERNEL_BOOTCMD ??= "bootz"
@@ -22,7 +20,7 @@ inherit deploy
 
 do_deploy() {
     sed -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/;s/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/;s/@@KERNEL_DTB_PREFIX@@/${DTB_PREFIX}/;s/@@APPEND@@/${APPEND}/' \
-        "${S}/boot.cmd.in" > boot.cmd
+        "${WORKDIR}/boot.cmd.in" > boot.cmd
     mkimage -T script -C none -n "Distro boot script" -d boot.cmd boot.scr
 
     install -m 0644 boot.scr ${DEPLOYDIR}/boot.scr-${MACHINE}

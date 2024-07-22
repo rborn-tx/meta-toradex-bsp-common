@@ -2,8 +2,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://weston.sh"
 
-OURFILEPATH = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
-
 PACKAGECONFIG:append:upstream:tdx = " no-idle-timeout"
 PACKAGECONFIG:append:k3 = " no-idle-timeout"
 PACKAGECONFIG:append:upstream:colibri-imx6ull = " use-pixman"
@@ -12,7 +10,7 @@ PACKAGECONFIG:append:upstream:colibri-imx7 = " use-pixman"
 PACKAGECONFIG:append:upstream:colibri-imx7-emmc = " use-pixman"
 
 do_install:append:tdx() {
-    install -Dm0755 ${OURFILEPATH}/weston.sh ${D}${sysconfdir}/profile.d/weston.sh
+    install -Dm0755 ${WORKDIR}/weston.sh ${D}${sysconfdir}/profile.d/weston.sh
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         # We need run weston systemd service with root user, or else it could not
