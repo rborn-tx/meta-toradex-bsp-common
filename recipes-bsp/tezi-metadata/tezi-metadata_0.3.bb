@@ -13,7 +13,7 @@ SRC_URI = " \
     file://${TEZI_EULA_FILE} \
 "
 
-S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
+S = "${UNPACKDIR}"
 
 # We want to always check the latest EULA file in image_type_tezi.bbclass
 # So we put ${TEZI_EULA_FILE} to sstate allow overlap files, this

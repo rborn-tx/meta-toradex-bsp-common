@@ -22,7 +22,7 @@ SRC_URI:append:verdin-imx8mp = " \
     file://10-toradex-can1-ifname.link \
 "
 
-S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
+S = "${UNPACKDIR}"
 
 do_install () {
     install -d ${D}${sysconfdir}/udev/rules.d

@@ -9,7 +9,7 @@ SRC_URI = " \
     file://boot.cmd.in \
 "
 
-S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
+S = "${UNPACKDIR}"
 
 APPEND ?= ""
 

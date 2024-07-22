@@ -10,7 +10,7 @@ SRC_URI += " \
     file://set-hostname.service \
 "
 
-S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
+S = "${UNPACKDIR}"
 
 FILES:${PN} = " \
     ${bindir} \

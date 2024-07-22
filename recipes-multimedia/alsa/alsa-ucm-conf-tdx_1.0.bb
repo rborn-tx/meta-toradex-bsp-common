@@ -11,7 +11,7 @@ SRC_URI = "\
         file://verdin-wm8904.conf \
 "
 
-S = "${@d.getVar("UNPACKDIR") or '${WORKDIR}'}"
+S = "${UNPACKDIR}"
 
 do_install () {
         wm8904_dir="${D}${datadir}/alsa/ucm2/Toradex/wm8904"
