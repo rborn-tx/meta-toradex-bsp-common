@@ -1,7 +1,7 @@
 IMX_FIRMWARE_SRC ?= "git://github.com/NXP/imx-firmware.git;protocol=https"
 SRCBRANCH_imx-firmware = "lf-6.6.3_1.0.0"
 SRC_URI += " \
-    ${IMX_FIRMWARE_SRC};branch=${SRCBRANCH_imx-firmware};destsuffix=${WORKDIR}/imx-firmware;name=imx-firmware \
+    ${IMX_FIRMWARE_SRC};branch=${SRCBRANCH_imx-firmware};destsuffix=${UNPACKDIR}/imx-firmware;name=imx-firmware \
 "
 
 SRCREV_imx-firmware = "2afa15e77f0b58eade42b4f59c9215339efcca66"
@@ -9,7 +9,7 @@ SRCREV_imx-firmware = "2afa15e77f0b58eade42b4f59c9215339efcca66"
 SRCREV_FORMAT = "default_imx-firmware"
 
 do_patch:append() {
-    src = oe.path.join(d.getVar("WORKDIR"), "/imx-firmware")
+    src = oe.path.join(d.getVar("UNPACKDIR"), "/imx-firmware")
     dest = oe.path.join(d.getVar("S"), "/imx-firmware")
     oe.path.copyhardlinktree(src, dest)
 }
