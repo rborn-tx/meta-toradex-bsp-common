@@ -26,8 +26,8 @@ error_exit () {
 
 # Do a basic validation that we do this on one of our modules
 case $PRODUCT_ID in
-0027|0028|0029|0035) ;;
-0014|0015|0016|0017) ;;
+0027|0028|0029|0035|0082|0083|0084|0085) ;;
+0014|0015|0016|0017|0077|0078|0079|0080) ;;
 *) error_exit "This script is meant to be run on a Apalis/Colibri iMX6. Aborting...";
 esac
 
