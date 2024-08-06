@@ -30,8 +30,8 @@ TDX_PATCHES = " \
     file://0002-arm64-dts-ti-k3-am62-verdin-dahlia-support-sleep-.patch \
 "
 PV = "6.6"
-LINUX_VERSION ?= "6.6.44"
+LINUX_VERSION ?= "6.6.48"
 KBRANCH = "linux-6.6.y"
 KERNEL_VERSION_SANITY_SKIP = "1"
-SRCREV_machine = "7213910600667c51c978e577bf5454d3f7b313b7"
+SRCREV_machine = "c77dee530e77eae20220784b409381366a588ac4"
 SRCREV_machine:use-head-next = "${AUTOREV}"
