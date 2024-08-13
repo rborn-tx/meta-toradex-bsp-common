@@ -17,7 +17,6 @@ TDX_PATCHES = " \
     file://0002-power-reset-gpio-poweroff-use-sys-off-handler-API.patch \
     file://0002-Revert-drm-panel-simple-drop-use-of-data-mapping-pro.patch \
     file://0003-ARM-dts-imx7d-colibri-emmc-Add-usdhc-aliases.patch \
-    file://0003-drivers-chipidea-disable-runtime-pm-for-imx6ul.patch \
     file://0003-dt-bindings-power-reset-gpio-poweroff-Add-priority-p.patch \
     file://0004-media-i2c-ov5640-Implement-get_mbus_config.patch \
     file://0004-power-reset-gpio-poweroff-make-sys-handler-priority-.patch \
