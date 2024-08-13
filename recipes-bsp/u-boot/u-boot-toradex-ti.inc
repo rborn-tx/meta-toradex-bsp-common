@@ -30,6 +30,25 @@ BINMAN_INDIRS = "${STAGING_DIR_HOST}${nonarch_base_libdir}/firmware"
 
 EXTRA_OEMAKE:append = " ${PACKAGECONFIG_CONFARGS} BINMAN_INDIRS=${BINMAN_INDIRS}"
 
+do_compile[mcdepends] += "mc::k3r5:virtual/bootloader:do_deploy"
+
+do_compile:prepend:k3 () {
+    cp ${DEPLOY_DIR_IMAGE}/tiboot3-*.bin ${STAGING_DIR_HOST}${nonarch_base_libdir}/firmware/
+}
+
+do_deploy:append:k3 () {
+    if [ -n "${UBOOT_CONFIG}" ]
+    then
+        for config in ${UBOOT_MACHINE}; do
+            for f in ${B}/${config}/firmware-*.bin; do
+                if [ -f "$f" ]; then
+                    install -m 644 $f ${DEPLOYDIR}/
+                fi
+            done
+        done
+    fi
+}
+
 do_deploy:append:k3r5 () {
     if [ -n "${UBOOT_CONFIG}" ]
     then
