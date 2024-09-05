@@ -114,15 +114,17 @@ fi
 
 # Set static commands
 if test ${root_devtype} = "nfs-dhcp"; then
-    env set rootfsargs_set 'env set rootfsargs "root=/dev/nfs ip=dhcp"'
+    env set rootfsargs_set 'env set rootfsargs1 "root=/dev/nfs ip=dhcp" && env set rootfsargs2'
 elif test ${root_devtype} = "nfs-static"; then
-    env set rootfsargs_set 'env set rootfsargs "root=/dev/nfs nfsroot=${serverip}:/${rootpath}"'
+    env set rootfsargs_set 'env set rootfsargs1 "root=/dev/nfs" && env set rootfsargs2 "nfsroot=${serverip}:/${rootpath}"'
 else
     env set uuid_set 'part uuid ${root_devtype} ${root_devnum}:${root_part} uuid'
-    env set rootfsargs_set 'run uuid_set && env set rootfsargs "root=PARTUUID=${uuid} ro rootwait"'
+    env set rootfsargs_set 'run uuid_set && env set rootfsargs1 "ro rootwait" && env set rootfsargs2 "root=PARTUUID=${uuid}"'
 fi
 
-env set bootcmd_args 'run rootfsargs_set && env set bootargs ${rootfsargs} ${setupargs} ${appendargs} ${tdxargs}'
+# rootfsargs1: static part of rootfs args
+# rootfsargs2: dynamic part of rootfs args (kept at the end of bootargs string for secure boot purposes)
+env set bootcmd_args 'run rootfsargs_set && env set bootargs ${rootfsargs1} ${setupargs} ${appendargs} ${tdxargs} ${rootfsargs2}'
 if test ${skip_fdt_overlays} != 1; then
     env set bootcmd_overlays 'run load_overlays_file && run fdt_resize && run apply_overlays'
 else
