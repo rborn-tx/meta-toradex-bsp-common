@@ -46,6 +46,7 @@ test -n ${kernel_image} || env set kernel_image @@KERNEL_IMAGETYPE@@
 test -n ${boot_devtype} || env set boot_devtype ${devtype}
 test -n ${overlays_file} || env set overlays_file "overlays.txt"
 test -n ${overlays_prefix} || env set overlays_prefix "overlays/"
+test -n ${fitconf_fdt_overlays} || env set fitconf_fdt_overlays '@@FITCONF_FDT_OVERLAYS@@'
 
 test ${boot_devtype} = "mmc" && env set load_cmd 'load ${boot_devtype} ${boot_devnum}:${boot_part}'
 test ${boot_devtype} = "usb" && env set load_cmd 'load ${boot_devtype} ${boot_devnum}:${boot_part}'
