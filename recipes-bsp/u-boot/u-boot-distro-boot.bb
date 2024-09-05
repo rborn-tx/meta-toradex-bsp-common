@@ -16,10 +16,16 @@ KERNEL_BOOTCMD:aarch64 ?= "booti"
 
 DTB_PREFIX ??= "${@d.getVar('KERNEL_DTB_PREFIX').replace("/", "_") if d.getVar('KERNEL_DTB_PREFIX') else ''}"
 
+FITCONF_FDT_OVERLAYS ??= ""
+
 inherit deploy
 
 do_deploy() {
-    sed -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/;s/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/;s/@@KERNEL_DTB_PREFIX@@/${DTB_PREFIX}/;s/@@APPEND@@/${APPEND}/' \
+    sed -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
+        -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
+        -e 's/@@KERNEL_DTB_PREFIX@@/${DTB_PREFIX}/' \
+        -e 's/@@APPEND@@/${APPEND}/' \
+        -e 's/@@FITCONF_FDT_OVERLAYS@@/${FITCONF_FDT_OVERLAYS}/' \
         "${WORKDIR}/boot.cmd.in" > boot.cmd
     mkimage -T script -C none -n "Distro boot script" -d boot.cmd boot.scr
 
