@@ -20,15 +20,19 @@ FITCONF_FDT_OVERLAYS ??= ""
 
 inherit deploy
 
-do_deploy() {
+do_compile() {
+    cp "${WORKDIR}/boot.cmd.in" boot.cmd
+
     sed -e 's/@@KERNEL_BOOTCMD@@/${KERNEL_BOOTCMD}/' \
         -e 's/@@KERNEL_IMAGETYPE@@/${KERNEL_IMAGETYPE}/' \
         -e 's/@@KERNEL_DTB_PREFIX@@/${DTB_PREFIX}/' \
         -e 's/@@APPEND@@/${APPEND}/' \
         -e 's/@@FITCONF_FDT_OVERLAYS@@/${FITCONF_FDT_OVERLAYS}/' \
-        "${WORKDIR}/boot.cmd.in" > boot.cmd
-    mkimage -T script -C none -n "Distro boot script" -d boot.cmd boot.scr
+        -i boot.cmd
+}
 
+do_deploy() {
+    mkimage -T script -C none -n "Distro boot script" -d boot.cmd boot.scr
     install -m 0644 boot.scr ${DEPLOYDIR}/boot.scr-${MACHINE}
 }
 
