@@ -66,14 +66,22 @@ if test "${root_devtype}" = ""; then
     fi
 fi
 
-# Set console baudrate only when required
-setexpr _res sub "," "_" ${console}
-if test ! $? -eq 0; then
-	env set console "${console},${baudrate}"
-fi
-
 env set appendargs @@APPEND@@
-env set setupargs console=tty1 console=${console}
+
+#+START_BLOCK(BAUDRATE_MISSING=AUTO)
+# Detect if the console is fully specified (i.e. contains a baudrate)
+setexpr _res sub "," "_" ${console}
+baudrate_missing=$?
+#+END_BLOCK(BAUDRATE_MISSING=AUTO)
+#+START_BLOCK(BAUDRATE_MISSING=FIXED)
+baudrate_missing=@@BAUDRATE_MISSING@@
+#+END_BLOCK(BAUDRATE_MISSING=FIXED)
+
+if test ${baudrate_missing} -eq 0; then
+    env set setupargs console=tty1 console=${console}
+else
+    env set setupargs console=tty1 console=${console},${baudrate}
+fi
 
 env set bootcmd_unzip ';'
 if test ${kernel_image} = "fitImage"; then
