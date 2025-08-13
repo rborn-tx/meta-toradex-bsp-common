@@ -539,3 +539,10 @@ do_image_teziimg[prefuncs] += "${TEZI_IMAGE_TEZIIMG_PREFUNCS}"
 do_image_teziimg[recrdeptask] += "do_deploy"
 do_image_teziimg[vardepsexclude] = "TEZI_VERSION TEZI_DATE"
 do_image_teziimg[network] = "1"
+
+UBOOT_BINARY_DEPTASK ?= "virtual/bootloader:do_deploy"
+UBOOT_BINARY_DEPTASK:mx8-generic-bsp ?= "${@oe.utils.conditional('UBOOT_PROVIDES_BOOT_CONTAINER', '1', 'virtual/bootloader:do_deploy', 'imx-boot:do_deploy', d)}"
+UBOOT_BINARY_DEPTASK:mx9-generic-bsp ?= "${@oe.utils.conditional('UBOOT_PROVIDES_BOOT_CONTAINER', '1', 'virtual/bootloader:do_deploy', 'imx-boot:do_deploy', d)}"
+
+TEZI_IMAGE_TEZIIMG_DEPENDS ??= "${UBOOT_BINARY_DEPTASK}"
+do_image_teziimg[depends] += "${TEZI_IMAGE_TEZIIMG_DEPENDS}"
